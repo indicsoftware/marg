@@ -49,10 +49,10 @@ class WooCommerceCustomizations {
 		$this->remove_upsells_functionality();
 
 		// Clear shipping data for downloadable products
-		add_action( 'woocommerce_admin_process_product_object', array( $this, 'clear_shipping_for_downloadable' ) );
+		// add_action( 'woocommerce_admin_process_product_object', array( $this, 'clear_shipping_for_downloadable' ) );
 
 		// Auto-set simple downloadable for Articles category
-		add_action( 'woocommerce_admin_process_product_object', array( $this, 'auto_set_articles_as_downloadable' ), 5 );
+		// add_action( 'woocommerce_admin_process_product_object', array( $this, 'auto_set_articles_as_downloadable' ), 5 );
 
 		// Add out of print checkbox for Print variations
 		add_action( 'woocommerce_variation_options', array( $this, 'add_out_of_print_checkbox_to_variations' ), 10, 3 );

@@ -97,9 +97,9 @@ $acf_category_filter = new \TenUpTheme\ACFCategoryFilter();
 $acf_category_filter->init();
 
 // Initialize WooCommerce Customizations to remove grouped product type
-require_once __DIR__ . '/src/WooCommerceCustomizations.php';
-$woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();
-$woocommerce_customizations->init();
+// require_once __DIR__ . '/src/WooCommerceCustomizations.php';
+// $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();
+// $woocommerce_customizations->init();
 
 // Temporary: ACF Duplicate Cleanup (remove after cleanup)
 // if ( is_admin() ) {

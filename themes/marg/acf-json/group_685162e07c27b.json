@@ -7,7 +7,7 @@
             "label": "Parent Publication",
             "name": "parent_publication",
             "aria-label": "",
-            "type": "relationship",
+            "type": "post_object",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -23,15 +23,12 @@
             "taxonomy": [
                 "product_cat:magazines"
             ],
-            "filters": [
-                "search"
-            ],
             "return_format": "object",
-            "min": "",
-            "max": "",
+            "multiple": 1,
+            "allow_null": 0,
             "allow_in_bindings": 0,
-            "elements": "",
             "bidirectional": 0,
+            "ui": 1,
             "bidirectional_target": []
         },
         {
@@ -100,8 +97,8 @@
     "label_placement": "top",
     "instruction_placement": "label",
     "hide_on_screen": "",
-    "active": true,
-    "description": "",
+    "active": false,
+    "description": "DEPRECATED: This field group has been merged into Product Details (group_68ac2f305640f) as a conditional group field named 'article_details'. All fields now exist as sub-fields within the Product Details group and appear automatically when Product Type = Articles.",
     "show_in_rest": 0,
-    "modified": 1760410559
+    "modified": 1760417074
 }

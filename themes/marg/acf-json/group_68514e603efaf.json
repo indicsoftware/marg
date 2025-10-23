@@ -317,8 +317,8 @@
     "label_placement": "top",
     "instruction_placement": "label",
     "hide_on_screen": "",
-    "active": true,
-    "description": "",
+    "active": false,
+    "description": "DEPRECATED: This field group has been merged into Product Details (group_68ac2f305640f) as a conditional group field named 'book_details'. All fields now exist as sub-fields within the Product Details group and appear automatically when Product Type = Books.",
     "show_in_rest": 0,
-    "modified": 1760164423
+    "modified": 1760414423
 }

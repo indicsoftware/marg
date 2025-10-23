@@ -63,9 +63,6 @@ class AdminMenuCustomizer {
 
 		// Add CSS to reorder product edit screen
 		add_action( 'admin_head', array( $this, 'reorder_product_editor_css' ) );
-
-		// Add JavaScript for dynamic ACF field group visibility
-		add_action( 'admin_footer', array( $this, 'product_type_conditional_logic_js' ) );
 	}
 
 	/**
@@ -1387,12 +1384,12 @@ class AdminMenuCustomizer {
 
 			/* Desired order:
 			   1. Product title
-			   2. Product details (ACF field groups - Book/Magazine/Article Details)
-			   3. Taxonomy (appears after detail groups)
-			   4. Product data
-			   5. Product description (main editor)
-			   6. Product short description
-			   7. Memberships
+			   2. Product Details (ACF - includes Book/Magazine/Article/Taxonomies Details as conditional group fields)
+			   3. Product data
+			   4. Product description (main editor)
+			   5. Product short description
+			   6. Memberships
+			   Note: All publication type-specific fields now use ACF native conditional logic
 			*/
 
 			/* Product title - order -1 to ensure it comes first */
@@ -1401,50 +1398,35 @@ class AdminMenuCustomizer {
 				order: -1 !important;
 			}
 
-			/* ACF detail field groups - order 10 (Book/Magazine/Article Details) */
-			#acf-group_68514e603efaf,
-			#acf-group_68515df1511ff,
-			#acf-group_685162e07c27b {
+			/* Product Details (ACF) - order 10 */
+			#acf-group_68ac2f305640f {
 				order: 10 !important;
 			}
 
-			/* Taxonomy field group - order 20 (appears after detail groups) */
-			#acf-group_68e48ee0308e8 {
+			/* Product Data - order 20 */
+			#woocommerce-product-data {
 				order: 20 !important;
 			}
 
-			/* Product Data - order 30 */
-			#woocommerce-product-data {
+			/* Product description (main editor) - order 30 */
+			#postdivrich {
 				order: 30 !important;
 			}
 
-			/* Product description (main editor) - order 40 */
-			#postdivrich {
+			/* Product short description - order 40 */
+			#postexcerpt {
 				order: 40 !important;
 			}
 
-			/* Product short description - order 50 */
-			#postexcerpt {
+			/* Memberships - order 50 */
+			#wc_memberships_restrict_product,
+			#wc-memberships-product-memberships-data {
 				order: 50 !important;
 			}
 
-			/* Memberships - order 60 */
-			#wc_memberships_restrict_product,
-			#wc-memberships-product-memberships-data {
-				order: 60 !important;
-			}
-
-			/* Other meta boxes - order 70 */
+			/* Other meta boxes - order 60 */
 			.postbox {
-				order: 70 !important;
-			}
-
-			/* Hide ACF detail field groups by default - JavaScript will show the appropriate one */
-			#acf-group_68514e603efaf,
-			#acf-group_68515df1511ff,
-			#acf-group_685162e07c27b,
-			#acf-group_68e48ee0308e8 {
-				display: none !important;
+				order: 60 !important;
 			}
 
 			/* Hide taxonomy boxes from sidebar */
@@ -1456,105 +1438,5 @@ class AdminMenuCustomizer {
 				display: none !important;
 			}
 		</style>';
-	}
-
-	/**
-	 * Add JavaScript for conditional ACF field group visibility based on Publication Type
-	 *
-	 * @return void
-	 */
-	public function product_type_conditional_logic_js() {
-		global $post;
-
-		// Only on product edit/new screen
-		if ( ! isset( $post->post_type ) || $post->post_type !== 'product' ) {
-			return;
-		}
-
-		?>
-		<script>
-		// Move Product description BEFORE TinyMCE initializes
-		(function() {
-			// Use vanilla JS to move the element as early as possible
-			function moveProductDescription() {
-				var productDescription = document.getElementById('postdivrich');
-				var productData = document.getElementById('woocommerce-product-data');
-
-				if (productDescription && productData && productData.parentNode) {
-					// Insert Product description after Product Data
-					productData.parentNode.insertBefore(productDescription, productData.nextSibling);
-					console.log('Product description moved to correct position');
-				}
-			}
-
-			// Try to move it immediately if DOM is ready
-			if (document.readyState === 'loading') {
-				document.addEventListener('DOMContentLoaded', moveProductDescription);
-			} else {
-				moveProductDescription();
-			}
-		})();
-
-		jQuery(document).ready(function($) {
-			// Function to show/hide ACF field groups based on Publication Type
-			function toggleACFFieldGroups() {
-				var selectedType = $('select[name="acf[field_68ac2f304ad26]"]').val();
-				var selectedText = $('select[name="acf[field_68ac2f304ad26]"] option:selected').text().toLowerCase().trim();
-
-				// Debug: log the selected text
-				console.log('Selected Publication Type:', selectedText);
-
-				// Hide all detail field groups first (using !important to override CSS)
-				$('#acf-group_68514e603efaf').attr('style', 'display: none !important;'); // Book Details
-				$('#acf-group_68515df1511ff').attr('style', 'display: none !important;'); // Magazine Details
-				$('#acf-group_685162e07c27b').attr('style', 'display: none !important;'); // Article Details
-
-				// Show the appropriate field group based on selection
-				if (selectedText.includes('book')) {
-					console.log('Showing Book Details');
-					$('#acf-group_68514e603efaf').attr('style', 'display: block !important; order: 10 !important;');
-				} else if (selectedText.includes('magazine')) {
-					console.log('Showing Magazine Details');
-					$('#acf-group_68515df1511ff').attr('style', 'display: block !important; order: 10 !important;');
-				} else if (selectedText.includes('article')) {
-					console.log('Showing Article Details');
-					$('#acf-group_685162e07c27b').attr('style', 'display: block !important; order: 10 !important;');
-				}
-
-				// Show/hide Taxonomy field group based on Publication Type
-				// Hide if: no selection, placeholder text, or Subscription Plan
-				// Show only if: a valid Publication Type is selected AND it's not Subscription Plan
-				if (!selectedText || selectedText === 'select' || selectedText === '' || selectedText.includes('subscription plan')) {
-					console.log('Hiding Taxonomy field group (no selection or Subscription Plan)');
-					$('#acf-group_68e48ee0308e8').attr('style', 'display: none !important;');
-				} else if (selectedText.includes('book') || selectedText.includes('magazine') || selectedText.includes('article')) {
-					console.log('Showing Taxonomy field group');
-					$('#acf-group_68e48ee0308e8').attr('style', 'display: block !important; order: 20 !important;');
-				} else {
-					// For any other text that's not empty/placeholder, keep it hidden by default
-					console.log('Hiding Taxonomy field group (unknown type)');
-					$('#acf-group_68e48ee0308e8').attr('style', 'display: none !important;');
-				}
-			}
-
-			// Run on page load with a slight delay to ensure DOM is ready
-			setTimeout(function() {
-				toggleACFFieldGroups();
-			}, 100);
-
-			// Run when Publication Type changes
-			$(document).on('change', 'select[name="acf[field_68ac2f304ad26]"]', function() {
-				toggleACFFieldGroups();
-			});
-
-			// Also listen for ACF's own events
-			if (typeof acf !== 'undefined') {
-				acf.addAction('ready', function() {
-					toggleACFFieldGroups();
-				});
-			}
-		});
-		</script>
-		<?php
 	}
 }
