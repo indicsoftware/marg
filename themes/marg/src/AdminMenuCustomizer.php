@@ -585,17 +585,14 @@ class AdminMenuCustomizer {
 			}
 		}
 
-		// Add Marketing (WooCommerce Marketing)
-		if ( function_exists( 'wc_admin_is_registered_page' ) ) {
-			add_submenu_page(
-				'advanced-menu',
-				'Marketing',
-				'Marketing',
-				'manage_woocommerce',
-				'wc-admin&path=/marketing'
-			);
-			remove_menu_page( 'woocommerce-marketing' );
-		}
+		// Add Coupons (WooCommerce Coupons)
+		add_submenu_page(
+			'advanced-menu',
+			'Coupons',
+			'Coupons',
+			'manage_woocommerce',
+			'edit.php?post_type=shop_coupon'
+		);
 
 		// Add ACF (Advanced Custom Fields)
 		if ( class_exists( 'ACF' ) ) {

@@ -42,9 +42,6 @@ class WooCommerceCustomizations {
 		// Remove unwanted product data tabs
 		add_filter( 'woocommerce_product_data_tabs', array( $this, 'remove_unwanted_product_data_tabs' ) );
 
-		// Add JavaScript to remove unwanted options from any dynamic interfaces
-		add_action( 'admin_footer', array( $this, 'remove_unwanted_product_js' ) );
-
 		// Remove upsells functionality
 		$this->remove_upsells_functionality();
 
@@ -53,6 +50,9 @@ class WooCommerceCustomizations {
 
 		// Auto-set simple downloadable for Articles category
 		// add_action( 'woocommerce_admin_process_product_object', array( $this, 'auto_set_articles_as_downloadable' ), 5 );
+
+		// Auto-set Magazines as variable products
+		add_action( 'acf/save_post', array( $this, 'set_magazine_to_variable' ), 20 );
 
 		// Add out of print checkbox for Print variations
 		add_action( 'woocommerce_variation_options', array( $this, 'add_out_of_print_checkbox_to_variations' ), 10, 3 );
@@ -227,450 +227,6 @@ class WooCommerceCustomizations {
 		}
 
 		return $args;
-	}
-
-	/**
-	 * Add JavaScript to remove unwanted options from dynamic interfaces
-	 *
-	 * @return void
-	 */
-	public function remove_unwanted_product_js() {
-		// Only on product edit pages
-		$screen = get_current_screen();
-		if ( ! $screen || 'product' !== $screen->post_type ) {
-			return;
-		}
-		?>
-		<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			var VARIABLE_CATEGORY_SLUGS = ['books', 'magazines'];
-			var ARTICLE_CATEGORY_SLUGS = ['articles'];
-
-			function slugifyCategoryText(text) {
-				if (!text) {
-					return '';
-				}
-
-				return text
-					.toString()
-					.toLowerCase()
-					.replace(/\([^)]+\)/g, '')
-					.replace(/&/g, 'and')
-					.replace(/[^a-z0-9]+/g, '-')
-					.replace(/^-+|-+$/g, '');
-			}
-
-			function getCheckboxLabelText($checkbox) {
-				var $label = $checkbox.next('label');
-				if (!$label.length) {
-					$label = $checkbox.siblings('label').first();
-				}
-				if (!$label.length) {
-					$label = $checkbox.parent().find('label').first();
-				}
-				return $label.length ? $label.text() : '';
-			}
-
-			function extractCategorySlugFromCheckbox($checkbox) {
-				return slugifyCategoryText(getCheckboxLabelText($checkbox));
-			}
-
-			function setProductType(type) {
-				var $productType = $('#product-type');
-				if (!$productType.length) {
-					return;
-				}
-
-				if ($productType.val() !== type) {
-					$productType.val(type).trigger('change');
-				}
-			}
-
-			function categoryTextMatchesSlugList(text, slugs) {
-				if (!text) {
-					return false;
-				}
-
-				var slug = slugifyCategoryText(text);
-				return slug && slugs.indexOf(slug) !== -1;
-			}
-
-			function isCategorySelected(slugs) {
-				var matchFound = false;
-
-				function checkCheckbox($checkbox) {
-					var labelText = getCheckboxLabelText($checkbox);
-					if (categoryTextMatchesSlugList(labelText, slugs)) {
-						matchFound = true;
-						return true;
-					}
-
-					return false;
-				}
-
-				$('#product_catchecklist input[type="checkbox"]:checked').each(function() {
-					if (checkCheckbox($(this))) {
-						return false;
-					}
-				});
-
-				if (matchFound) {
-					return true;
-				}
-
-				$('#taxonomy-product_cat input[type="checkbox"]:checked').each(function() {
-					if (checkCheckbox($(this))) {
-						return false;
-					}
-				});
-
-				if (matchFound) {
-					return true;
-				}
-
-				$('.categorychecklist input[type="checkbox"]:checked').each(function() {
-					if (checkCheckbox($(this))) {
-						return false;
-					}
-				});
-
-				if (matchFound) {
-					return true;
-				}
-
-				$('.wc-product-search').each(function() {
-					if (matchFound) {
-						return false;
-					}
-
-					var select2Data = null;
-					try {
-						if (typeof $(this).select2 === 'function' && $(this).data('select2')) {
-							select2Data = $(this).select2('data');
-						}
-					} catch (error) {
-						select2Data = null;
-					}
-
-					if (select2Data && Array.isArray(select2Data)) {
-						select2Data.forEach(function(item) {
-							if (matchFound) {
-								return;
-							}
-
-							if (item && item.text && categoryTextMatchesSlugList(item.text, slugs)) {
-								matchFound = true;
-							}
-						});
-					}
-				});
-
-				return matchFound;
-			}
-
-			function checkVariableCategoriesAndSetProductType() {
-				console.log('Checking for variable product categories...');
-				var shouldBeVariable = isCategorySelected(VARIABLE_CATEGORY_SLUGS);
-
-				if (!shouldBeVariable) {
-					var $publicationType = $('select[name="acf[field_68ac2f304ad26]"]');
-					if ($publicationType.length) {
-						var selectedText = $publicationType.find('option:selected').text();
-						console.log('ACF Publication Type selected:', selectedText);
-						if (categoryTextMatchesSlugList(selectedText, VARIABLE_CATEGORY_SLUGS)) {
-							shouldBeVariable = true;
-							console.log('Match found in ACF field.');
-						}
-					}
-				}
-
-				if (shouldBeVariable) {
-					console.log('Setting product type to variable.');
-					setProductType('variable');
-				} else {
-					console.log('No variable category match found.');
-				}
-			}
-
-			// Remove grouped and external options from product type selector
-			$('#product-type option[value="grouped"]').remove();
-			$('#product-type option[value="external"]').remove();
-
-			// Remove grouped tab if it exists
-			$('.product_data_tabs .grouped_tab').remove();
-			$('#grouped_product_data').remove();
-
-			// Remove external tab if it exists
-			$('.product_data_tabs .external_tab').remove();
-			$('#external_product_data').remove();
-
-			// Remove from any dynamically created selects
-			$(document).on('DOMNodeInserted', function(e) {
-				if ($(e.target).is('select')) {
-					$(e.target).find('option[value="grouped"]').remove();
-					$(e.target).find('option[value="external"]').remove();
-				}
-			});
-
-			// Handle WooCommerce product type change event
-			$('#product-type').on('change', function() {
-				if ($(this).val() === 'grouped' || $(this).val() === 'external') {
-					$(this).val('simple').trigger('change');
-				}
-			});
-
-			// Remove grouped and external from bulk edit and quick edit
-			$('.inline-edit-product select[name="_product_type"] option[value="grouped"]').remove();
-			$('.inline-edit-product select[name="_product_type"] option[value="external"]').remove();
-			$('.quick-edit-row select[name="_product_type"] option[value="grouped"]').remove();
-			$('.quick-edit-row select[name="_product_type"] option[value="external"]').remove();
-
-			// Hide external product fields
-			$('.show_if_external').hide();
-
-			// Hide upsells field in Linked Products tab
-			$('.form-field._upsell_ids_field').hide();
-			$('label[for="upsell_ids"]').parent().hide();
-			$('#upsell_ids').closest('.form-field').hide();
-
-			// Remove upsells select2 if it exists
-			if ($('#upsell_ids').length) {
-				$('#upsell_ids').select2('destroy').hide();
-			}
-
-			// Hide upsells on any tab change
-			$('.product_data_tabs').on('click', 'li', function() {
-				setTimeout(function() {
-					$('.form-field._upsell_ids_field').hide();
-					$('label[for="upsell_ids"]').parent().hide();
-					$('#upsell_ids').closest('.form-field').hide();
-				}, 100);
-			});
-
-			// Hide shipping options for downloadable products
-			function toggleShippingOptionsForDownloadable() {
-				var $body = $('body');
-				var isDownloadable = $('#_downloadable').is(':checked');
-				var productType = $('#product-type').val();
-
-				if (isDownloadable && productType === 'simple') {
-					// Add class to body for CSS targeting
-					$body.addClass('downloadable-product');
-
-					// Hide shipping-related fields
-					$('._weight_field').hide();
-					$('._length_field').hide();
-					$('._width_field').hide();
-					$('._height_field').hide();
-					$('.dimensions_field').hide();
-					$('.wc-shipping-class-field').hide();
-					$('.product_shipping_class').hide();
-					$('.shipping_tab_options').hide();
-
-					// Hide Shipping tab if it exists
-					$('.shipping_options').hide();
-				} else {
-					// Remove class from body
-					$body.removeClass('downloadable-product');
-
-					// Show shipping-related fields
-					$('._weight_field').show();
-					$('._length_field').show();
-					$('._width_field').show();
-					$('._height_field').show();
-					$('.dimensions_field').show();
-					$('.wc-shipping-class-field').show();
-					$('.product_shipping_class').show();
-					$('.shipping_tab_options').show();
-
-					// Show Shipping tab
-					$('.shipping_options').show();
-				}
-			}
-
-			// Run on page load
-			toggleShippingOptionsForDownloadable();
-
-			// Run when downloadable checkbox changes
-			$('#_downloadable').on('change', function() {
-				var isChecked = $(this).is(':checked');
-
-				// Switch to General tab when downloadable is checked
-				if (isChecked) {
-					$('.general_options a').trigger('click');
-				}
-
-				toggleShippingOptionsForDownloadable();
-			});
-
-			// Run when product type changes
-			$('#product-type').on('change', function() {
-				toggleShippingOptionsForDownloadable();
-			});
-
-			// Run when switching tabs
-			$('.product_data_tabs').on('click', 'li', function() {
-				setTimeout(function() {
-					toggleShippingOptionsForDownloadable();
-				}, 50);
-			});
-
-			// Auto-set simple downloadable for Articles category
-			function checkArticlesCategoryAndSetDownloadable() {
-				var hasArticles = isCategorySelected(ARTICLE_CATEGORY_SLUGS);
-
-				if (!hasArticles) {
-					var $publicationType = $('select[name="acf[field_68ac2f304ad26]"]');
-					if ($publicationType.length) {
-						var selectedText = $publicationType.find('option:selected').text();
-						if (categoryTextMatchesSlugList(selectedText, ARTICLE_CATEGORY_SLUGS)) {
-							hasArticles = true;
-						}
-					}
-				}
-
-				if (!hasArticles) {
-					return;
-				}
-
-				var $productType = $('#product-type');
-				if ($productType.length && $productType.val() !== 'simple') {
-					$productType.val('simple').trigger('change');
-				}
-
-				setTimeout(function() {
-					var $downloadable = $('#_downloadable');
-					if (!$downloadable.length) {
-						return;
-					}
-
-					if (!$downloadable.is(':checked')) {
-						$downloadable.prop('disabled', false);
-						$downloadable.prop('checked', true);
-						$downloadable.trigger('change');
-					}
-				}, 500);
-			}
-
-			// Run on page load with multiple attempts
-			setTimeout(function() {
-				checkArticlesCategoryAndSetDownloadable();
-				checkVariableCategoriesAndSetProductType();
-			}, 500);
-
-			setTimeout(function() {
-				checkArticlesCategoryAndSetDownloadable();
-				checkVariableCategoriesAndSetProductType();
-			}, 1000);
-
-			setTimeout(function() {
-				checkArticlesCategoryAndSetDownloadable();
-				checkVariableCategoriesAndSetProductType();
-			}, 2000);
-
-			// Run when categories change (checkbox) - use multiple selectors
-			$(document).on('change', '#product_catchecklist input[type="checkbox"]', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 100);
-				setTimeout(checkVariableCategoriesAndSetProductType, 100);
-			});
-
-			$(document).on('change', '#taxonomy-product_cat input[type="checkbox"]', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 100);
-				setTimeout(checkVariableCategoriesAndSetProductType, 100);
-			});
-
-			$(document).on('change', '.categorychecklist input[type="checkbox"]', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 100);
-				setTimeout(checkVariableCategoriesAndSetProductType, 100);
-			});
-
-			// Run when Select2 categories change
-			$(document).on('change', 'select.wc-product-search', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 100);
-				setTimeout(checkVariableCategoriesAndSetProductType, 100);
-			});
-
-			// Listen for any category-related clicks
-			$(document).on('click', '#product_catchecklist-pop label', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 200);
-				setTimeout(checkVariableCategoriesAndSetProductType, 200);
-			});
-
-			// Listen for ACF Publication Type field changes (the actual field that controls article selection)
-			$(document).on('change', 'select[name="acf[field_68ac2f304ad26]"]', function() {
-				setTimeout(checkArticlesCategoryAndSetDownloadable, 100);
-			});
-
-			// Also listen for ACF's own events if ACF is available
-			if (typeof acf !== 'undefined') {
-				acf.addAction('ready', function() {
-					checkArticlesCategoryAndSetDownloadable();
-					checkVariableCategoriesAndSetProductType();
-				});
-			}
-
-			// Show/hide "Out of print" checkbox based on Medium attribute
-			function toggleOutOfPrintCheckbox() {
-				$('.woocommerce_variation').each(function() {
-					var $variation = $(this);
-					var $outOfPrintField = $variation.find('.variable_out_of_print_field');
-
-					// Find the Medium attribute select in this variation (note: underscore not hyphen)
-					var $mediumSelect = $variation.find('select[name^="attribute_pa_medium"]');
-
-					if (!$mediumSelect.length) {
-						// If no select found, check for hidden input (if attribute is already set)
-						var $mediumInput = $variation.find('input[name^="attribute_pa_medium"]');
-						if ($mediumInput.length) {
-							var mediumValue = $mediumInput.val();
-							if (mediumValue === 'print') {
-								$outOfPrintField.show();
-							} else {
-								$outOfPrintField.hide();
-							}
-						} else {
-							// No medium attribute found, hide by default
-							$outOfPrintField.hide();
-						}
-						return;
-					}
-
-					var selectedMedium = $mediumSelect.val();
-
-					// Show checkbox only for Print medium
-					if (selectedMedium === 'print') {
-						$outOfPrintField.show();
-					} else {
-						$outOfPrintField.hide();
-					}
-				});
-			}
-
-			// Run on page load
-			setTimeout(toggleOutOfPrintCheckbox, 500);
-
-			// Run when variations are loaded/reloaded
-			$('#variable_product_options').on('woocommerce_variations_loaded', function() {
-				setTimeout(toggleOutOfPrintCheckbox, 100);
-			});
-
-			// Run when a variation is added
-			$('#variable_product_options').on('woocommerce_variations_added', function() {
-				setTimeout(toggleOutOfPrintCheckbox, 100);
-			});
-
-			// Run when Medium attribute changes (note: underscore not hyphen)
-			$(document).on('change', 'select[name^="attribute_pa_medium"]', function() {
-				setTimeout(toggleOutOfPrintCheckbox, 100);
-			});
-
-			// Run when variation panel is opened
-			$(document).on('click', '.woocommerce_variation h3', function() {
-				setTimeout(toggleOutOfPrintCheckbox, 100);
-			});
-		});
-		</script>
-		<?php
 	}
 
 	/**
@@ -932,4 +488,105 @@ class WooCommerceCustomizations {
 			update_post_meta( $variation_id, '_out_of_print', 'no' );
 		}
 	}
+
+	/**
+	 * Auto-set Magazine products as variable product type.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return void
+	 */
+	public function set_magazine_to_variable( $product_id ) {
+		// Verify this is a product
+		if ( get_post_type( $product_id ) !== 'product' ) {
+			return;
+		}
+
+		// Skip autosaves
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		// Check if product has Magazine category (term ID 198)
+		if ( ! has_term( 198, 'product_cat', $product_id ) ) {
+			return;
+		}
+
+		// Check if already variable
+		$is_already_variable = has_term( 'variable', 'product_type', $product_id );
+
+		if ( ! $is_already_variable ) {
+			// Convert to variable product
+			$result = wp_set_object_terms( $product_id, 'variable', 'product_type' );
+
+			if ( is_wp_error( $result ) ) {
+				return;
+			}
+
+			// Clear caches
+			wc_delete_product_transients( $product_id );
+			clean_post_cache( $product_id );
+			wp_cache_delete( $product_id, 'product_type' );
+			delete_transient( 'wc_product_type_' . $product_id );
+		}
+
+		// Create variations for Print and Digital
+		$this->create_magazine_variations( $product_id );
+	}
+
+	/**
+	 * Create Print and Digital variations for Magazine products.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return void
+	 */
+	private function create_magazine_variations( $product_id ) {
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product || ! $product->is_type( 'variable' ) ) {
+			return;
+		}
+
+		// If product already has ANY variations, skip entirely
+		$existing_variations = $product->get_children();
+		if ( ! empty( $existing_variations ) ) {
+			return;
+		}
+
+		// Use existing pa_medium attribute
+		$attribute_taxonomy = 'pa_medium';
+
+		// Assign both Print and Digital terms to the parent product
+		wp_set_object_terms( $product_id, array( 'print', 'digital' ), $attribute_taxonomy );
+
+		// Set the product attribute
+		$attributes = $product->get_attributes();
+		$attribute  = new \WC_Product_Attribute();
+		$attribute->set_id( wc_attribute_taxonomy_id_by_name( $attribute_taxonomy ) );
+		$attribute->set_name( $attribute_taxonomy );
+		$attribute->set_options( array( 'print', 'digital' ) );
+		$attribute->set_visible( true );
+		$attribute->set_variation( true );
+		$attributes[ $attribute_taxonomy ] = $attribute;
+		$product->set_attributes( $attributes );
+		$product->save();
+
+		// Create Print variation
+		$print_variation = new \WC_Product_Variation();
+		$print_variation->set_parent_id( $product_id );
+		$print_variation->set_attributes( array( $attribute_taxonomy => 'print' ) );
+		$print_variation->set_status( 'publish' );
+		$print_variation->save();
+
+		// Create Digital variation
+		$digital_variation = new \WC_Product_Variation();
+		$digital_variation->set_parent_id( $product_id );
+		$digital_variation->set_attributes( array( $attribute_taxonomy => 'digital' ) );
+		$digital_variation->set_status( 'publish' );
+		$digital_variation->save();
+
+		// Clear caches
+		wc_delete_product_transients( $product_id );
+		clean_post_cache( $product_id );
+	}
+
 }
