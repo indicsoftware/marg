@@ -63,6 +63,12 @@ class AdminMenuCustomizer {
 
 		// Add CSS to reorder product edit screen
 		add_action( 'admin_head', array( $this, 'reorder_product_editor_css' ) );
+
+		// Add JavaScript to disable Print fields when "Out of Print" is checked
+		add_action( 'admin_head', array( $this, 'out_of_print_conditional_logic_js' ) );
+
+		// Add JavaScript to disable Digital price fields when "Open Access" is checked
+		add_action( 'admin_head', array( $this, 'open_access_conditional_logic_js' ) );
 	}
 
 	/**
@@ -1435,5 +1441,255 @@ class AdminMenuCustomizer {
 				display: none !important;
 			}
 		</style>';
+	}
+
+	/**
+	 * Add JavaScript to disable Print fields when "Out of Print" is checked
+	 * Disables price, stock, and dimension fields while keeping SKU and ISSN/ISBN enabled
+	 *
+	 * @return void
+	 */
+	public function out_of_print_conditional_logic_js() {
+		// Only on product edit pages
+		$screen = get_current_screen();
+		if ( ! $screen || 'product' !== $screen->post_type || 'post' !== $screen->base ) {
+			return;
+		}
+
+		?>
+		<style>
+			/* Disabled out of print fields styling */
+			.acf-field.acf-disabled-out-of-print {
+				opacity: 0.5;
+				pointer-events: none;
+				position: relative;
+			}
+
+			.acf-field.acf-disabled-out-of-print::after {
+				content: "Disabled - Out of Print";
+				position: absolute;
+				top: 5px;
+				right: 10px;
+				background: #dc3232;
+				color: white;
+				padding: 2px 8px;
+				font-size: 11px;
+				border-radius: 3px;
+				font-weight: 600;
+				z-index: 10;
+			}
+		</style>
+
+		<script type="text/javascript">
+		(function($) {
+			'use strict';
+
+			$(document).ready(function() {
+				// Magazine Print Details fields to disable
+				var magazineFieldKeys = [
+					'field_print_price_inr',
+					'field_print_sale_price_inr',
+					'field_print_price_usd',
+					'field_print_sale_price_usd',
+					'field_print_stock_status',
+					'field_print_stock_quantity',
+					'field_print_weight',
+					'field_print_length',
+					'field_print_width',
+					'field_print_height'
+				];
+
+				// Book Print Details fields to disable
+				var bookFieldKeys = [
+					'field_book_print_price_inr',
+					'field_book_print_sale_price_inr',
+					'field_book_print_price_usd',
+					'field_book_print_sale_price_usd',
+					'field_book_print_stock_status',
+					'field_book_print_stock_quantity',
+					'field_book_print_weight',
+					'field_book_print_length',
+					'field_book_print_width',
+					'field_book_print_height'
+				];
+
+				/**
+				 * Toggle fields enabled/disabled state based on out of print checkbox
+				 */
+				function toggleFields($checkbox, fieldKeys) {
+					var isOutOfPrint = $checkbox.is(':checked');
+
+					fieldKeys.forEach(function(key) {
+						var $field = $('.acf-field[data-key="' + key + '"]');
+
+						if (isOutOfPrint) {
+							// Disable field
+							$field.addClass('acf-disabled-out-of-print');
+							$field.find('input, select, textarea').prop('disabled', true);
+						} else {
+							// Enable field
+							$field.removeClass('acf-disabled-out-of-print');
+							$field.find('input, select, textarea').prop('disabled', false);
+						}
+					});
+				}
+
+				/**
+				 * Initialize out of print logic for Magazine Print Details
+				 */
+				function initMagazineOutOfPrint() {
+					var $checkbox = $('.acf-field[data-key="field_print_out_of_print"] input[type="checkbox"]');
+
+					if ($checkbox.length) {
+						// Bind change event
+						$checkbox.on('change', function() {
+							toggleFields($(this), magazineFieldKeys);
+						});
+
+						// Trigger on page load to set initial state
+						$checkbox.trigger('change');
+					}
+				}
+
+				/**
+				 * Initialize out of print logic for Book Print Details
+				 */
+				function initBookOutOfPrint() {
+					var $checkbox = $('.acf-field[data-key="field_book_print_out_of_print"] input[type="checkbox"]');
+
+					if ($checkbox.length) {
+						// Bind change event
+						$checkbox.on('change', function() {
+							toggleFields($(this), bookFieldKeys);
+						});
+
+						// Trigger on page load to set initial state
+						$checkbox.trigger('change');
+					}
+				}
+
+				// Initialize both
+				initMagazineOutOfPrint();
+				initBookOutOfPrint();
+
+				// Re-initialize when ACF fields are loaded/updated
+				if (typeof acf !== 'undefined') {
+					acf.addAction('ready', function() {
+						initMagazineOutOfPrint();
+						initBookOutOfPrint();
+					});
+				}
+			});
+		})(jQuery);
+		</script>
+		<?php
+	}
+
+	/**
+	 * Add JavaScript to disable Digital fields when "Open Access" is checked
+	 * Disables price fields while keeping PDF upload enabled
+	 * Only applies to Magazines (term ID 198)
+	 *
+	 * @return void
+	 */
+	public function open_access_conditional_logic_js() {
+		// Only on product edit pages
+		$screen = get_current_screen();
+		if ( ! $screen || 'product' !== $screen->post_type || 'post' !== $screen->base ) {
+			return;
+		}
+
+		?>
+		<style>
+			/* Disabled open access fields styling */
+			.acf-field.acf-disabled-open-access {
+				opacity: 0.5;
+				pointer-events: none;
+				position: relative;
+			}
+
+			.acf-field.acf-disabled-open-access::after {
+				content: "Disabled - Open Access";
+				position: absolute;
+				top: 5px;
+				right: 10px;
+				background: #ff8c00;
+				color: white;
+				padding: 2px 8px;
+				font-size: 11px;
+				border-radius: 3px;
+				font-weight: 600;
+				z-index: 10;
+			}
+		</style>
+
+		<script type="text/javascript">
+		(function($) {
+			'use strict';
+
+			$(document).ready(function() {
+				// Magazine Digital Details fields to disable (excludes PDF upload)
+				var magazineDigitalFieldKeys = [
+					'field_digital_price_inr',
+					'field_digital_sale_price_inr',
+					'field_digital_price_usd',
+					'field_digital_sale_price_usd'
+				];
+
+				/**
+				 * Toggle fields enabled/disabled state based on open access checkbox
+				 */
+				function toggleFields($checkbox, fieldKeys) {
+					var isOpenAccess = $checkbox.is(':checked');
+
+					fieldKeys.forEach(function(key) {
+						var $field = $('.acf-field[data-key="' + key + '"]');
+
+						if (isOpenAccess) {
+							// Disable field
+							$field.addClass('acf-disabled-open-access');
+							$field.find('input, select, textarea').prop('disabled', true);
+						} else {
+							// Enable field
+							$field.removeClass('acf-disabled-open-access');
+							$field.find('input, select, textarea').prop('disabled', false);
+						}
+					});
+				}
+
+				/**
+				 * Initialize open access logic for Magazine Digital Details
+				 */
+				function initMagazineOpenAccess() {
+					var $checkbox = $('.acf-field[data-key="field_68ef600be900f"] input[type="checkbox"]');
+
+					if ($checkbox.length) {
+						// Bind change event
+						$checkbox.on('change', function() {
+							toggleFields($(this), magazineDigitalFieldKeys);
+						});
+
+						// Trigger on page load to set initial state
+						$checkbox.trigger('change');
+					}
+				}
+
+				// Initialize
+				initMagazineOpenAccess();
+
+				// Re-initialize when ACF fields are loaded/updated
+				if (typeof acf !== 'undefined') {
+					acf.addAction('ready', function() {
+						initMagazineOpenAccess();
+					});
+
+					acf.addAction('append', function() {
+						initMagazineOpenAccess();
+					});
+				}
+			});
+		})(jQuery);
+		</script>
+		<?php
 	}
 }

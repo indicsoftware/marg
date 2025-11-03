@@ -101,6 +101,21 @@ require_once __DIR__ . '/src/WooCommerceCustomizations.php';
 $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();
 $woocommerce_customizations->init();
 
+// Initialize Product Filters for admin list filtering (Open Access filter for Magazines)
+require_once __DIR__ . '/src/ProductFilters.php';
+$product_filters = new \TenUpTheme\ProductFilters();
+$product_filters->init();
+
+// Initialize Variation Sync to sync ACF fields to WooCommerce variations for Magazines and Books
+require_once __DIR__ . '/src/VariationSync.php';
+$variation_sync = new \TenUpTheme\VariationSync();
+$variation_sync->init();
+
+// Initialize Taxonomy Inheritance to auto-sync taxonomies from Articles to Magazines
+require_once __DIR__ . '/src/TaxonomyInheritance.php';
+$taxonomy_inheritance = new \TenUpTheme\TaxonomyInheritance();
+$taxonomy_inheritance->init();
+
 // Temporary: ACF Duplicate Cleanup (remove after cleanup)
 // if ( is_admin() ) {
 // 	require_once __DIR__ . '/acf-cleanup-duplicates.php';
