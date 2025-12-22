@@ -750,7 +750,7 @@ class AdminMenuCustomizer {
 				'All Export',
 				'All Export',
 				'manage_options',
-				'pmxe-admin-export'
+				'admin.php?page=pmxe-admin-export'
 			);
 			$export_added = true;
 		}
@@ -765,12 +765,18 @@ class AdminMenuCustomizer {
 			foreach ( $menu as $key => $item ) {
 				if ( isset( $item[0] ) && ( stripos( $item[0], 'All Export' ) !== false || ( stripos( $item[0], 'Export' ) !== false && stripos( $item[2], 'pmxe' ) !== false ) ) ) {
 					if ( ! $export_added ) {
+						// Use the original menu slug if available, otherwise use the proper format
+						$export_slug = isset( $item[2] ) ? $item[2] : 'admin.php?page=pmxe-admin-export';
+						// If it's just a slug without admin.php, add it
+						if ( strpos( $export_slug, 'admin.php' ) === false && strpos( $export_slug, '?' ) === false ) {
+							$export_slug = 'admin.php?page=' . $export_slug;
+						}
 						add_submenu_page(
 							'advanced-menu',
 							'All Export',
 							'All Export',
 							isset( $item[1] ) ? $item[1] : 'manage_options',
-							isset( $item[2] ) ? $item[2] : 'pmxe-admin-export'
+							$export_slug
 						);
 					}
 					unset( $menu[$key] );
@@ -1128,6 +1134,7 @@ class AdminMenuCustomizer {
 			'alt-text-ai',
 			'wpsynchro_menu',
 			'pmxe-admin-export',
+			'admin.php?page=pmxe-admin-export',
 			'pmxe-admin-manage',
 			'pmxe-admin-home',
 			'pmxi-admin-home',
@@ -1140,6 +1147,11 @@ class AdminMenuCustomizer {
 		);
 
 		if ( in_array( $parent_file, $advanced_pages, true ) ) {
+			return 'advanced-menu';
+		}
+
+		// Also check if we're on a WP All Export page via GET parameter
+		if ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'pmxe' ) === 0 ) {
 			return 'advanced-menu';
 		}
 
