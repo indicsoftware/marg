@@ -46,28 +46,18 @@ class SecurePDFViewer {
 			true
 		);
 
-		// Enqueue custom PDF viewer script
-		wp_enqueue_script(
-			'secure-pdf-viewer',
-			TENUP_THEME_DIST_URL . 'js/secure-pdf-viewer.js',
-			[ 'jquery', 'pdf-js' ],
-			TENUP_THEME_VERSION,
-			true
-		);
+		// Register a dummy handle for localization and inline script
+		wp_register_script( 'secure-pdf-viewer', '', [ 'jquery', 'pdf-js' ], TENUP_THEME_VERSION, true );
+		wp_enqueue_script( 'secure-pdf-viewer' );
 
 		// Localize script with AJAX URL
 		wp_localize_script( 'secure-pdf-viewer', 'securePDFViewer', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce( 'secure_pdf_viewer_nonce' ),
+			'nonce'   => wp_create_nonce( 'secure_pdf_viewer_nonce' ),
 		] );
 
-		// Enqueue PDF viewer styles
-		wp_enqueue_style(
-			'secure-pdf-viewer',
-			TENUP_THEME_DIST_URL . 'css/secure-pdf-viewer.css',
-			[],
-			TENUP_THEME_VERSION
-		);
+		// Add inline viewer script
+		wp_add_inline_script( 'secure-pdf-viewer', $this->get_viewer_script() );
 	}
 
 	/**
@@ -110,6 +100,135 @@ class SecurePDFViewer {
 	}
 
 	/**
+	 * Get inline JavaScript for the PDF viewer.
+	 *
+	 * Handles click on .member-view-btn, fetches secure PDF URL via AJAX,
+	 * and renders the PDF in a modal using PDF.js.
+	 *
+	 * @return string
+	 */
+	private function get_viewer_script() {
+		return '
+(function($) {
+	"use strict";
+
+	var pdfDoc = null;
+	var pageNum = 1;
+	var pageRendering = false;
+	var pageNumPending = null;
+	var scale = 1.2;
+	var canvas = null;
+	var ctx = null;
+
+	function renderPage(num) {
+		pageRendering = true;
+		pdfDoc.getPage(num).then(function(page) {
+			var viewport = page.getViewport({ scale: scale });
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
+			var renderContext = { canvasContext: ctx, viewport: viewport };
+			page.render(renderContext).promise.then(function() {
+				pageRendering = false;
+				if (pageNumPending !== null) {
+					renderPage(pageNumPending);
+					pageNumPending = null;
+				}
+			});
+			$("#pdf-page-info").text("Page " + num + " of " + pdfDoc.numPages);
+		});
+	}
+
+	function queueRenderPage(num) {
+		if (pageRendering) { pageNumPending = num; } else { renderPage(num); }
+	}
+
+	$(document).on("click", ".member-view-btn", function(e) {
+		// If user is not logged in, let the auth modal interceptor handle it.
+		if (window.margAuth && !window.margAuth.isLoggedIn) {
+			return;
+		}
+		e.preventDefault();
+		var variationId = $(this).data("variation-id");
+		if (!variationId) return;
+
+		var $modal = $("#secure-pdf-viewer-modal");
+		var $loading = $("#pdf-loading");
+
+		$modal.show();
+		$loading.show();
+		$("#pdf-canvas").hide();
+		$(".pdf-controls").hide();
+
+		$.post(securePDFViewer.ajaxUrl, {
+			action: "get_secure_pdf_url",
+			nonce: securePDFViewer.nonce,
+			variation_id: variationId
+		}, function(response) {
+			if (response.success) {
+				$("#pdf-viewer-title").text(response.data.product_name || "PDF Viewer");
+
+				pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+				canvas = document.getElementById("pdf-canvas");
+				ctx = canvas.getContext("2d");
+
+				pdfjsLib.getDocument(response.data.secure_url).promise.then(function(pdf) {
+					pdfDoc = pdf;
+					pageNum = 1;
+					$loading.hide();
+					$(canvas).show();
+					$(".pdf-controls").show();
+					renderPage(pageNum);
+				}).catch(function(err) {
+					$loading.html("<p>Error loading PDF.</p>");
+					console.error("PDF load error:", err);
+				});
+			} else {
+				$loading.html("<p>" + (response.data || "Error loading PDF") + "</p>");
+			}
+		}).fail(function() {
+			$loading.html("<p>Request failed.</p>");
+		});
+	});
+
+	// Modal controls
+	$(document).on("click", ".secure-pdf-close, .secure-pdf-modal-overlay", function() {
+		$("#secure-pdf-viewer-modal").hide();
+		pdfDoc = null;
+	});
+	$(document).on("click", "#pdf-prev", function() {
+		if (pageNum <= 1) return;
+		pageNum--;
+		queueRenderPage(pageNum);
+	});
+	$(document).on("click", "#pdf-next", function() {
+		if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
+		pageNum++;
+		queueRenderPage(pageNum);
+	});
+	$(document).on("click", "#pdf-zoom-in", function() {
+		scale += 0.2;
+		queueRenderPage(pageNum);
+	});
+	$(document).on("click", "#pdf-zoom-out", function() {
+		if (scale <= 0.4) return;
+		scale -= 0.2;
+		queueRenderPage(pageNum);
+	});
+	$(document).on("click", "#pdf-fit-width", function() {
+		if (!pdfDoc) return;
+		pdfDoc.getPage(pageNum).then(function(page) {
+			var containerWidth = $(".pdf-viewer-container").width();
+			var viewport = page.getViewport({ scale: 1 });
+			scale = containerWidth / viewport.width;
+			queueRenderPage(pageNum);
+		});
+	});
+})(jQuery);
+		';
+	}
+
+	/**
 	 * AJAX handler to get secure PDF URL.
 	 *
 	 * @return void
@@ -121,21 +240,26 @@ class SecurePDFViewer {
 			wp_send_json_error( 'Security check failed' );
 		}
 
-		// Check if user is logged in and has membership
-		if ( ! is_user_logged_in() ) {
-			error_log( 'Secure PDF Viewer: User not logged in' );
-			wp_send_json_error( 'User not logged in' );
-		}
-
-		$user_id = get_current_user_id();
+		$user_id      = get_current_user_id(); // 0 if not logged in
 		$variation_id = intval( $_POST['variation_id'] );
 
 		error_log( 'Secure PDF Viewer: Processing request for user ' . $user_id . ', variation ' . $variation_id );
 
-		// Check if user has active membership
-		if ( ! $this->user_has_active_membership( $user_id ) ) {
-			error_log( 'Secure PDF Viewer: User does not have active membership' );
-			wp_send_json_error( 'User does not have active membership' );
+		// Check if this is an Open Access product (bypass login and membership checks)
+		$parent_id      = wp_get_post_parent_id( $variation_id );
+		$is_open_access = $parent_id ? WooCommerceCustomizations::is_open_access( $parent_id ) : false;
+
+		if ( ! $is_open_access ) {
+			// Non-Open Access: require login and membership
+			if ( ! is_user_logged_in() ) {
+				error_log( 'Secure PDF Viewer: User not logged in' );
+				wp_send_json_error( 'User not logged in' );
+			}
+
+			if ( ! $this->user_has_active_membership( $user_id ) ) {
+				error_log( 'Secure PDF Viewer: User does not have active membership' );
+				wp_send_json_error( 'User does not have active membership' );
+			}
 		}
 
 		// Get the variation product
@@ -182,7 +306,7 @@ class SecurePDFViewer {
 		error_log( 'Secure PDF Viewer: Original PDF URL: ' . $pdf_url );
 
 		// Generate a temporary secure token (expires in 1 hour)
-		$secure_token = $this->generate_secure_url( $pdf_url, $user_id );
+		$secure_token = $this->generate_secure_url( $pdf_url, $user_id, $is_open_access );
 
 		error_log( 'Secure PDF Viewer: Generated secure token: ' . $secure_token );
 
@@ -230,22 +354,24 @@ class SecurePDFViewer {
 	/**
 	 * Generate a secure URL for PDF access.
 	 *
-	 * @param string $original_url Original PDF URL.
-	 * @param int $user_id User ID.
+	 * @param string $original_url  Original PDF URL.
+	 * @param int    $user_id       User ID (0 for non-logged-in users).
+	 * @param bool   $is_open_access Whether this is an Open Access PDF.
 	 * @return string
 	 */
-	private function generate_secure_url( $original_url, $user_id ) {
+	private function generate_secure_url( $original_url, $user_id, $is_open_access = false ) {
 		// Create a temporary token
-		$token = wp_generate_password( 32, false );
+		$token   = wp_generate_password( 32, false );
 		$expires = time() + ( 60 * 60 ); // 1 hour
 
 		// Store token in transient
 		set_transient(
 			'secure_pdf_token_' . $token,
 			[
-				'url' => $original_url,
-				'user_id' => $user_id,
-				'expires' => $expires,
+				'url'            => $original_url,
+				'user_id'        => $user_id,
+				'expires'        => $expires,
+				'is_open_access' => $is_open_access,
 			],
 			3600 // 1 hour
 		);
