@@ -104,9 +104,12 @@ class SecurePDFEndpoint {
 			$this->send_error_response( 'Token expired', 401 );
 		}
 
-		// Verify user is still logged in and has membership
-		if ( ! is_user_logged_in() || get_current_user_id() !== $token_data['user_id'] ) {
-			$this->send_error_response( 'Unauthorized access', 403 );
+		// Verify user is still logged in and matches token (skip for Open Access)
+		$is_open_access = ! empty( $token_data['is_open_access'] );
+		if ( ! $is_open_access ) {
+			if ( ! is_user_logged_in() || get_current_user_id() !== $token_data['user_id'] ) {
+				$this->send_error_response( 'Unauthorized access', 403 );
+			}
 		}
 
 		// Disable S3 plugin filters to avoid database errors

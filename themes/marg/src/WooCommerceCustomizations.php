@@ -35,6 +35,31 @@ class WooCommerceCustomizations {
 	}
 
 	/**
+	 * Check if a product is Open Access.
+	 *
+	 * Works for both Magazine products (direct field) and Article products
+	 * (inherited from parent Magazine).
+	 *
+	 * @param int $product_id Product ID.
+	 * @return bool
+	 */
+	public static function is_open_access( $product_id ) {
+		// Magazine: check magazine_details.open_access
+		if ( has_term( 198, 'product_cat', $product_id ) ) {
+			$magazine_details = get_field( 'magazine_details', $product_id );
+			return ! empty( $magazine_details['open_access'] );
+		}
+
+		// Article: check article_details.open_access
+		if ( has_term( 202, 'product_cat', $product_id ) ) {
+			$article_details = get_field( 'article_details', $product_id );
+			return ! empty( $article_details['open_access'] ) && $article_details['open_access'] !== 'No';
+		}
+
+		return false;
+	}
+
+	/**
 	 * Convert existing unwanted products to simple products.
 	 *
 	 * @param string $type Product type to convert ('grouped', 'external', or 'all').

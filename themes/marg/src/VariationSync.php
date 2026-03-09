@@ -86,7 +86,7 @@ class VariationSync {
 				continue;
 			}
 
-			$medium = $variation->get_attribute( 'pa_medium' );
+			$medium = strtolower( $variation->get_attribute( 'pa_medium' ) );
 
 			if ( $medium === 'print' ) {
 				$this->sync_print_fields( $product_details, $variation, $identifier_key );
@@ -190,19 +190,26 @@ class VariationSync {
 	 * @return void
 	 */
 	private function sync_digital_fields( $product_details, $variation, $identifier_key = 'issn' ) {
-		$digital_data = $product_details['digital_details'] ?? array();
+		$digital_data  = $product_details['digital_details'] ?? array();
+		$is_open_access = ! empty( $product_details['open_access'] );
 
 		// Set WooCommerce fields
 		if ( isset( $digital_data['sku'] ) && ! empty( $digital_data['sku'] ) ) {
 			$variation->set_sku( $digital_data['sku'] );
 		}
 
-		if ( isset( $digital_data['regular_price_inr'] ) && $digital_data['regular_price_inr'] !== '' ) {
-			$variation->set_regular_price( $digital_data['regular_price_inr'] );
-		}
+		// Open Access: Digital edition is free
+		if ( $is_open_access ) {
+			$variation->set_regular_price( '0' );
+			$variation->set_sale_price( '' );
+		} else {
+			if ( isset( $digital_data['regular_price_inr'] ) && $digital_data['regular_price_inr'] !== '' ) {
+				$variation->set_regular_price( $digital_data['regular_price_inr'] );
+			}
 
-		if ( isset( $digital_data['sale_price_inr'] ) && $digital_data['sale_price_inr'] !== '' ) {
-			$variation->set_sale_price( $digital_data['sale_price_inr'] );
+			if ( isset( $digital_data['sale_price_inr'] ) && $digital_data['sale_price_inr'] !== '' ) {
+				$variation->set_sale_price( $digital_data['sale_price_inr'] );
+			}
 		}
 
 		// Digital product settings
@@ -255,13 +262,18 @@ class VariationSync {
 			update_post_meta( $variation->get_id(), '_' . $identifier_field, sanitize_text_field( $digital_data[ $identifier_field ] ) );
 		}
 
-		// Store USD prices if provided (for Price Based on Country plugin)
-		if ( isset( $digital_data['regular_price_usd'] ) && $digital_data['regular_price_usd'] !== '' ) {
-			update_post_meta( $variation->get_id(), '_regular_price_usd', floatval( $digital_data['regular_price_usd'] ) );
-		}
+		// Store USD prices (for Price Based on Country plugin)
+		if ( $is_open_access ) {
+			update_post_meta( $variation->get_id(), '_regular_price_usd', 0 );
+			delete_post_meta( $variation->get_id(), '_sale_price_usd' );
+		} else {
+			if ( isset( $digital_data['regular_price_usd'] ) && $digital_data['regular_price_usd'] !== '' ) {
+				update_post_meta( $variation->get_id(), '_regular_price_usd', floatval( $digital_data['regular_price_usd'] ) );
+			}
 
-		if ( isset( $digital_data['sale_price_usd'] ) && $digital_data['sale_price_usd'] !== '' ) {
-			update_post_meta( $variation->get_id(), '_sale_price_usd', floatval( $digital_data['sale_price_usd'] ) );
+			if ( isset( $digital_data['sale_price_usd'] ) && $digital_data['sale_price_usd'] !== '' ) {
+				update_post_meta( $variation->get_id(), '_sale_price_usd', floatval( $digital_data['sale_price_usd'] ) );
+			}
 		}
 	}
 

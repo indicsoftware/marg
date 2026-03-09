@@ -72,15 +72,25 @@ class WooCommerceMemberships {
 			return;
 		}
 
+		$is_open_access = WooCommerceCustomizations::is_open_access( $product->get_id() );
+		$has_membership = $this->user_has_active_membership();
+
+		// Open Access products: replace the entire variation form with a Read button (any user)
+		if ( $is_open_access && $product->is_type( 'variable' ) ) {
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+			add_action( 'woocommerce_single_product_summary', [ $this, 'display_open_access_read_button' ], 30 );
+			return;
+		}
+
 		// For variable products, we'll handle this with JavaScript
 		// For simple products, check if we should show member button
-		if ( ! $product->is_type( 'variable' ) && $this->user_has_active_membership() && $this->should_show_member_button( $product ) ) {
+		if ( ! $product->is_type( 'variable' ) && ( $has_membership || $is_open_access ) && $this->should_show_member_button( $product ) ) {
 			// Remove default add to cart button
 			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
 
 			// Add custom view button
 			add_action( 'woocommerce_single_product_summary', [ $this, 'display_member_view_button' ], 30 );
-		} elseif ( $product->is_type( 'variable' ) && $this->user_has_active_membership() ) {
+		} elseif ( $product->is_type( 'variable' ) && $has_membership ) {
 			// For variable products, add member button after the add to cart form
 			add_action( 'woocommerce_single_product_summary', [ $this, 'display_member_button_for_variable' ], 35 );
 		}
@@ -98,8 +108,10 @@ class WooCommerceMemberships {
 			return;
 		}
 
-		// Check if current user has active membership and product should show member button
-		if ( $this->user_has_active_membership() && $this->should_show_member_button( $product ) ) {
+		$is_open_access = WooCommerceCustomizations::is_open_access( $product->get_id() );
+
+		// Check if current user has active membership (or product is Open Access) and product should show member button
+		if ( ( $this->user_has_active_membership() || $is_open_access ) && $this->should_show_member_button( $product ) ) {
 			// Remove default add to cart button
 			remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
 
@@ -116,7 +128,9 @@ class WooCommerceMemberships {
 	 * @return string
 	 */
 	public function modify_add_to_cart_text( $text, $product ) {
-		if ( $this->user_has_active_membership() && $this->should_show_member_button( $product ) ) {
+		$is_open_access = WooCommerceCustomizations::is_open_access( $product->get_id() );
+
+		if ( ( $this->user_has_active_membership() || $is_open_access ) && $this->should_show_member_button( $product ) ) {
 			return __( 'View', 'tenup-theme' );
 		}
 
@@ -131,7 +145,9 @@ class WooCommerceMemberships {
 	 * @return string
 	 */
 	public function modify_add_to_cart_url( $url, $product ) {
-		if ( $this->user_has_active_membership() && $this->should_show_member_button( $product ) ) {
+		$is_open_access = WooCommerceCustomizations::is_open_access( $product->get_id() );
+
+		if ( ( $this->user_has_active_membership() || $is_open_access ) && $this->should_show_member_button( $product ) ) {
 			// Return the product URL for viewing
 			return get_permalink( $product->get_id() );
 		}
@@ -196,6 +212,47 @@ class WooCommerceMemberships {
 			   class="button alt wc-forward member-view-btn"
 			   data-variation-id="">
 				<?php esc_html_e( 'View PDF', 'tenup-theme' ); ?>
+			</a>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Display a Read button for Open Access products.
+	 *
+	 * Replaces the variation form entirely with a single Read button
+	 * that opens the PDF viewer. Works for any visitor (no login required).
+	 *
+	 * @return void
+	 */
+	public function display_open_access_read_button() {
+		global $product;
+
+		if ( ! $product ) {
+			return;
+		}
+
+		// Find the Digital variation ID
+		$digital_variation_id = 0;
+		$variations           = $product->get_children();
+		foreach ( $variations as $vid ) {
+			$variation = wc_get_product( $vid );
+			if ( $variation && strtolower( $variation->get_attribute( 'pa_medium' ) ) === 'digital' ) {
+				$digital_variation_id = $vid;
+				break;
+			}
+		}
+
+		if ( ! $digital_variation_id ) {
+			return;
+		}
+
+		?>
+		<div class="woocommerce-open-access-read">
+			<a href="#"
+			   class="button alt member-view-btn open-access-read-btn"
+			   data-variation-id="<?php echo esc_attr( $digital_variation_id ); ?>">
+				<?php esc_html_e( 'Read', 'tenup-theme' ); ?>
 			</a>
 		</div>
 		<?php
@@ -428,11 +485,14 @@ class WooCommerceMemberships {
 			return;
 		}
 
-		$is_member = $this->user_has_active_membership();
+		global $product;
+		$is_member      = $this->user_has_active_membership();
+		$is_open_access = $product ? WooCommerceCustomizations::is_open_access( $product->get_id() ) : false;
 		?>
 		<script type="text/javascript">
 			window.woocommerceMemberships = window.woocommerceMemberships || {};
 			window.woocommerceMemberships.isMember = <?php echo $is_member ? 'true' : 'false'; ?>;
+			window.woocommerceMemberships.isOpenAccess = <?php echo $is_open_access ? 'true' : 'false'; ?>;
 		</script>
 		<?php
 	}
