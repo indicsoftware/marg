@@ -24,8 +24,8 @@
       "admin": "./assets/js/admin/admin.js"
     },
     "paths": {
-      "globalStylesDir": "../../themes/10up-theme/assets/css/globals/",
-      "globalMixinsDir": "../../themes/10up-theme/assets/css/globals/mixins/"
+      "globalStylesDir": "../../themes/marg/assets/css/globals/",
+      "globalMixinsDir": "../../themes/marg/assets/css/globals/mixins/"
     }
   }
 }

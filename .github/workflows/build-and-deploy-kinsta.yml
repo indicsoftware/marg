@@ -1,0 +1,196 @@
+name: Build and deploy to Kinsta
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, branch, or tag to deploy (use a previous SHA for rollback)
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kinsta-production
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "24.x"
+  PHP_VERSION: "8.3"
+  HUSKY: "0"
+
+jobs:
+  build:
+    name: Build deployable wp-content
+    runs-on: ubuntu-latest
+    outputs:
+      release_sha: ${{ steps.meta.outputs.release_sha }}
+      artifact_name: ${{ steps.meta.outputs.artifact_name }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
+
+      - name: Record release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          release_sha="$(git rev-parse HEAD)"
+          echo "release_sha=$release_sha" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=wp-content-$release_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:2
+          coverage: none
+
+      - name: Install JavaScript dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build and package release
+        run: ./bin/build-deploy-artifact.sh "${{ steps.meta.outputs.release_sha }}"
+
+      - name: Verify release checksum
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          cd release
+          sha256sum --check "wp-content-${{ steps.meta.outputs.release_sha }}.tar.gz.sha256"
+
+      - name: Upload deployable release
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: |
+            release/wp-content-${{ steps.meta.outputs.release_sha }}.tar.gz
+            release/wp-content-${{ steps.meta.outputs.release_sha }}.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    name: Deploy release to Kinsta
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    env:
+      KINSTA_SSH_HOST: ${{ secrets.KINSTA_SSH_HOST }}
+      KINSTA_SSH_PORT: ${{ secrets.KINSTA_SSH_PORT }}
+      KINSTA_SSH_USER: ${{ secrets.KINSTA_SSH_USER }}
+      KINSTA_SSH_PRIVATE_KEY: ${{ secrets.KINSTA_SSH_PRIVATE_KEY }}
+      KINSTA_SSH_KNOWN_HOSTS: ${{ secrets.KINSTA_SSH_KNOWN_HOSTS }}
+      KINSTA_WP_PATH: ${{ secrets.KINSTA_WP_PATH }}
+      RELEASE_SHA: ${{ needs.build.outputs.release_sha }}
+      REMOTE_ARCHIVE: /tmp/wp-content-${{ needs.build.outputs.release_sha }}.tar.gz
+    steps:
+      - name: Download deployable release
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: release
+
+      - name: Validate deployment settings
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          for variable_name in \
+            KINSTA_SSH_HOST \
+            KINSTA_SSH_PORT \
+            KINSTA_SSH_USER \
+            KINSTA_SSH_PRIVATE_KEY \
+            KINSTA_SSH_KNOWN_HOSTS \
+            KINSTA_WP_PATH; do
+            if [[ -z "${!variable_name:-}" ]]; then
+              echo "::error::Missing required deployment secret: $variable_name"
+              exit 1
+            fi
+          done
+          if [[ ! "$KINSTA_SSH_PORT" =~ ^[0-9]+$ ]]; then
+            echo "::error::KINSTA_SSH_PORT must be numeric"
+            exit 1
+          fi
+          if [[ "$KINSTA_WP_PATH" != /* ]]; then
+            echo "::error::KINSTA_WP_PATH must be an absolute path from MyKinsta"
+            exit 1
+          fi
+
+      - name: Verify release checksum
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          cd release
+          sha256sum --check "wp-content-${RELEASE_SHA}.tar.gz.sha256"
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$KINSTA_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$KINSTA_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          chmod 644 "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+
+      - name: Upload release archive
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          scp \
+            -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -P "$KINSTA_SSH_PORT" \
+            "release/wp-content-${RELEASE_SHA}.tar.gz" \
+            "${KINSTA_SSH_USER}@${KINSTA_SSH_HOST}:${REMOTE_ARCHIVE}"
+
+      - name: Apply release on Kinsta
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh \
+            -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -p "$KINSTA_SSH_PORT" \
+            "${KINSTA_SSH_USER}@${KINSTA_SSH_HOST}" \
+            bash -s -- "$KINSTA_WP_PATH" "$REMOTE_ARCHIVE" "$RELEASE_SHA" <<'REMOTE_SCRIPT'
+          set -Eeuo pipefail
+          wordpress_path="$1"
+          archive="$2"
+          release_sha="$3"
+          staging_root="$(mktemp -d "/tmp/marg-release-${release_sha}.XXXXXX")"
+
+          cleanup() {
+            status=$?
+            rm -rf -- "$staging_root" "$archive"
+            exit $status
+          }
+          trap cleanup EXIT
+
+          tar -xzf "$archive" -C "$staging_root"
+          bash "$staging_root/bin/deploy-kinsta-release.sh" "$wordpress_path" "$staging_root" "$release_sha"
+          REMOTE_SCRIPT
