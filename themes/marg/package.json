@@ -1,0 +1,35 @@
+{
+  "name": "tenup-theme",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm run watch",
+    "watch": "10up-toolkit watch --port=5000 --hot",
+    "build": "10up-toolkit build",
+    "format-js": "10up-toolkit format-js",
+    "lint-js": "10up-toolkit lint-js",
+    "lint-style": "10up-toolkit lint-style",
+    "test": "10up-toolkit test-unit-jest --passWithNoTests",
+    "clean-dist": "rm -rf ./dist",
+    "scaffold:block": "cd blocks/ && wp-create-block --no-plugin --template ../../../../bin/create-block-template"
+  },
+  "devDependencies": {
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "dependencies": {
+    "10up-toolkit": "^6.5.0",
+    "modern-normalize": "^3.0.0"
+  },
+  "10up-toolkit": {
+    "devURL": "http://marg-art.local",
+    "useBlockAssets": true,
+    "loadBlockSpecificStyles": true,
+    "entry": {
+      "editor-style-overrides": "./assets/js/frontend/editor-style-overrides.js",
+      "frontend": "./assets/js/frontend/frontend.js",
+      "block-editor-script": "./assets/js/block-editor/block-editor-script.js"
+    },
+    "paths": {
+      "blocksDir": "./blocks"
+    }
+  }
+}

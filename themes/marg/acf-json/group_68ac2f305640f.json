@@ -1,0 +1,2114 @@
+{
+    "key": "group_68ac2f305640f",
+    "title": "Product Details",
+    "fields": [
+        {
+            "key": "field_68ac2f304ad26",
+            "label": "Product Type",
+            "name": "type",
+            "aria-label": "",
+            "type": "taxonomy",
+            "instructions": "Choose between Magazines, Articles, Books, Gift Sets and Subscription Plans",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "product_cat",
+            "add_term": 0,
+            "save_terms": 1,
+            "load_terms": 1,
+            "return_format": "id",
+            "field_type": "select",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "bidirectional": 0,
+            "multiple": 0,
+            "bidirectional_target": [],
+            "exclude": [
+                "uncategorized"
+            ]
+        },
+        {
+            "key": "field_book_details_group",
+            "label": "Book Details",
+            "name": "book_details",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "197"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_68e4a4a7ab73f",
+                    "label": "Subtitle",
+                    "name": "subtitle",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Optional descriptive tagline or secondary title for the issue",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_689c646db2d73",
+                    "label": "Product ID",
+                    "name": "product_id",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Reference only. Imported from the old CMS to preserve relationships. This field is not editable.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "readonly": 1,
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_689d959455d34",
+                    "label": "Publication month & year",
+                    "name": "publication_month_year",
+                    "aria-label": "",
+                    "type": "date_picker",
+                    "instructions": "Enter the publication month and year (e.g., January 2024).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "display_format": "F Y",
+                    "return_format": "F Y",
+                    "first_day": 1,
+                    "default_to_current_date": 0,
+                    "allow_in_bindings": 0
+                },
+                {
+                    "key": "field_68e9f9711c2bd",
+                    "label": "General Editors",
+                    "name": "general_editors",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "Select the general editor(s) of this issue (from dropdown list).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "person"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "person-type:general-editor"
+                    ],
+                    "return_format": "object",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "ui": 1,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_68514e9cea8b7",
+                    "label": "Editors",
+                    "name": "editors",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "Select\/add editor(s) who contributed to the issue.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "person"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "person-type:contributor"
+                    ],
+                    "return_format": "object",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "ui": 1,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_689c660922d52",
+                    "label": "Book Number",
+                    "name": "book_number",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Imported from the old CMS for archival consistency. Leave blank if not applicable.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_685157ebb7216",
+                    "label": "Book chapters",
+                    "name": "chapters",
+                    "aria-label": "",
+                    "type": "repeater",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "table",
+                    "pagination": 0,
+                    "min": 0,
+                    "max": 0,
+                    "collapsed": "",
+                    "button_label": "Add Row",
+                    "rows_per_page": 20,
+                    "sub_fields": [
+                        {
+                            "key": "field_68515801b7217",
+                            "label": "Title",
+                            "name": "title",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "parent_repeater": "field_685157ebb7216"
+                        },
+                        {
+                            "key": "field_68515812b7218",
+                            "label": "Description",
+                            "name": "description",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "rows": "",
+                            "placeholder": "",
+                            "new_lines": "",
+                            "parent_repeater": "field_685157ebb7216"
+                        },
+                        {
+                            "key": "field_6851581db7219",
+                            "label": "Page Range",
+                            "name": "page_number",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": false,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "parent_repeater": "field_685157ebb7216"
+                        },
+                        {
+                            "key": "field_68ac1f3aecec3",
+                            "label": "Authors",
+                            "name": "authors",
+                            "aria-label": "",
+                            "type": "post_object",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "post_type": [
+                                "person"
+                            ],
+                            "post_status": "",
+                            "taxonomy": [
+                                "person-type:contributor"
+                            ],
+                            "return_format": "object",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "bidirectional": 0,
+                            "ui": 1,
+                            "bidirectional_target": [],
+                            "parent_repeater": "field_685157ebb7216"
+                        }
+                    ]
+                },
+                {
+                    "key": "field_book_create_print_variant",
+                    "label": "Create Print Variant",
+                    "name": "create_print_variant",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "Check to create a Print variation for this book. Uncheck if this book is only available digitally.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "Create Print Variant",
+                    "default_value": 1,
+                    "allow_in_bindings": 0,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1
+                },
+                {
+                    "key": "field_book_create_digital_variant",
+                    "label": "Create Digital Variant",
+                    "name": "create_digital_variant",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "Check to create a Digital variation for this book. Uncheck if this book is only available in print.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "Create Digital Variant",
+                    "default_value": 1,
+                    "allow_in_bindings": 0,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1
+                },
+                {
+                    "key": "field_book_print_details_group",
+                    "label": "Print Details",
+                    "name": "print_details",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "Product data for the Print variation. These fields will automatically sync to the WooCommerce Print variation.",
+                    "required": 0,
+                    "conditional_logic": [
+                        [
+                            {
+                                "field": "field_book_create_print_variant",
+                                "operator": "==",
+                                "value": "1"
+                            }
+                        ]
+                    ],
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_book_print_sku",
+                            "label": "SKU",
+                            "name": "sku",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Auto-generated from parent SKU. Format: {PARENT-SKU}-PRINT",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "readonly": 1,
+                            "disabled": 1,
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_isbn",
+                            "label": "ISBN",
+                            "name": "isbn",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "International Standard Book Number for print edition (e.g., 978-3-16-148410-0).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "978-X-XX-XXXXXX-X",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_price_inr",
+                            "label": "Regular Price (INR)",
+                            "name": "regular_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_sale_price_inr",
+                            "label": "Sale Price (INR)",
+                            "name": "sale_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_price_usd",
+                            "label": "Regular Price (USD)",
+                            "name": "regular_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_sale_price_usd",
+                            "label": "Sale Price (USD)",
+                            "name": "sale_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_stock_status",
+                            "label": "Stock Status",
+                            "name": "stock_status",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "instock": "In stock",
+                                "outofstock": "Out of stock",
+                                "onbackorder": "On backorder"
+                            },
+                            "default_value": "instock",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_book_print_stock_quantity",
+                            "label": "Stock Quantity",
+                            "name": "stock_quantity",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Leave empty for unlimited stock",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_print_weight",
+                            "label": "Weight (grams)",
+                            "name": "weight",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "g"
+                        },
+                        {
+                            "key": "field_book_print_length",
+                            "label": "Length (cm)",
+                            "name": "length",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        },
+                        {
+                            "key": "field_book_print_width",
+                            "label": "Width (cm)",
+                            "name": "width",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        },
+                        {
+                            "key": "field_book_print_height",
+                            "label": "Height (cm)",
+                            "name": "height",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        },
+                        {
+                            "key": "field_book_print_out_of_print",
+                            "label": "Out of Print",
+                            "name": "out_of_print",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Mark this book as permanently out of print",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "This book is out of print",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui_on_text": "",
+                            "ui_off_text": "",
+                            "ui": 1
+                        }
+                    ]
+                },
+                {
+                    "key": "field_book_digital_details_group",
+                    "label": "Digital Details",
+                    "name": "digital_details",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "Product data for the Digital variation. These fields will automatically sync to the WooCommerce Digital variation.",
+                    "required": 0,
+                    "conditional_logic": [
+                        [
+                            {
+                                "field": "field_book_create_digital_variant",
+                                "operator": "==",
+                                "value": "1"
+                            }
+                        ]
+                    ],
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_book_digital_sku",
+                            "label": "SKU",
+                            "name": "sku",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Auto-generated from parent SKU. Format: {PARENT-SKU}-DIGITAL",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "readonly": 1,
+                            "disabled": 1,
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_isbn",
+                            "label": "ISBN",
+                            "name": "isbn",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "International Standard Book Number for digital edition (e.g., 978-3-16-148410-0).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "978-X-XX-XXXXXX-X",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_price_inr",
+                            "label": "Regular Price (INR)",
+                            "name": "regular_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_sale_price_inr",
+                            "label": "Sale Price (INR)",
+                            "name": "sale_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_price_usd",
+                            "label": "Regular Price (USD)",
+                            "name": "regular_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_sale_price_usd",
+                            "label": "Sale Price (USD)",
+                            "name": "sale_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_book_digital_pdf_file",
+                            "label": "Book PDF",
+                            "name": "pdf_file",
+                            "aria-label": "",
+                            "type": "file",
+                            "instructions": "Upload the PDF file for the digital version of this book. Customers will be able to download this file after purchase.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "100",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "id",
+                            "library": "all",
+                            "min_size": "",
+                            "max_size": "",
+                            "mime_types": "pdf",
+                            "allow_in_bindings": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "field_magazine_details_group",
+            "label": "Magazine Details",
+            "name": "magazine_details",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "198"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_68ef600be900f",
+                    "label": "Open Access",
+                    "name": "open_access",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "",
+                    "default_value": 0,
+                    "allow_in_bindings": 0,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1
+                },
+                {
+                    "key": "field_689c64b07e6b2",
+                    "label": "Product ID",
+                    "name": "product_id",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Reference only. Imported from the old CMS to preserve relationships. This field is not editable.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "readonly": 1,
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68a845e46fc94",
+                    "label": "Volume Info",
+                    "name": "volume_info",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Reference only. Imported from the old CMS for archival consistency. This field is not editable.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "readonly": 1,
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 1,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68515df152caf",
+                    "label": "Publication month & year (Reference)",
+                    "name": "publication_month_year_reference",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Reference only. Imported from the old CMS as reference.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "readonly": 1,
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68515df152bc6",
+                    "label": "Subtitle",
+                    "name": "subtitle_mag",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Optional descriptive tagline or secondary title for the issue.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68515df152c76",
+                    "label": "Volume Number",
+                    "name": "volume_number",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "Numeric value of the volume (e.g., 70).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": "",
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68a845be7acae",
+                    "label": "Issue Number",
+                    "name": "issue_number",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "Numeric value of the issue within the volume (e.g., 3).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": "",
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_689d970ca7425",
+                    "label": "Publication month & year",
+                    "name": "publication_month_year",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "For all older issues, just enter the Month + Year in the Start Date. Use ranges for current issues that are published across multiple months.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_689d970ca7426",
+                            "label": "Start Date",
+                            "name": "start_date",
+                            "aria-label": "",
+                            "type": "date_picker",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "display_format": "F Y",
+                            "return_format": "F Y",
+                            "first_day": 1,
+                            "default_to_current_date": 0,
+                            "allow_in_bindings": 0
+                        },
+                        {
+                            "key": "field_689d970ca7427",
+                            "label": "End Date",
+                            "name": "end_date",
+                            "aria-label": "",
+                            "type": "date_picker",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "display_format": "F Y",
+                            "return_format": "F Y",
+                            "first_day": 1,
+                            "default_to_current_date": 0,
+                            "allow_in_bindings": 0
+                        }
+                    ]
+                },
+                {
+                    "key": "field_68515df152d5e",
+                    "label": "General Editor(s)",
+                    "name": "editors",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "Select the general editor(s) of this issue (from dropdown list).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "person"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "person-type:general-editor"
+                    ],
+                    "return_format": "object",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "ui": 1,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_68515df152c02",
+                    "label": "Guest Editor(s)",
+                    "name": "guest_editors",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "Select\/add guest editor(s) who contributed to the issue.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "person"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "person-type:contributor"
+                    ],
+                    "return_format": "object",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "ui": 1,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_print_details_group",
+                    "label": "Print Details",
+                    "name": "print_details",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "Product data for the Print variation. These fields will automatically sync to the WooCommerce Print variation.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_print_sku",
+                            "label": "SKU",
+                            "name": "sku",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Auto-generated from parent SKU. Format: {PARENT-SKU}-PRINT",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "readonly": 1,
+                            "disabled": 1,
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_issn",
+                            "label": "ISSN",
+                            "name": "issn",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Pre-filled from Global Settings. Can be overridden if this issue has a different ISSN.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "XXXX-XXXX",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_price_inr",
+                            "label": "Regular Price (INR)",
+                            "name": "regular_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_sale_price_inr",
+                            "label": "Sale Price (INR)",
+                            "name": "sale_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_price_usd",
+                            "label": "Regular Price (USD)",
+                            "name": "regular_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_sale_price_usd",
+                            "label": "Sale Price (USD)",
+                            "name": "sale_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_stock_status",
+                            "label": "Stock Status",
+                            "name": "stock_status",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "choices": {
+                                "instock": "In stock",
+                                "outofstock": "Out of stock",
+                                "onbackorder": "On backorder"
+                            },
+                            "default_value": "instock",
+                            "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "allow_in_bindings": 0,
+                            "ui": 0,
+                            "ajax": 0,
+                            "placeholder": "",
+                            "create_options": 0,
+                            "save_options": 0
+                        },
+                        {
+                            "key": "field_print_stock_quantity",
+                            "label": "Stock Quantity",
+                            "name": "stock_quantity",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Leave empty for unlimited stock",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_print_out_of_print",
+                            "label": "Out of Print",
+                            "name": "out_of_print",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "Mark this issue as permanently out of print",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "message": "This issue is out of print",
+                            "default_value": 0,
+                            "allow_in_bindings": 0,
+                            "ui_on_text": "",
+                            "ui_off_text": "",
+                            "ui": 1
+                        },
+                        {
+                            "key": "field_print_weight",
+                            "label": "Weight (grams)",
+                            "name": "weight",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "g"
+                        },
+                        {
+                            "key": "field_print_length",
+                            "label": "Length (cm)",
+                            "name": "length",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        },
+                        {
+                            "key": "field_print_width",
+                            "label": "Width (cm)",
+                            "name": "width",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        },
+                        {
+                            "key": "field_print_height",
+                            "label": "Height (cm)",
+                            "name": "height",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": "cm"
+                        }
+                    ]
+                },
+                {
+                    "key": "field_digital_details_group",
+                    "label": "Digital Details",
+                    "name": "digital_details",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "Product data for the Digital variation. These fields will automatically sync to the WooCommerce Digital variation.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_digital_sku",
+                            "label": "SKU",
+                            "name": "sku",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Auto-generated from parent SKU. Format: {PARENT-SKU}-DIGITAL",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "readonly": 1,
+                            "disabled": 1,
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_issn",
+                            "label": "ISSN",
+                            "name": "issn",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Pre-filled from Global Settings. Can be overridden if this issue has a different ISSN.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "50",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "XXXX-XXXX",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_price_inr",
+                            "label": "Regular Price (INR)",
+                            "name": "regular_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_sale_price_inr",
+                            "label": "Sale Price (INR)",
+                            "name": "sale_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_price_usd",
+                            "label": "Regular Price (USD)",
+                            "name": "regular_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_sale_price_usd",
+                            "label": "Sale Price (USD)",
+                            "name": "sale_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_digital_pdf_file",
+                            "label": "Magazine PDF",
+                            "name": "pdf_file",
+                            "aria-label": "",
+                            "type": "file",
+                            "instructions": "Upload the PDF file for the digital version of this magazine issue. Customers will be able to download this file after purchase.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "100",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "id",
+                            "library": "all",
+                            "min_size": "",
+                            "max_size": "",
+                            "mime_types": "pdf",
+                            "allow_in_bindings": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "field_article_details_group",
+            "label": "Article Details",
+            "name": "article_details",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "202"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_article_open_access",
+                    "label": "Open Access",
+                    "name": "open_access",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Auto-inherited from parent Magazine. Automatically updates when parent Magazine's Open Access setting changes.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "Inherited from parent Magazine",
+                    "prepend": "",
+                    "append": "",
+                    "readonly": 1,
+                    "disabled": 1
+                },
+                {
+                    "key": "field_6851635e1fcb3",
+                    "label": "Parent Publication",
+                    "name": "parent_publication",
+                    "aria-label": "",
+                    "type": "relationship",
+                    "instructions": "Select the parent Magazine for this Article. Each Article can only have one parent Magazine.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "product"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "product_cat:magazines"
+                    ],
+                    "filters": [
+                        "search"
+                    ],
+                    "return_format": "object",
+                    "min": "",
+                    "max": 1,
+                    "allow_in_bindings": 0,
+                    "elements": "",
+                    "bidirectional": 0,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_685162f41fcaf",
+                    "label": "Page Range",
+                    "name": "page_number",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Enter the page range in plain text, following the format used in the old system (e.g., pp. 112–125). Use a single page number if the content is only on one page (e.g., p. 45).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68a6b1c061cfc",
+                    "label": "Authors",
+                    "name": "authors",
+                    "aria-label": "",
+                    "type": "post_object",
+                    "instructions": "Select the general editor(s) of this issue (from dropdown list).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "person"
+                    ],
+                    "post_status": "",
+                    "taxonomy": [
+                        "person-type:contributor"
+                    ],
+                    "return_format": "object",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "ui": 1,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_article_product_data",
+                    "label": "Product Data",
+                    "name": "product_data",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "Configure WooCommerce product data for this article. These fields will automatically sync to WooCommerce when you save the product.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_article_sku",
+                            "label": "SKU",
+                            "name": "sku",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Product SKU (Stock Keeping Unit). Auto-generated as ARTICLE-{ID}.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "readonly": 1,
+                            "disabled": 1
+                        },
+                        {
+                            "key": "field_article_regular_price_inr",
+                            "label": "Regular Price (INR)",
+                            "name": "regular_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Regular price in Indian Rupees.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_article_sale_price_inr",
+                            "label": "Sale Price (INR)",
+                            "name": "sale_price_inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Sale price in Indian Rupees (optional).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "₹",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_article_regular_price_usd",
+                            "label": "Regular Price (USD)",
+                            "name": "regular_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Regular price in US Dollars (for international customers).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_article_sale_price_usd",
+                            "label": "Sale Price (USD)",
+                            "name": "sale_price_usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Sale price in US Dollars (optional).",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": 0,
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "$",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_article_pdf_file",
+                            "label": "Article PDF",
+                            "name": "pdf_file",
+                            "aria-label": "",
+                            "type": "file",
+                            "instructions": "Upload the PDF file for this article.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "id",
+                            "library": "all",
+                            "min_size": "",
+                            "max_size": "",
+                            "mime_types": "pdf",
+                            "allow_in_bindings": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "field_taxonomies_group",
+            "label": "Taxonomies",
+            "name": "taxonomies",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "For Magazines: Auto-inherited from linked Articles (read-only). For Books & Articles: Select manually.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "197"
+                    }
+                ],
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "198"
+                    }
+                ],
+                [
+                    {
+                        "field": "field_68ac2f304ad26",
+                        "operator": "==",
+                        "value": "202"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_68e48ee04bd49",
+                    "label": "Time periods",
+                    "name": "time_periods",
+                    "aria-label": "",
+                    "type": "taxonomy",
+                    "instructions": "Choose from the predefined list; new periods only added sparingly by admins.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "taxonomy": "time-period",
+                    "add_term": 0,
+                    "save_terms": 1,
+                    "load_terms": 1,
+                    "return_format": "id",
+                    "field_type": "multi_select",
+                    "allow_null": 1,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "multiple": 0,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_68e48f82a6a61",
+                    "label": "Subjects",
+                    "name": "subjects",
+                    "aria-label": "",
+                    "type": "taxonomy",
+                    "instructions": "Choose from the predefined list; new subjects only added sparingly by admins.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "taxonomy": "subject",
+                    "add_term": 0,
+                    "save_terms": 1,
+                    "load_terms": 1,
+                    "return_format": "id",
+                    "field_type": "multi_select",
+                    "allow_null": 1,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "multiple": 0,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_68e48fa2a6a62",
+                    "label": "Geography",
+                    "name": "geography",
+                    "aria-label": "",
+                    "type": "taxonomy",
+                    "instructions": "Select from the list of countries (global). For India, you can add more granular tags (e.g., Meghalaya, Tanjore).",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "taxonomy": "geographic-area",
+                    "add_term": 0,
+                    "save_terms": 1,
+                    "load_terms": 1,
+                    "return_format": "id",
+                    "field_type": "multi_select",
+                    "allow_null": 1,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "multiple": 0,
+                    "bidirectional_target": []
+                },
+                {
+                    "key": "field_68fc6caa6cfe9",
+                    "label": "Tags",
+                    "name": "tags",
+                    "aria-label": "",
+                    "type": "taxonomy",
+                    "instructions": "Add tags to the product. Tags are used to categorize the product.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "taxonomy": "product_tag",
+                    "add_term": 1,
+                    "save_terms": 1,
+                    "load_terms": 1,
+                    "return_format": "id",
+                    "field_type": "multi_select",
+                    "allow_null": 0,
+                    "allow_in_bindings": 0,
+                    "bidirectional": 0,
+                    "multiple": 0,
+                    "bidirectional_target": []
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "product"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "acf_after_title",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1762168430
+}

@@ -1,0 +1,359 @@
+{
+    "key": "group_68edaa5ab166c",
+    "title": "Global Settings Details",
+    "fields": [
+        {
+            "key": "field_68edab434d390",
+            "label": "ISSN",
+            "name": "issn",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_68edab694d391",
+                    "label": "Print",
+                    "name": "print",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "ISSN (International Standard Serial Number) for the print edition of MARG magazine. Format: XXXX-XXXX",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_68edab734d392",
+                    "label": "Digital",
+                    "name": "digital",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "ISSN (International Standard Serial Number) for the digital edition of MARG magazine. Format: XXXX-XXXX",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                }
+            ]
+        },
+        {
+            "key": "field_68edaba44d393",
+            "label": "Price",
+            "name": "price",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_68edabec4d395",
+                    "label": "Magazines",
+                    "name": "magazines",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_68edacebaedef",
+                            "label": "Physical",
+                            "name": "physical",
+                            "aria-label": "",
+                            "type": "group",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_68edad20aedf0",
+                                    "label": "INR",
+                                    "name": "inr",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "Base price for physical magazine issues in Indian Rupees (₹). Enter amount without currency symbol.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "min": "",
+                                    "max": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "step": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_68edad28aedf1",
+                                    "label": "USD",
+                                    "name": "usd",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "Base price for physical magazine issues in US Dollars ($). Enter amount without currency symbol.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "min": "",
+                                    "max": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "step": "",
+                                    "prepend": "",
+                                    "append": ""
+                                }
+                            ]
+                        },
+                        {
+                            "key": "field_68eddb1a42d62",
+                            "label": "Digital",
+                            "name": "digital",
+                            "aria-label": "",
+                            "type": "group",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_68eddb2742d63",
+                                    "label": "INR",
+                                    "name": "inr",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "Base price for digital magazine issues in Indian Rupees (₹). Enter amount without currency symbol.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "min": "",
+                                    "max": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "step": "",
+                                    "prepend": "",
+                                    "append": ""
+                                },
+                                {
+                                    "key": "field_68eddb2d42d64",
+                                    "label": "USD",
+                                    "name": "usd",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "Base price for digital magazine issues in US Dollars ($). Enter amount without currency symbol.",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "min": "",
+                                    "max": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "step": "",
+                                    "prepend": "",
+                                    "append": ""
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "field_68edabf44d396",
+                    "label": "Articles",
+                    "name": "articles",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_68edada393f23",
+                            "label": "INR",
+                            "name": "inr",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Base price for individual articles in Indian Rupees (₹). This is used as default pricing for article products.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": "",
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_68edadaa93f24",
+                            "label": "USD",
+                            "name": "usd",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "Base price for individual articles in US Dollars ($). This is used as default pricing for article products.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "min": "",
+                            "max": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "field_68edadf653be5",
+            "label": "Domestic tax rate for digital products",
+            "name": "domestic_tax_rate_for_digital_products",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "GST\/Tax rate for digital products sold to domestic (India) customers. Enter as percentage (e.g., 18 for 18% GST).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "min": "",
+            "max": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_68edaeda53be6",
+            "label": "Discount applicable to members",
+            "name": "discount_applicable_to_members",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "Discount percentage given to members on product purchases. Enter as percentage (e.g., 10 for 10% discount).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "min": "",
+            "max": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "global-settings"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1760418655
+}

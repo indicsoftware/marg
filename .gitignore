@@ -20,6 +20,7 @@ backstop_data
 tmtags
 .*.sw[a-z]
 *.un~
+Session.vim
 *.swp
 .vscode/launch.json
 tasks.json
