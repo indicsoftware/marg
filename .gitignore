@@ -9,6 +9,10 @@ upgrade
 cache
 plugins
 
+# Local theme snapshots and links
+themes/marg.bak
+themes/marg-local-link
+
 # Project Files
 dist
 backstop_data
