@@ -36,7 +36,7 @@ jobs:
       artifact_name: ${{ steps.meta.outputs.artifact_name }}
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.sha }}
@@ -51,7 +51,7 @@ jobs:
           echo "artifact_name=wp-content-$release_sha" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -78,7 +78,7 @@ jobs:
           sha256sum --check "wp-content-${{ steps.meta.outputs.release_sha }}.tar.gz.sha256"
 
       - name: Upload deployable release
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.meta.outputs.artifact_name }}
           path: |
@@ -105,7 +105,7 @@ jobs:
       REMOTE_ARCHIVE: /tmp/wp-content-${{ needs.build.outputs.release_sha }}.tar.gz
     steps:
       - name: Download deployable release
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.build.outputs.artifact_name }}
           path: release
