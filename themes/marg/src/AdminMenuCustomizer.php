@@ -1600,7 +1600,7 @@ class AdminMenuCustomizer {
 	/**
 	 * Add JavaScript to disable Digital fields when "Open Access" is checked
 	 * Disables price fields while keeping PDF upload enabled
-	 * Only applies to Magazines (term ID 198)
+	 * Only applies to Magazines.
 	 *
 	 * @return void
 	 */

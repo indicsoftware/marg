@@ -44,7 +44,7 @@
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "197"
+                        "value": "books"
                     }
                 ]
             ],
@@ -884,7 +884,7 @@
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "198"
+                        "value": "magazines"
                     }
                 ]
             ],
@@ -1675,7 +1675,7 @@
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "202"
+                        "value": "articles"
                     }
                 ]
             ],
@@ -1960,21 +1960,21 @@
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "197"
+                        "value": "books"
                     }
                 ],
                 [
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "198"
+                        "value": "magazines"
                     }
                 ],
                 [
                     {
                         "field": "field_68ac2f304ad26",
                         "operator": "==",
-                        "value": "202"
+                        "value": "articles"
                     }
                 ]
             ],

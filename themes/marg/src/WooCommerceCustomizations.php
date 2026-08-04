@@ -266,9 +266,10 @@ class WooCommerceCustomizations {
 			return;
 		}
 
-		// Check if product has Magazine (198) or Book (197) category
-		$is_magazine = has_term( 198, 'product_cat', $product_id );
-		$is_book     = has_term( 197, 'product_cat', $product_id );
+		// Check if product has a Magazine or Book category. Product category IDs
+		// differ between databases, so resolve by the stable category slugs.
+		$is_magazine = ProductCategoryResolver::has( $product_id, 'magazines' );
+		$is_book     = ProductCategoryResolver::has( $product_id, 'books' );
 
 		if ( ! $is_magazine && ! $is_book ) {
 			return;

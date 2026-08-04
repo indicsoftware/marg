@@ -52,8 +52,9 @@ class VariationSync {
 			return;
 		}
 
-		// Only for Magazines (198) or Books (197)
-		if ( ! has_term( array( 197, 198 ), 'product_cat', $post_id ) ) {
+		// Only for Magazines or Books. Product category IDs differ between
+		// databases, so resolve by the stable category slugs.
+		if ( ! ProductCategoryResolver::has_any( $post_id, array( 'magazines', 'books' ) ) ) {
 			return;
 		}
 
@@ -68,10 +69,10 @@ class VariationSync {
 		}
 
 		// Get appropriate details field based on product type
-		if ( has_term( 198, 'product_cat', $post_id ) ) {
+		if ( ProductCategoryResolver::has( $post_id, 'magazines' ) ) {
 			$product_details = get_field( 'magazine_details', $post_id );
 			$identifier_key  = 'issn'; // Magazines use ISSN
-		} elseif ( has_term( 197, 'product_cat', $post_id ) ) {
+		} elseif ( ProductCategoryResolver::has( $post_id, 'books' ) ) {
 			$product_details = get_field( 'book_details', $post_id );
 			$identifier_key  = 'isbn'; // Books use ISBN
 		}
@@ -282,8 +283,8 @@ class VariationSync {
 			return;
 		}
 
-		// Only for Articles (202)
-		if ( ! has_term( 202, 'product_cat', $post_id ) ) {
+		// Only for Articles. Product category IDs differ between databases.
+		if ( ! ProductCategoryResolver::has( $post_id, 'articles' ) ) {
 			return;
 		}
 
@@ -378,7 +379,7 @@ class VariationSync {
 	 */
 	public function show_acf_sync_notice( $variation, $loop ) {
 		$parent_id = $variation->get_parent_id();
-		if ( ! has_term( array( 197, 198 ), 'product_cat', $parent_id ) ) {
+		if ( ! ProductCategoryResolver::has_any( $parent_id, array( 'magazines', 'books' ) ) ) {
 			return;
 		}
 
@@ -399,7 +400,7 @@ class VariationSync {
 		}
 
 		global $post;
-		if ( ! $post || ! has_term( array( 197, 198 ), 'product_cat', $post->ID ) ) {
+		if ( ! $post || ! ProductCategoryResolver::has_any( $post->ID, array( 'magazines', 'books' ) ) ) {
 			return;
 		}
 

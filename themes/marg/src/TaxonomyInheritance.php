@@ -57,8 +57,9 @@ class TaxonomyInheritance {
 			return;
 		}
 
-		// Only for Articles (term ID 202)
-		if ( ! has_term( 202, 'product_cat', $post_id ) ) {
+		// Only for Articles. Product category IDs differ between databases, so
+		// resolve by the stable category slug.
+		if ( ! ProductCategoryResolver::has( $post_id, 'articles' ) ) {
 			error_log( "[TaxonomyInheritance] Post {$post_id} is not an Article, skipping" );
 			return;
 		}
@@ -114,8 +115,8 @@ class TaxonomyInheritance {
 				return;
 			}
 
-			// Only for Magazines (term ID 198)
-			if ( ! has_term( 198, 'product_cat', $post_id ) ) {
+			// Only for Magazines. Product category IDs differ between databases.
+			if ( ! ProductCategoryResolver::has( $post_id, 'magazines' ) ) {
 				return;
 			}
 
@@ -373,8 +374,8 @@ class TaxonomyInheritance {
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'product_cat',
-					'field'    => 'term_id',
-					'terms'    => 202, // Articles
+					'field'    => 'slug',
+					'terms'    => ProductCategoryResolver::slug( 'articles' ),
 				),
 			),
 			'meta_query'     => array(
@@ -448,7 +449,7 @@ class TaxonomyInheritance {
 
 	/**
 	 * Add admin notice and CSS/JS to disable Magazine taxonomy fields
-	 * Only applies to Magazines (term 198), not Articles or Books
+	 * Only applies to Magazines, not Articles or Books.
 	 *
 	 * @return void
 	 */
@@ -457,6 +458,8 @@ class TaxonomyInheritance {
 		if ( ! $screen || $screen->post_type !== 'product' ) {
 			return;
 		}
+
+		$magazine_term_id = ProductCategoryResolver::id( 'magazines' );
 
 		?>
 		<style>
@@ -490,13 +493,13 @@ class TaxonomyInheritance {
 				 * Check if current product is a Magazine and apply taxonomy notice
 				 */
 				function checkAndApplyMagazineTaxonomyNotice() {
-					// Check if the product type field has Magazines selected (term ID 198)
+					// Check if the product type field has the current site's Magazines term selected.
 					var $typeField = $('.acf-field[data-name="type"]');
 
 					if ($typeField.length) {
 						var $select = $typeField.find('select');
 
-						if ($select.length && $select.val() == '198') {
+						if ($select.length && String($select.val()) === String(<?php echo wp_json_encode( $magazine_term_id ); ?>)) {
 							// This is a Magazine - apply the notice class
 							$('.acf-field[data-name="taxonomies"]').addClass('magazine-inherited');
 						} else {
@@ -544,7 +547,7 @@ class TaxonomyInheritance {
 		}
 
 		global $post;
-		if ( ! $post || ! has_term( 202, 'product_cat', $post->ID ) ) {
+		if ( ! $post || ! ProductCategoryResolver::has( $post->ID, 'articles' ) ) {
 			return;
 		}
 

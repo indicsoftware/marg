@@ -11,6 +11,9 @@
 
     $(document).ready(function() {
         console.log('Simple ACF Conditional Logic - DOM ready');
+
+        var termIds = (typeof margACFConditional !== 'undefined' && margACFConditional.termIds) || {};
+        var subscriptionTermId = termIds.subscription_plans ? String(termIds.subscription_plans) : '';
         
         // Wait a bit for ACF to load
         setTimeout(function() {
@@ -38,16 +41,17 @@
                     
                     // Add change handler
                     $select.on('change', function() {
+                        var selectedValue = String($(this).val() || '');
                         var selectedText = $(this).find('option:selected').text().trim();
-                        console.log('Simple ACF Conditional Logic - Type changed to:', selectedText);
+                        console.log('Simple ACF Conditional Logic - Type changed to:', selectedText, selectedValue);
                         
                         // Look for taxonomy group
                         var $taxonomyGroup = $('[data-key="group_68e48ee0308e8"]');
                         console.log('Simple ACF Conditional Logic - Taxonomy group found:', $taxonomyGroup.length);
                         
                         if ($taxonomyGroup.length > 0) {
-                            // Simple logic: hide if "Subscription Plans"
-                            if (selectedText.toLowerCase().includes('subscription')) {
+                            // Use the current site's term ID; labels can be translated or renamed.
+                            if (subscriptionTermId && selectedValue === subscriptionTermId) {
                                 console.log('Simple ACF Conditional Logic - Hiding taxonomy group');
                                 $taxonomyGroup.hide();
                             } else {
@@ -70,4 +74,3 @@
     });
 
 })(jQuery);
-

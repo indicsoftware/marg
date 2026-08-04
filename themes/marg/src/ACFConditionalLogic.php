@@ -68,6 +68,12 @@ class ACFConditionalLogic {
 				'taxonomyGroupKey' => 'group_68e48ee0308e8',
 				'showForTerms'     => array( 'articles', 'books', 'magazines' ),
 				'hideForTerms'     => array( 'subscription-plans' ),
+				'termIds'          => array(
+					'articles'           => ProductCategoryResolver::id( 'articles' ),
+					'books'              => ProductCategoryResolver::id( 'books' ),
+					'magazines'          => ProductCategoryResolver::id( 'magazines' ),
+					'subscription_plans' => ProductCategoryResolver::id( 'subscription_plans' ),
+				),
 				'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
 				'nonce'            => wp_create_nonce( 'marg_acf_conditional_nonce' ),
 			)

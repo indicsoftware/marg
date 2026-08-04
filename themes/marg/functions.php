@@ -96,6 +96,11 @@ require_once __DIR__ . '/src/ACFCategoryFilter.php';
 $acf_category_filter = new \TenUpTheme\ACFCategoryFilter();
 $acf_category_filter->init();
 
+// Resolve product categories by slug so term IDs can differ between environments
+require_once __DIR__ . '/src/ProductCategoryResolver.php';
+$product_category_resolver = new \TenUpTheme\ProductCategoryResolver();
+$product_category_resolver->init();
+
 // Initialize WooCommerce Customizations to remove grouped product type
 require_once __DIR__ . '/src/WooCommerceCustomizations.php';
 $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();
