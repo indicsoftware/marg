@@ -60,7 +60,12 @@ class ThemeCore {
 		);
 
 		add_theme_support( 'editor-styles' );
-		add_editor_style( 'dist/css/frontend.css' );
+		add_editor_style(
+			array(
+				'dist/css/frontend.css',
+				'dist/css/editor-style-overrides.css',
+			)
+		);
 
 		remove_theme_support( 'core-block-patterns' );
 
