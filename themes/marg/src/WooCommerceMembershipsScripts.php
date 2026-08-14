@@ -83,10 +83,11 @@ class WooCommerceMembershipsScripts {
 				// Additional price elements to hide for members
 				var $memberDiscountElements = $(".wc-memberships-member-discount-message, .woocommerce-Price-amount, .woocommerce-Price-currencySymbol, .price, .woocommerce-variation-price .price");
 
-				// Check if user is a member
+				// Check if user is a member or product is Open Access
 				var isMember = window.woocommerceMemberships && window.woocommerceMemberships.isMember;
+				var isOpenAccess = window.woocommerceMemberships && window.woocommerceMemberships.isOpenAccess;
 
-				if (isMember && variation && variation.is_downloadable) {
+				if ((isMember || isOpenAccess) && variation && variation.is_downloadable) {
 					// Show member button and hide add to cart container for downloadable variations
 					$memberButtonContainer.show();
 					$addToCartContainer.hide();

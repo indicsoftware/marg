@@ -44,6 +44,11 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 		new \TenUpTheme\SecurePDFViewer();
 		new \TenUpTheme\SecurePDFEndpoint();
 		new \TenUpTheme\ACFConditionalLogic();
+		new \TenUpTheme\AuthModal();
+		new \TenUpTheme\AuthAjaxHandlers();
+		new \TenUpTheme\AuthProviders\MagicLinkAuth();
+		new \TenUpTheme\AuthProviders\GoogleAuth();
+		new \TenUpTheme\AuthProviders\AppleAuth();
 	}, 20 );
 } else {
 	// Basic autoloader for theme classes when vendor is not available
@@ -64,6 +69,23 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	});
 
 	require_once __DIR__ . '/template-tags.php';
+
+	// Initialize WooCommerce-related classes (same as vendor branch)
+	add_action( 'init', function() {
+		new \TenUpTheme\WooCommerceMemberships();
+		new \TenUpTheme\WooCommerceMembershipsStyles();
+		new \TenUpTheme\WooCommerceMembershipsScripts();
+		new \TenUpTheme\SecurePDFViewer();
+		new \TenUpTheme\SecurePDFEndpoint();
+		if ( class_exists( '\TenUpTheme\ACFConditionalLogic' ) ) {
+			new \TenUpTheme\ACFConditionalLogic();
+		}
+		new \TenUpTheme\AuthModal();
+		new \TenUpTheme\AuthAjaxHandlers();
+		new \TenUpTheme\AuthProviders\MagicLinkAuth();
+		new \TenUpTheme\AuthProviders\GoogleAuth();
+		new \TenUpTheme\AuthProviders\AppleAuth();
+	}, 20 );
 }
 
 // Initialize Admin Menu Customizer independently of vendor autoloader
