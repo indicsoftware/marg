@@ -16,6 +16,13 @@ namespace TenUpTheme;
 class AdminMenuCustomizer {
 
 	/**
+	 * Organizer for menu pages moved below Advanced.
+	 *
+	 * @var AdvancedAdminMenuOrganizer|null
+	 */
+	private $advanced_menu_organizer;
+
+	/**
 	 * Initialize the admin menu customizations
 	 *
 	 * @return void
@@ -46,7 +53,7 @@ class AdminMenuCustomizer {
 		add_action( 'admin_menu', array( $this, 'create_taxonomies_menu' ), 998 );
 		add_action( 'admin_menu', array( $this, 'create_advanced_menu' ), 998 );
 		add_action( 'admin_menu', array( $this, 'reorganize_taxonomies_menu' ), 999 );
-		add_action( 'admin_menu', array( $this, 'reorganize_advanced_menu' ), 999 );
+		add_action( 'admin_menu', array( $this, 'reorganize_advanced_menu' ), PHP_INT_MAX );
 		add_action( 'admin_menu', array( $this, 'customize_products_submenu' ), 999 );
 		add_action( 'admin_menu', array( $this, 'customize_people_submenu' ), 1000 );
 		add_action( 'admin_menu', array( $this, 'reorder_post_type_menus' ), 9999 );
@@ -474,7 +481,7 @@ class AdminMenuCustomizer {
 		add_menu_page(
 			'Advanced',                  // Page title
 			'Advanced',                  // Menu title
-			'manage_options',           // Capability
+			'read',                     // Capability
 			'advanced-menu',            // Menu slug
 			'',                        // Function (empty as this is just a parent)
 			'dashicons-admin-tools',   // Icon
@@ -483,376 +490,27 @@ class AdminMenuCustomizer {
 	}
 
 	/**
-	 * Reorganize advanced/plugin menu items
+	 * Move unlisted top-level menus below Advanced.
 	 *
 	 * @return void
 	 */
 	public function reorganize_advanced_menu() {
 		global $menu, $submenu;
 
-		// Move Updates from Dashboard to Advanced
-		if ( isset( $submenu['index.php'] ) ) {
-			foreach ( $submenu['index.php'] as $key => $item ) {
-				if ( isset( $item[2] ) && $item[2] === 'update-core.php' ) {
-					add_submenu_page(
-						'advanced-menu',
-						'Updates',
-						'Updates',
-						$item[1],
-						'update-core.php'
-					);
-					unset( $submenu['index.php'][$key] );
-					break;
-				}
-			}
+		$this->get_advanced_menu_organizer()->organize( $menu, $submenu );
+	}
+
+	/**
+	 * Get the shared Advanced menu organizer.
+	 *
+	 * @return AdvancedAdminMenuOrganizer
+	 */
+	private function get_advanced_menu_organizer() {
+		if ( null === $this->advanced_menu_organizer ) {
+			$this->advanced_menu_organizer = new AdvancedAdminMenuOrganizer();
 		}
 
-		// Add Appearance as submenu under Advanced
-		add_submenu_page(
-			'advanced-menu',
-			'Appearance',
-			'Appearance',
-			'switch_themes',
-			'themes.php'
-		);
-
-		// Add Plugins as submenu under Advanced
-		add_submenu_page(
-			'advanced-menu',
-			'Plugins',
-			'Plugins',
-			'activate_plugins',
-			'plugins.php'
-		);
-
-		// Add Users as submenu under Advanced
-		add_submenu_page(
-			'advanced-menu',
-			'Users',
-			'Users',
-			'list_users',
-			'users.php'
-		);
-
-		// Add Tools as submenu under Advanced
-		add_submenu_page(
-			'advanced-menu',
-			'Tools',
-			'Tools',
-			'manage_options',
-			'tools.php'
-		);
-
-		// Add Settings as submenu under Advanced
-		add_submenu_page(
-			'advanced-menu',
-			'Settings',
-			'Settings',
-			'manage_options',
-			'options-general.php'
-		);
-
-		// Remove the original menu items
-		remove_menu_page( 'themes.php' );           // Appearance
-		remove_menu_page( 'plugins.php' );          // Plugins
-		remove_menu_page( 'users.php' );            // Users
-		remove_menu_page( 'tools.php' );            // Tools
-		remove_menu_page( 'options-general.php' );  // Settings
-		remove_menu_page( 'profile.php' );          // Profile
-
-		// Remove WooCommerce top-level menu and add to Advanced
-		if ( class_exists( 'WooCommerce' ) ) {
-			// Remove WooCommerce top-level menu
-			remove_menu_page( 'woocommerce' );
-
-			// Add WooCommerce Settings to Advanced submenu
-			add_submenu_page(
-				'advanced-menu',
-				'WooCommerce',
-				'WooCommerce',
-				'manage_woocommerce',
-				'admin.php?page=wc-settings'
-			);
-		}
-
-		// Add Analytics (if WooCommerce Analytics exists)
-		if ( isset( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( isset( $item[0] ) && strpos( $item[0], 'Analytics' ) !== false ) {
-					add_submenu_page(
-						'advanced-menu',
-						'Analytics',
-						'Analytics',
-						$item[1],
-						$item[2]
-					);
-					remove_menu_page( $item[2] );
-				}
-			}
-		}
-
-		// Add Coupons (WooCommerce Coupons)
-		add_submenu_page(
-			'advanced-menu',
-			'Coupons',
-			'Coupons',
-			'manage_woocommerce',
-			'edit.php?post_type=shop_coupon'
-		);
-
-		// Add ACF (Advanced Custom Fields)
-		if ( class_exists( 'ACF' ) ) {
-			add_submenu_page(
-				'advanced-menu',
-				'ACF',
-				'ACF',
-				'manage_options',
-				'edit.php?post_type=acf-field-group'
-			);
-			remove_menu_page( 'edit.php?post_type=acf-field-group' );
-		}
-
-		// Add FileBird
-		add_submenu_page(
-			'advanced-menu',
-			'FileBird',
-			'FileBird',
-			'manage_options',
-			'filebird-settings'
-		);
-		remove_menu_page( 'filebird-settings' );
-
-		// Add Payments (WooCommerce Payments if exists)
-		// Try multiple possible menu slugs for Payments
-		$payment_slugs = array(
-			'wc-admin&path=/payments/overview',
-			'wc-admin&path=/payments',
-			'wcpay-overview',
-			'wc-payments'
-		);
-
-		foreach ( $payment_slugs as $slug ) {
-			remove_menu_page( $slug );
-		}
-
-		// Also check in the global menu array for any menu with "Payments" in the title
-		if ( isset( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( isset( $item[0] ) && ( strpos( $item[0], 'Payments' ) !== false || strpos( $item[0], 'payments' ) !== false ) ) {
-					add_submenu_page(
-						'advanced-menu',
-						'Payments',
-						'Payments',
-						isset( $item[1] ) ? $item[1] : 'manage_woocommerce',
-						isset( $item[2] ) ? $item[2] : 'wc-admin&path=/payments'
-					);
-					unset( $menu[$key] );
-					break;
-				}
-			}
-		}
-
-		// Add Code Snippets - check multiple possible menu slugs
-		$snippets_slugs = array( 'snippets', 'code-snippets', 'edit-snippets' );
-		$snippets_added = false;
-
-		// Try to add by class existence first
-		if ( class_exists( 'Code_Snippets' ) ) {
-			add_submenu_page(
-				'advanced-menu',
-				'Snippets',
-				'Snippets',
-				'manage_options',
-				'snippets'
-			);
-			$snippets_added = true;
-		}
-
-		// Remove all possible snippets menu slugs
-		foreach ( $snippets_slugs as $slug ) {
-			remove_menu_page( $slug );
-		}
-
-		// Also check in the global menu array for any menu with "Snippets" in the title
-		if ( isset( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( isset( $item[0] ) && stripos( $item[0], 'Snippets' ) !== false ) {
-					if ( ! $snippets_added ) {
-						add_submenu_page(
-							'advanced-menu',
-							'Snippets',
-							'Snippets',
-							isset( $item[1] ) ? $item[1] : 'manage_options',
-							isset( $item[2] ) ? $item[2] : 'snippets'
-						);
-					}
-					unset( $menu[$key] );
-					break;
-				}
-			}
-		}
-
-		// Add AltText.ai - check multiple possible menu slugs
-		$alttext_slugs = array( 'atai', 'alttext', 'alttext-ai', 'alt-text-ai' );
-		$alttext_added = false;
-
-		// Remove all possible AltText.ai menu slugs
-		foreach ( $alttext_slugs as $slug ) {
-			remove_menu_page( $slug );
-		}
-
-		// Also check in the global menu array for any menu with "AltText" or "Alt Text" in the title
-		if ( isset( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( isset( $item[0] ) && ( stripos( $item[0], 'AltText' ) !== false || stripos( $item[0], 'Alt Text' ) !== false || stripos( $item[0], 'atai' ) !== false ) ) {
-					add_submenu_page(
-						'advanced-menu',
-						'AltText.ai',
-						'AltText.ai',
-						isset( $item[1] ) ? $item[1] : 'manage_options',
-						isset( $item[2] ) ? $item[2] : 'atai'
-					);
-					unset( $menu[$key] );
-					$alttext_added = true;
-					break;
-				}
-			}
-		}
-
-		// If not found yet, add it with the known slug
-		if ( ! $alttext_added ) {
-			add_submenu_page(
-				'advanced-menu',
-				'AltText.ai',
-				'AltText.ai',
-				'manage_options',
-				'atai'
-			);
-		}
-
-		// Add WP Synchro
-		add_submenu_page(
-			'advanced-menu',
-			'WP Synchro',
-			'WP Synchro',
-			'manage_options',
-			'wpsynchro_menu'
-		);
-		remove_menu_page( 'wpsynchro_menu' );
-
-		// Add WP All Export - check multiple possible menu slugs
-		$export_slugs = array( 'pmxe-admin-export', 'pmxe-admin-manage', 'pmxe-admin-home' );
-		$export_added = false;
-
-		if ( class_exists( 'PMXE_Plugin' ) ) {
-			add_submenu_page(
-				'advanced-menu',
-				'All Export',
-				'All Export',
-				'manage_options',
-				'admin.php?page=pmxe-admin-export'
-			);
-			$export_added = true;
-		}
-
-		// Remove all possible export menu slugs
-		foreach ( $export_slugs as $slug ) {
-			remove_menu_page( $slug );
-		}
-
-		// Also check in the global menu array for any menu with "Export" in the title
-		if ( isset( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( isset( $item[0] ) && ( stripos( $item[0], 'All Export' ) !== false || ( stripos( $item[0], 'Export' ) !== false && stripos( $item[2], 'pmxe' ) !== false ) ) ) {
-					if ( ! $export_added ) {
-						// Use the original menu slug if available, otherwise use the proper format
-						$export_slug = isset( $item[2] ) ? $item[2] : 'admin.php?page=pmxe-admin-export';
-						// If it's just a slug without admin.php, add it
-						if ( strpos( $export_slug, 'admin.php' ) === false && strpos( $export_slug, '?' ) === false ) {
-							$export_slug = 'admin.php?page=' . $export_slug;
-						}
-						add_submenu_page(
-							'advanced-menu',
-							'All Export',
-							'All Export',
-							isset( $item[1] ) ? $item[1] : 'manage_options',
-							$export_slug
-						);
-					}
-					unset( $menu[$key] );
-					break;
-				}
-			}
-		}
-
-		// Add WP All Import
-		if ( class_exists( 'PMXI_Plugin' ) ) {
-			add_submenu_page(
-				'advanced-menu',
-				'All Import',
-				'All Import',
-				'manage_options',
-				'pmxi-admin-home'
-			);
-			remove_menu_page( 'pmxi-admin-home' );
-		}
-
-		// Add WP Pusher
-		add_submenu_page(
-			'advanced-menu',
-			'WP Pusher',
-			'WP Pusher',
-			'manage_options',
-			'wppusher'
-		);
-		remove_menu_page( 'wppusher' );
-
-		// Add Kinsta Cache
-		add_submenu_page(
-			'advanced-menu',
-			'Kinsta Cache',
-			'Kinsta Cache',
-			'manage_options',
-			'kinsta-tools'
-		);
-		remove_menu_page( 'kinsta-tools' );
-
-		// Check for any remaining plugin menus and move them
-		$plugin_keywords = array( 'Marketing', 'Analytics', 'Payments', 'Snippets', 'AltText', 'Alt Text', 'All Export', 'All Import' );
-
-		if ( isset( $menu ) && is_array( $menu ) ) {
-			foreach ( $menu as $key => $item ) {
-				if ( ! isset( $item[0] ) || ! isset( $item[2] ) ) {
-					continue;
-				}
-
-				// Skip core WordPress menus we've already handled
-				$core_menus = array( 'index.php', 'upload.php', 'edit-comments.php', 'profile.php' );
-				if ( in_array( $item[2], $core_menus, true ) ) {
-					continue;
-				}
-
-				// Check if this menu item matches any of our plugin keywords
-				foreach ( $plugin_keywords as $keyword ) {
-					if ( stripos( $item[0], $keyword ) !== false ) {
-						add_submenu_page(
-							'advanced-menu',
-							$item[0],
-							$item[0],
-							$item[1],
-							$item[2]
-						);
-						unset( $menu[$key] );
-						break;
-					}
-				}
-			}
-		}
-
-		// Remove the empty parent menu item (first item) from Advanced submenu
-		if ( isset( $submenu['advanced-menu'] ) && ! empty( $submenu['advanced-menu'] ) ) {
-			unset( $submenu['advanced-menu'][0] );
-		}
+		return $this->advanced_menu_organizer;
 	}
 
 	/**
@@ -1111,58 +769,15 @@ class AdminMenuCustomizer {
 			return 'admin.php?page=wc-orders';
 		}
 
-		// Check if we're on one of the advanced/plugin pages
-		$advanced_pages = array(
-			'update-core.php',
-			'themes.php',
-			'plugins.php',
-			'users.php',
-			'tools.php',
-			'options-general.php',
-			'woocommerce',
-			'wc-settings',
-			'admin.php?page=wc-settings',
-			'woocommerce-marketing',
-			'edit.php?post_type=acf-field-group',
-			'filebird-settings',
-			'snippets',
-			'code-snippets',
-			'edit-snippets',
-			'atai',
-			'alttext',
-			'alttext-ai',
-			'alt-text-ai',
-			'wpsynchro_menu',
-			'pmxe-admin-export',
-			'admin.php?page=pmxe-admin-export',
-			'pmxe-admin-manage',
-			'pmxe-admin-home',
-			'pmxi-admin-home',
-			'wppusher',
-			'kinsta-tools',
-			'wc-admin&path=/payments/overview',
-			'wc-admin&path=/payments',
-			'wcpay-overview',
-			'wc-payments'
-		);
-
-		if ( in_array( $parent_file, $advanced_pages, true ) ) {
+		if ( null !== $this->get_advanced_menu_organizer()->get_moved_link( $parent_file ) ) {
 			return 'advanced-menu';
 		}
 
-		// Also check if we're on a WP All Export page via GET parameter
-		if ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'pmxe' ) === 0 ) {
-			return 'advanced-menu';
-		}
-
-		// Check if parent file contains payments
-		if ( strpos( $parent_file, 'payments' ) !== false || strpos( $parent_file, 'Payments' ) !== false ) {
-			return 'advanced-menu';
-		}
-
-		// Check for WooCommerce admin pages
-		if ( isset( $current_screen->id ) && strpos( $current_screen->id, 'woocommerce' ) !== false ) {
-			return 'advanced-menu';
+		if ( isset( $_GET['page'] ) ) {
+			$page_slug = sanitize_text_field( wp_unslash( $_GET['page'] ) );
+			if ( null !== $this->get_advanced_menu_organizer()->get_moved_link( $page_slug ) ) {
+				return 'advanced-menu';
+			}
 		}
 
 		return $parent_file;
@@ -1177,6 +792,21 @@ class AdminMenuCustomizer {
 	 */
 	public function adjust_submenu_file( $submenu_file, $parent_file ) {
 		global $current_screen;
+
+		if ( 'advanced-menu' === $parent_file ) {
+			if ( isset( $_GET['page'] ) ) {
+				$page_slug = sanitize_text_field( wp_unslash( $_GET['page'] ) );
+				$moved_link = $this->get_advanced_menu_organizer()->get_moved_link( $page_slug );
+				if ( null !== $moved_link ) {
+					return $moved_link;
+				}
+			}
+
+			$moved_link = $this->get_advanced_menu_organizer()->get_moved_link( $submenu_file );
+			if ( null !== $moved_link ) {
+				return $moved_link;
+			}
+		}
 
 		// If we're on a taxonomy page that we moved to the Taxonomies menu
 		if ( isset( $current_screen->taxonomy ) && $parent_file === 'taxonomies-menu' ) {
