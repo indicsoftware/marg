@@ -43,7 +43,6 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 		new \TenUpTheme\WooCommerceMembershipsScripts();
 		new \TenUpTheme\SecurePDFViewer();
 		new \TenUpTheme\SecurePDFEndpoint();
-		new \TenUpTheme\ACFConditionalLogic();
 	}, 20 );
 } else {
 	// Basic autoloader for theme classes when vendor is not available
