@@ -25,6 +25,9 @@ class TaxonomyInheritance {
 		// Sync taxonomies from Articles to Magazines after ACF save
 		add_action( 'acf/save_post', array( $this, 'sync_article_taxonomies_to_magazines' ), 30 );
 
+		// WP All Import writes ACF values without firing acf/save_post.
+		add_action( 'pmxi_after_xml_import', array( $this, 'sync_imported_article_taxonomies_to_magazines' ), 20, 2 );
+
 		// Sync Open Access from Magazines to Articles after ACF save
 		add_action( 'acf/save_post', array( $this, 'sync_magazine_open_access_to_articles' ), 30 );
 
@@ -94,6 +97,72 @@ class TaxonomyInheritance {
 				error_log( "[TaxonomyInheritance] WARNING: Invalid magazine object in parent_publication" );
 			}
 		}
+	}
+
+	/**
+	 * Rebuild Magazine taxonomies after an Article import completes.
+	 *
+	 * Rebuilding every Magazine also clears stale terms when an imported
+	 * Article has moved from one parent publication to another.
+	 *
+	 * @param int        $import_id WP All Import import ID.
+	 * @param mixed|null $import    WP All Import record. Unused.
+	 * @return array Taxonomy sync summary.
+	 */
+	public function sync_imported_article_taxonomies_to_magazines( $import_id, $import = null ) {
+		unset( $import );
+
+		foreach ( $this->get_imported_post_ids( $import_id ) as $post_id ) {
+			if (
+				'product' === get_post_type( $post_id ) &&
+				ProductCategoryResolver::has( $post_id, 'articles' )
+			) {
+				return $this->sync_all_magazine_taxonomies();
+			}
+		}
+
+		return $this->empty_sync_summary();
+	}
+
+	/**
+	 * Rebuild inherited taxonomies for every Magazine.
+	 *
+	 * @return array Taxonomy sync summary.
+	 */
+	public function sync_all_magazine_taxonomies() {
+		$query = new \WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'tax_query'      => array(
+					array(
+						'taxonomy' => 'product_cat',
+						'field'    => 'slug',
+						'terms'    => ProductCategoryResolver::slug( 'magazines' ),
+					),
+				),
+			)
+		);
+
+		$magazine_ids = array_values( array_unique( array_map( 'intval', $query->posts ) ) );
+		$summary      = array(
+			'requested' => count( $magazine_ids ),
+			'updated'   => 0,
+			'failed'    => array(),
+		);
+
+		foreach ( $magazine_ids as $magazine_id ) {
+			if ( $this->update_magazine_taxonomies( $magazine_id ) ) {
+				$summary['updated']++;
+			} else {
+				$summary['failed'][] = $magazine_id;
+			}
+		}
+
+		return $summary;
 	}
 
 	/**
@@ -404,6 +473,44 @@ class TaxonomyInheritance {
 		}
 
 		return $query->posts;
+	}
+
+	/**
+	 * Return the posts tracked for one WP All Import run.
+	 *
+	 * @param int $import_id WP All Import import ID.
+	 * @return array<int, int> Imported post IDs.
+	 */
+	private function get_imported_post_ids( $import_id ) {
+		global $wpdb;
+
+		$import_id = (int) $import_id;
+		if ( $import_id < 1 ) {
+			return array();
+		}
+
+		$table_name = $wpdb->prefix . 'pmxi_posts';
+		$post_ids   = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$table_name} WHERE import_id = %d",
+				$import_id
+			)
+		);
+
+		return array_values( array_unique( array_map( 'intval', $post_ids ) ) );
+	}
+
+	/**
+	 * Return a no-op taxonomy sync result.
+	 *
+	 * @return array Taxonomy sync summary.
+	 */
+	private function empty_sync_summary() {
+		return array(
+			'requested' => 0,
+			'updated'   => 0,
+			'failed'    => array(),
+		);
 	}
 
 	/**
