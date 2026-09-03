@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repository_root"
+
+temporary_directory="$(mktemp -d)"
+trap 'rm -rf -- "$temporary_directory"' EXIT
+
+run_step() {
+	local label="$1"
+	shift
+	local started_at=$SECONDS
+
+	printf '\n==> %s\n' "$label"
+	"$@"
+	printf '<== %s (%ss)\n' "$label" "$((SECONDS - started_at))"
+}
+
+install_node() {
+	local node_major=0
+	local npm_major=0
+
+	if command -v node >/dev/null 2>&1; then
+		node_major="$(node --version | sed -E 's/^v([0-9]+).*/\1/')"
+	fi
+	if command -v npm >/dev/null 2>&1; then
+		npm_major="$(npm --version | sed -E 's/^([0-9]+).*/\1/')"
+	fi
+
+	if ((node_major == 24 && npm_major >= 9)); then
+		return
+	fi
+
+	if ! command -v npm >/dev/null 2>&1; then
+		printf '%s\n' 'npm is required to install the project Node.js version.' >&2
+		exit 1
+	fi
+
+	sudo npm install --global n --no-audit --no-fund
+	sudo n 24
+	hash -r
+}
+
+install_php() {
+	local packages=(
+		php8.3-cli
+		php8.3-curl
+		php8.3-mbstring
+		php8.3-xml
+		php8.3-zip
+	)
+	local missing_package=false
+	local package
+
+	for package in "${packages[@]}"; do
+		if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -Fq 'install ok installed'; then
+			missing_package=true
+		fi
+	done
+	if [[ "$missing_package" == false ]]; then
+		sudo update-alternatives --set php /usr/bin/php8.3 >/dev/null
+		return
+	fi
+
+	sudo apt-get update
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+		ca-certificates \
+		curl
+
+	if ! dpkg-query -W -f='${Status}' debsuryorg-archive-keyring 2>/dev/null | grep -Fq 'install ok installed'; then
+		curl -fsSL https://packages.sury.org/debsuryorg-archive-keyring.deb \
+			-o "$temporary_directory/debsuryorg-archive-keyring.deb"
+		sudo dpkg -i "$temporary_directory/debsuryorg-archive-keyring.deb"
+	fi
+
+	if ! apt-cache show php8.3-cli >/dev/null 2>&1; then
+		printf 'deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ %s main\n' \
+			"$(. /etc/os-release && printf '%s' "$VERSION_CODENAME")" |
+			sudo tee /etc/apt/sources.list.d/php.list >/dev/null
+		sudo apt-get update
+	fi
+
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${packages[@]}"
+	sudo update-alternatives --set php /usr/bin/php8.3 >/dev/null
+}
+
+install_composer() {
+	if command -v composer >/dev/null 2>&1 && [[ "$(composer --version --no-ansi 2>/dev/null)" =~ ^Composer\ version\ 2\. ]]; then
+		return
+	fi
+
+	local expected_checksum
+	local actual_checksum
+	local installer="$temporary_directory/composer-setup.php"
+
+	expected_checksum="$(curl -fsSL https://composer.github.io/installer.sig)"
+	curl -fsSL https://getcomposer.org/installer -o "$installer"
+	actual_checksum="$(php -r "echo hash_file('sha384', '$installer');")"
+	if [[ "$actual_checksum" != "$expected_checksum" ]]; then
+		printf '%s\n' 'Composer installer checksum verification failed.' >&2
+		exit 1
+	fi
+
+	sudo php "$installer" --2 --install-dir=/usr/local/bin --filename=composer --quiet
+}
+
+install_javascript_dependencies() {
+	local fingerprint_file="node_modules/.amp-setup-fingerprint"
+	local fingerprint
+	fingerprint="$({
+		sha256sum package-lock.json
+		node --version
+		npm --version
+	} | sha256sum | cut -d ' ' -f 1)"
+
+	if [[ -f "$fingerprint_file" ]] && [[ "$(cat "$fingerprint_file")" == "$fingerprint" ]]; then
+		printf '%s\n' 'JavaScript dependencies already match the lockfile.'
+		return
+	fi
+
+	HUSKY=0 npm ci --no-audit --no-fund
+	printf '%s\n' "$fingerprint" > "$fingerprint_file"
+}
+
+run_step 'Install Node.js 24' install_node
+run_step 'Install PHP 8.3' install_php
+run_step 'Install Composer 2' install_composer
+run_step 'Install JavaScript dependencies' install_javascript_dependencies
+run_step 'Install root Composer dependencies' composer install --no-interaction --no-progress --prefer-dist
+run_step 'Install theme Composer dependencies' composer install --working-dir=themes/marg --no-interaction --no-progress --prefer-dist
+run_step 'Install plugin Composer dependencies' composer install --working-dir=mu-plugins/10up-plugin --no-interaction --no-progress --prefer-dist
+
+printf '\nOrb setup complete.\n'

@@ -39,3 +39,6 @@ tasks.json
 Thumbs.db
 Desktop.ini
 /debug.log
+
+# Amp orb runtime files
+.amp/portals/
