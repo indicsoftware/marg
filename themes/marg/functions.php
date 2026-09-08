@@ -66,7 +66,6 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 // Initialize Admin Menu Customizer independently of vendor autoloader
-require_once __DIR__ . '/src/AdvancedAdminMenuOrganizer.php';
 require_once __DIR__ . '/src/AdminMenuCustomizer.php';
 $admin_menu_customizer = new \TenUpTheme\AdminMenuCustomizer();
 $admin_menu_customizer->init();

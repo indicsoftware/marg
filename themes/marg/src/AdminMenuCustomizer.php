@@ -16,13 +16,6 @@ namespace TenUpTheme;
 class AdminMenuCustomizer {
 
 	/**
-	 * Organizer for menu pages moved below Advanced.
-	 *
-	 * @var AdvancedAdminMenuOrganizer|null
-	 */
-	private $advanced_menu_organizer;
-
-	/**
 	 * Initialize the admin menu customizations
 	 *
 	 * @return void
@@ -46,20 +39,15 @@ class AdminMenuCustomizer {
 		// Enable revisions for Person post type
 		add_action( 'init', array( $this, 'enable_person_revisions' ), 20 );
 
-		// Restrict global-settings page to Administrators only
+		// Restrict Global Settings to users who manage WooCommerce
 		add_action( 'admin_init', array( $this, 'restrict_global_settings_access' ) );
 
 		// Hook into admin_menu with high priority to ensure all menus are registered
 		add_action( 'admin_menu', array( $this, 'create_taxonomies_menu' ), 998 );
-		add_action( 'admin_menu', array( $this, 'create_advanced_menu' ), 998 );
 		add_action( 'admin_menu', array( $this, 'reorganize_taxonomies_menu' ), 999 );
-		add_action( 'admin_menu', array( $this, 'reorganize_advanced_menu' ), PHP_INT_MAX );
 		add_action( 'admin_menu', array( $this, 'customize_products_submenu' ), 999 );
 		add_action( 'admin_menu', array( $this, 'customize_people_submenu' ), 1000 );
 		add_action( 'admin_menu', array( $this, 'reorder_post_type_menus' ), 9999 );
-
-		// Hide unwanted separators with CSS
-		add_action( 'admin_head', array( $this, 'hide_menu_separators_css' ) );
 
 		// Adjust parent file for proper highlighting
 		add_filter( 'parent_file', array( $this, 'adjust_parent_file' ) );
@@ -79,15 +67,14 @@ class AdminMenuCustomizer {
 	}
 
 	/**
-	 * Restrict access to global-settings page to Administrators only
+	 * Restrict access to Global Settings to users who manage WooCommerce
 	 *
 	 * @return void
 	 */
 	public function restrict_global_settings_access() {
 		// Check if we're on the global-settings page
 		if ( isset( $_GET['page'] ) && $_GET['page'] === 'global-settings' ) {
-			// Check if user is NOT an administrator
-			if ( ! current_user_can( 'administrator' ) ) {
+			if ( ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die(
 					__( 'You do not have sufficient permissions to access this page.' ),
 					403
@@ -473,47 +460,6 @@ class AdminMenuCustomizer {
 	}
 
 	/**
-	 * Create the Advanced menu
-	 *
-	 * @return void
-	 */
-	public function create_advanced_menu() {
-		add_menu_page(
-			'Advanced',                  // Page title
-			'Advanced',                  // Menu title
-			'read',                     // Capability
-			'advanced-menu',            // Menu slug
-			'',                        // Function (empty as this is just a parent)
-			'dashicons-admin-tools',   // Icon
-			90                         // Position (near bottom)
-		);
-	}
-
-	/**
-	 * Move unlisted top-level menus below Advanced.
-	 *
-	 * @return void
-	 */
-	public function reorganize_advanced_menu() {
-		global $menu, $submenu;
-
-		$this->get_advanced_menu_organizer()->organize( $menu, $submenu );
-	}
-
-	/**
-	 * Get the shared Advanced menu organizer.
-	 *
-	 * @return AdvancedAdminMenuOrganizer
-	 */
-	private function get_advanced_menu_organizer() {
-		if ( null === $this->advanced_menu_organizer ) {
-			$this->advanced_menu_organizer = new AdvancedAdminMenuOrganizer();
-		}
-
-		return $this->advanced_menu_organizer;
-	}
-
-	/**
 	 * Customize the Products submenu to add product category links
 	 *
 	 * @return void
@@ -769,17 +715,6 @@ class AdminMenuCustomizer {
 			return 'admin.php?page=wc-orders';
 		}
 
-		if ( null !== $this->get_advanced_menu_organizer()->get_moved_link( $parent_file ) ) {
-			return 'advanced-menu';
-		}
-
-		if ( isset( $_GET['page'] ) ) {
-			$page_slug = sanitize_text_field( wp_unslash( $_GET['page'] ) );
-			if ( null !== $this->get_advanced_menu_organizer()->get_moved_link( $page_slug ) ) {
-				return 'advanced-menu';
-			}
-		}
-
 		return $parent_file;
 	}
 
@@ -792,21 +727,6 @@ class AdminMenuCustomizer {
 	 */
 	public function adjust_submenu_file( $submenu_file, $parent_file ) {
 		global $current_screen;
-
-		if ( 'advanced-menu' === $parent_file ) {
-			if ( isset( $_GET['page'] ) ) {
-				$page_slug = sanitize_text_field( wp_unslash( $_GET['page'] ) );
-				$moved_link = $this->get_advanced_menu_organizer()->get_moved_link( $page_slug );
-				if ( null !== $moved_link ) {
-					return $moved_link;
-				}
-			}
-
-			$moved_link = $this->get_advanced_menu_organizer()->get_moved_link( $submenu_file );
-			if ( null !== $moved_link ) {
-				return $moved_link;
-			}
-		}
 
 		// If we're on a taxonomy page that we moved to the Taxonomies menu
 		if ( isset( $current_screen->taxonomy ) && $parent_file === 'taxonomies-menu' ) {
@@ -829,138 +749,6 @@ class AdminMenuCustomizer {
 		}
 
 		return $submenu_file;
-	}
-
-	/**
-	 * Hide unwanted menu separators with CSS
-	 *
-	 * @return void
-	 */
-	public function hide_menu_separators_css() {
-		// Check if current user is NOT an administrator
-		$hide_global_settings = ! current_user_can( 'administrator' );
-
-		echo '<style>
-			/* Hide separator between Events and Media */
-			#menu-posts-event + .wp-menu-separator,
-			/* Hide separator between Pages and People */
-			#menu-pages + .wp-menu-separator,
-			/* Hide separator between Media and Taxonomies */
-			#menu-media + .wp-menu-separator {
-				display: none !important;
-			}
-
-			/* Hide Profile menu */
-			#menu-users {
-				display: none !important;
-			}';
-
-		// Hide Global Settings for non-administrators
-		if ( $hide_global_settings ) {
-			echo '
-			/* Hide Global Settings for non-administrators */
-			#toplevel_page_global-settings {
-				display: none !important;
-			}';
-		}
-
-		echo '
-			/* Reorder post type menus using flexbox */
-			#adminmenu {
-				display: flex !important;
-				flex-direction: column !important;
-			}
-
-			/* Dashboard stays first */
-			#menu-dashboard {
-				order: 10 !important;
-			}
-
-			/* Post types in desired order: Dashboard, Pages, People, Posts, Products, Orders, Events */
-			#menu-pages {
-				order: 20 !important;
-			}
-
-			#menu-posts-person {
-				order: 30 !important;
-			}
-
-			#menu-posts {
-				order: 40 !important;
-			}
-
-			#menu-posts-product {
-				order: 50 !important;
-			}
-
-			#toplevel_page_wc-orders {
-				order: 60 !important;
-			}
-
-			#menu-posts-event {
-				order: 70 !important;
-			}
-
-			/* Media after post types */
-			#menu-media {
-				order: 100 !important;
-			}
-
-			/* Custom menus */
-			#toplevel_page_taxonomies-menu {
-				order: 200 !important;
-			}
-
-			#toplevel_page_global-settings {
-				order: 210 !important;
-			}
-
-			#toplevel_page_advanced-menu {
-				order: 220 !important;
-			}
-
-			/* Menu separators */
-			.wp-menu-separator {
-				order: 1000 !important;
-			}
-
-			/* Collapse button at the end */
-			#collapse-menu {
-				order: 9999 !important;
-			}
-		</style>
-		<script>
-		jQuery(document).ready(function($) {
-			// Backup: Physically reorder menu items in DOM
-			// Order: Dashboard, Pages, People, Posts, Products, Orders, Events
-			var dashboard = $("#menu-dashboard");
-			var pages = $("#menu-pages");
-			var people = $("#menu-posts-person");
-			var posts = $("#menu-posts");
-			var products = $("#menu-posts-product");
-			var orders = $("#toplevel_page_wc-orders");
-			var events = $("#menu-posts-event");
-
-			if (dashboard.length && pages.length) {
-				pages.insertAfter(dashboard);
-			}
-			if (pages.length && people.length) {
-				people.insertAfter(pages);
-			}
-			if (people.length && posts.length) {
-				posts.insertAfter(people);
-			}
-			if (posts.length && products.length) {
-				products.insertAfter(posts);
-			}
-			if (products.length && orders.length) {
-				orders.insertAfter(products);
-			}
-			if (orders.length && events.length) {
-				events.insertAfter(orders);
-			}
-		});
-		</script>';
 	}
 
 	/**

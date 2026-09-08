@@ -125,7 +125,9 @@ class VariationSync {
 		}
 
 		if ( isset( $print_data['weight'] ) && $print_data['weight'] !== '' ) {
-			$variation->set_weight( $print_data['weight'] );
+			$variation->set_weight(
+				wc_get_weight( (float) $print_data['weight'], get_option( 'woocommerce_weight_unit', 'kg' ), 'g' )
+			);
 		}
 
 		if ( isset( $print_data['length'] ) && $print_data['length'] !== '' ) {
