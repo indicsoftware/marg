@@ -103,17 +103,32 @@ describe('product schema launch scope', () => {
 		});
 	});
 
-	test('leaves parked print commerce fields in place and excludes deferred magazine fields', () => {
+	test('includes fields parked only in For Marg and excludes fields parked in Field Status', () => {
+		expect(subField('magazine_details', 'open_access_hover_image')).toMatchObject({
+			key: 'field_magazine_open_access_hover_image',
+			type: 'image',
+			required: 1,
+			conditional_logic: 0,
+			return_format: 'id',
+			min_width: 500,
+			min_height: '',
+			max_width: '',
+			max_height: '',
+		});
 		const printDetails = subField('magazine_details', 'print_details');
 		expect(printDetails.sub_fields).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({ key: 'field_print_price_inr', name: 'regular_price_inr' }),
+				expect.objectContaining({ key: 'field_print_sale_price_inr', name: 'sale_price_inr' }),
+				expect.objectContaining({ key: 'field_print_price_usd', name: 'regular_price_usd' }),
+				expect.objectContaining({ key: 'field_print_sale_price_usd', name: 'sale_price_usd' }),
 				expect.objectContaining({ key: 'field_print_stock_status', name: 'stock_status' }),
+				expect.objectContaining({ key: 'field_print_stock_quantity', name: 'stock_quantity' }),
 				expect.objectContaining({ key: 'field_print_out_of_print', name: 'out_of_print' }),
 				expect.objectContaining({ key: 'field_print_weight', name: 'weight' }),
 			]),
 		);
-		for (const name of ['hover', 'cta', 'flipthrough', 'cutout', 'gallery']) {
+		for (const name of ['cta', 'flipthrough', 'cutout', 'gallery']) {
 			expect(subField('magazine_details', name)).toBeUndefined();
 		}
 	});

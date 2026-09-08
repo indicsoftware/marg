@@ -28,7 +28,7 @@ function absint( $value ) { return abs( (int) $value ); }
 function wp_unslash( $value ) { return $value; }
 function sanitize_text_field( $value ) { return strip_tags( $value ); }
 function get_post_thumbnail_id( $id ) { return 8; }
-function wp_get_attachment_metadata( $id ) { return array( 'width' => 8 === $id ? 1000 : 500 ); }
+function wp_get_attachment_metadata( $id ) { return array( 'width' => array( 7 => 499, 8 => 1000 )[$id] ?? 500 ); }
 function wp_attachment_is_image( $id ) { return $id > 0; }
 function acf_add_validation_error( $input, $message ) { global $errors; $errors[$input] = $message; }
 function acf_get_form_data( $key ) { return 1; }
@@ -44,6 +44,13 @@ require_once dirname( __DIR__ ) . '/src/WooCommerceCustomizations.php';
 $fields = new \TenUpTheme\ProductEditorialFields();
 $fields->init();
 $load = fn( $key, $value = null ) => $hooks['acf/load_value/key=' . $key]( $value, 1, array( 'key' => $key ) );
+
+$validate_hover = $hooks['acf/validate_value/key=field_magazine_open_access_hover_image'];
+same( true, $validate_hover( true, 9 ) ); // Exactly 500px.
+same( true, $validate_hover( true, 8 ) ); // Wider images retain their dimensions.
+same( true, is_string( $validate_hover( true, 7 ) ) ); // 499px must fail.
+same( true, is_string( $validate_hover( true, '' ) ) );
+same( 'required error', $validate_hover( 'required error', '' ) );
 
 foreach ( array( 'pp. 10-11' => array( 10, 11 ), 'p. 12' => array( 12, 12 ), '112–125' => array( 112, 125 ), '45' => array( 45, 45 ), '12-10' => array(), 'iv–vi' => array(), '10, 12' => array() ) as $text => $expected ) {
 	same( $expected, $fields::legacy_pages( $text ) );

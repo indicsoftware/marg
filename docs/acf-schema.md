@@ -30,13 +30,17 @@ The restriction lives in the Marg theme and applies while that theme is active. 
 
 ## Interim launch decisions
 
-Use `Backend-SourceOfTruth-1.xlsx` and the decisions agreed on 8 September 2026. A row marked Parked in Field Status or For Marg is excluded from launch work. Existing parked fields and data remain unchanged. Gift sets is also excluded.
+Use `Backend-SourceOfTruth-1.xlsx` and the decisions agreed on 8 September 2026. Exclude a row only when Field Status is Parked. Ignore the For Marg column when determining scope. Existing parked fields and data remain unchanged. Gift sets is also excluded.
 
 Person Type stays multi-select. Bio is a plain textarea. Bio Last Updated On captures date and time, displays `d/m/Y H:i` and returns `Y-m-d H:i:s`. Designation is required for Team; Contributor Type is required for Contributor and General Editor.
 
 Magazine volume, issue and publication Start date are required. Publication End date is optional and cannot precede Start. The separate read-only Year field is reserved for migration from the old CMS. It does not reuse Publication month and year (Reference). Volume Info is removed from the form; its database values are retained.
 
 Magazine additions are photograph and illustration counts, Print Length, Open Access Featured Text and Sightseeing Scan. Use WooCommerce's native product image for covers and Article featured images. The ACF editor submission requires a magazine cover at least 1000px wide. Article galleries and the other parked media fields are deferred.
+
+Open Access Hover Image is required for every Magazine, including those with Open Access set to No, as the workbook specifies no additional condition. It accepts images at least 500px wide and preserves their natural proportions. ACF enforces the required value; the theme also validates image width during form submission, because ACF's media-picker constraint alone does not reject undersized existing attachments on save. Existing Magazines need this image supplied when next saved through the editor. This field stores an attachment ID; adding it does not implement a front-end hover effect.
+
+Magazine print pricing, stock, Out of Print and shipping weight are in scope because their Field Status is Added. These fields already exist. The workbook labels shipping weight in kilograms, while the existing ACF field stores grams and the sync converts grams to the WooCommerce unit. Preserve this previously approved behavior until a separate unit change and data migration are agreed.
 
 Article From and To are optional positive integers. Supply both or neither; To must be at least From. The theme reads unambiguous legacy `article_details_page_number` strings such as `pp. 10-11` and `p. 12` into the new controls only when the new metadata does not yet exist. Original text is never deleted. Unparseable references remain available in field instructions for manual review. Saving the form stores the new numeric values. Explicitly clearing them leaves them blank on later loads.
 
@@ -49,6 +53,7 @@ Migration targets use these ACF keys:
 | Illustration count | `field_magazine_number_of_illustrations` | `magazine_details_number_of_illustrations` |
 | Print Length | `field_magazine_print_length` | `magazine_details_print_length` |
 | Open Access Featured Text | `field_magazine_open_access_featured_text` | `magazine_details_open_access_featured_text` |
+| Open Access Hover Image | `field_magazine_open_access_hover_image` | `magazine_details_open_access_hover_image` |
 | Sightseeing Scan | `field_magazine_sightseeing_scan` | `magazine_details_sightseeing_scan` |
 | From page | `field_article_page_from` | `article_details_page_from` |
 | To page | `field_article_page_to` | `article_details_page_to` |

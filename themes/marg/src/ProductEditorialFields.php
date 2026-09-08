@@ -20,12 +20,31 @@ class ProductEditorialFields {
 		add_filter( 'acf/update_value/key=field_article_open_access', array( $this, 'load_value' ), 20, 3 );
 		add_action( 'acf/input/admin_footer', array( $this, 'disable_inherited_toggle' ) );
 		add_filter( 'acf/prepare_field/key=field_article_page_from', array( $this, 'show_legacy_pages' ) );
+		add_filter( 'acf/validate_value/key=field_magazine_open_access_hover_image', array( $this, 'validate_hover_image' ), 10, 2 );
 		add_filter( 'acf/validate_value/key=field_article_details_group', array( $this, 'validate_pages' ), 10, 2 );
 		add_filter( 'acf/validate_value/key=field_689d970ca7425', array( $this, 'validate_dates' ), 10, 2 );
 		foreach ( array( 'field_article_page_from', 'field_article_page_to', 'field_68515df152c76', 'field_68a845be7acae', 'field_magazine_number_of_photographs', 'field_magazine_number_of_illustrations', 'field_magazine_print_length' ) as $key ) {
 			add_filter( 'acf/validate_value/key=' . $key, array( $this, 'validate_integer' ), 10, 2 );
 		}
 		add_action( 'acf/validate_save_post', array( $this, 'validate_native_product_fields' ) );
+	}
+
+	/**
+	 * Enforce image width on form saves as well as in the media picker.
+	 *
+	 * @param mixed $valid Existing validation result.
+	 * @param mixed $value Submitted attachment ID.
+	 * @return mixed
+	 */
+	public function validate_hover_image( $valid, $value ) {
+		if ( true !== $valid ) {
+			return $valid;
+		}
+		$metadata = wp_get_attachment_metadata( (int) $value );
+		if ( ! wp_attachment_is_image( (int) $value ) || empty( $metadata['width'] ) || $metadata['width'] < 500 ) {
+			return __( 'Choose an Open Access Hover Image at least 500px wide.', 'tenup' );
+		}
+		return $valid;
 	}
 
 	/**

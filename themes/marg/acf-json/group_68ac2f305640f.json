@@ -1198,6 +1198,32 @@
                     "append": ""
                 },
                 {
+                    "key": "field_magazine_open_access_hover_image",
+                    "label": "Open Access Hover Image",
+                    "name": "open_access_hover_image",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "Upload an image at least 500px wide. Keep its natural proportions.",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "id",
+                    "library": "all",
+                    "min_width": 500,
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "",
+                    "preview_size": "medium",
+                    "allow_in_bindings": 0
+                },
+                {
                     "key": "field_magazine_sightseeing_scan",
                     "label": "Sightseeing Scan",
                     "name": "sightseeing_scan",
@@ -2270,5 +2296,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788850923
+    "modified": 1788851591
 }
