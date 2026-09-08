@@ -75,7 +75,7 @@
             "label": "Bio",
             "name": "bio",
             "aria-label": "",
-            "type": "wysiwyg",
+            "type": "textarea",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -86,10 +86,10 @@
             },
             "default_value": "",
             "allow_in_bindings": 0,
-            "tabs": "visual",
-            "toolbar": "italic_only",
-            "media_upload": 0,
-            "delay": 0
+            "maxlength": "",
+            "rows": "",
+            "placeholder": "",
+            "new_lines": ""
         },
         {
             "key": "field_6859239657159",
@@ -98,7 +98,7 @@
             "aria-label": "",
             "type": "text",
             "instructions": "",
-            "required": 0,
+            "required": 1,
             "conditional_logic": [
                 [
                     {
@@ -125,7 +125,7 @@
             "label": "Bio Last Updated On",
             "name": "bio_last_updated_on",
             "aria-label": "",
-            "type": "date_picker",
+            "type": "date_time_picker",
             "instructions": "",
             "required": 0,
             "conditional_logic": [
@@ -149,8 +149,8 @@
                 "class": "",
                 "id": ""
             },
-            "display_format": "d\/m\/Y",
-            "return_format": "d\/m\/Y",
+            "display_format": "d\/m\/Y H:i",
+            "return_format": "Y-m-d H:i:s",
             "first_day": 1,
             "allow_in_bindings": 0,
             "default_to_current_date": 0
@@ -162,7 +162,7 @@
             "aria-label": "",
             "type": "taxonomy",
             "instructions": "",
-            "required": 0,
+            "required": 1,
             "conditional_logic": [
                 [
                     {
@@ -220,5 +220,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788845629
+    "modified": 1788847523
 }

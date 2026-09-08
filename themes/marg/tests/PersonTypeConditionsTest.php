@@ -36,6 +36,11 @@ $person->init();
 $resolve = $hooks['acf/load_field'];
 $schema = json_decode( file_get_contents( dirname( __DIR__ ) . '/acf-json/group_68590e998f6e2.json' ), true, 512, JSON_THROW_ON_ERROR );
 $fields = array_column( $schema['fields'], null, 'name' );
+assert_same( 'textarea', $fields['bio']['type'], 'Bio must be plain text.' );
+assert_same( '', $fields['bio']['new_lines'], 'Bio must not add HTML formatting.' );
+assert_same( 'date_time_picker', $fields['bio_last_updated_on']['type'], 'Capture both date and time.' );
+assert_same( 1, $fields['designation']['required'], 'Require Designation when its Team condition applies.' );
+assert_same( 1, $fields['contributor_type']['required'], 'Require Contributor Type when visible.' );
 $expected_slugs = array(
 	'designation' => array( 'team' ),
 	'bio_last_updated_on' => array( 'contributor', 'general-editor' ),

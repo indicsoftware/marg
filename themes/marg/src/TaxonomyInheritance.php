@@ -31,11 +31,41 @@ class TaxonomyInheritance {
 		// Sync Open Access from Magazines to Articles after ACF save
 		add_action( 'acf/save_post', array( $this, 'sync_magazine_open_access_to_articles' ), 30 );
 
+		// Also inherit when an Article is created or its parent changes.
+		add_action( 'acf/save_post', array( $this, 'sync_article_open_access' ), 15 );
+
 		// Add admin notice for Magazine taxonomy fields
 		add_action( 'admin_head', array( $this, 'add_magazine_taxonomy_notice' ) );
 
 		// Add admin notice for Article Open Access field
 		add_action( 'admin_head', array( $this, 'add_article_open_access_notice' ) );
+	}
+
+	/**
+	 * Read the parent's setting directly, including after imports and API writes.
+	 *
+	 * @param int $post_id Article ID.
+	 * @return int
+	 */
+	public static function article_open_access( $post_id ) {
+		$parents = (array) get_post_meta( $post_id, 'article_details_parent_publication', true );
+		$parent_id = (int) reset( $parents );
+		if ( ! $parent_id || ! ProductCategoryResolver::has( $parent_id, 'magazines' ) ) {
+			return 0;
+		}
+		return (int) ( '1' === (string) get_post_meta( $parent_id, 'magazine_details_open_access', true ) );
+	}
+
+	/**
+	 * Persist the inherited boolean after the parent relationship is saved.
+	 *
+	 * @param int $post_id Article ID.
+	 * @return void
+	 */
+	public function sync_article_open_access( $post_id ) {
+		if ( 'product' === get_post_type( $post_id ) && ProductCategoryResolver::has( $post_id, 'articles' ) ) {
+			update_field( 'field_article_open_access', self::article_open_access( $post_id ), $post_id );
+		}
 	}
 
 	/**
@@ -230,8 +260,8 @@ class TaxonomyInheritance {
 					$article_details = array();
 				}
 
-				// Update open_access field (convert boolean to "Yes"/"No" string for text field)
-				$article_details['open_access'] = $open_access_value;
+				// The inherited field is a disabled ACF toggle, stored as 0 or 1.
+				$article_details['open_access'] = (int) (bool) $open_access;
 
 				// Update the article_details field
 				$result = update_field( 'article_details', $article_details, $article->ID );

@@ -8,7 +8,7 @@
             "name": "type",
             "aria-label": "",
             "type": "taxonomy",
-            "instructions": "Choose between Magazines, Articles, Books, Gift Sets and Subscription Plans",
+            "instructions": "Choose between Magazines, Articles, Books and Subscription Plans",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -939,12 +939,12 @@
                     "append": ""
                 },
                 {
-                    "key": "field_68a845e46fc94",
-                    "label": "Volume Info",
-                    "name": "volume_info",
+                    "key": "field_magazine_year",
+                    "label": "Year",
+                    "name": "year",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "Reference only. Imported from the old CMS for archival consistency. This field is not editable.",
+                    "instructions": "Reference only. Imported from the legacy CMS. This field is not editable.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -955,7 +955,7 @@
                     "readonly": 1,
                     "default_value": "",
                     "maxlength": "",
-                    "allow_in_bindings": 1,
+                    "allow_in_bindings": 0,
                     "placeholder": "",
                     "prepend": "",
                     "append": ""
@@ -1010,7 +1010,7 @@
                     "aria-label": "",
                     "type": "number",
                     "instructions": "Numeric value of the volume (e.g., 70).",
-                    "required": 0,
+                    "required": 1,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1018,11 +1018,11 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "min": "",
+                    "min": 1,
                     "max": "",
                     "allow_in_bindings": 0,
                     "placeholder": "",
-                    "step": "",
+                    "step": 1,
                     "prepend": "",
                     "append": ""
                 },
@@ -1033,7 +1033,7 @@
                     "aria-label": "",
                     "type": "number",
                     "instructions": "Numeric value of the issue within the volume (e.g., 3).",
-                    "required": 0,
+                    "required": 1,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1041,11 +1041,11 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "min": "",
+                    "min": 1,
                     "max": "",
                     "allow_in_bindings": 0,
                     "placeholder": "",
-                    "step": "",
+                    "step": 1,
                     "prepend": "",
                     "append": ""
                 },
@@ -1055,8 +1055,8 @@
                     "name": "publication_month_year",
                     "aria-label": "",
                     "type": "group",
-                    "instructions": "For all older issues, just enter the Month + Year in the Start Date. Use ranges for current issues that are published across multiple months.",
-                    "required": 0,
+                    "instructions": "For older issues, enter the Month + Year range using Start Date and End Date. For the current issue, enter only the Start Date.",
+                    "required": 1,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1072,7 +1072,7 @@
                             "aria-label": "",
                             "type": "date_picker",
                             "instructions": "",
-                            "required": 0,
+                            "required": 1,
                             "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
@@ -1106,6 +1106,122 @@
                             "allow_in_bindings": 0
                         }
                     ]
+                },
+                {
+                    "key": "field_magazine_number_of_photographs",
+                    "label": "Number of Photographs",
+                    "name": "number_of_photographs",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": 0,
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": 1,
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_magazine_number_of_illustrations",
+                    "label": "Number of Illustrations",
+                    "name": "number_of_illustrations",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": 0,
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": 1,
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_magazine_print_length",
+                    "label": "Print Length",
+                    "name": "print_length",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": 0,
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": 1,
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_magazine_open_access_featured_text",
+                    "label": "Open Access Featured Text",
+                    "name": "open_access_featured_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_magazine_sightseeing_scan",
+                    "label": "Sightseeing Scan",
+                    "name": "sightseeing_scan",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "id",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "",
+                    "preview_size": "medium",
+                    "allow_in_bindings": 0
                 },
                 {
                     "key": "field_68515df152d5e",
@@ -1691,7 +1807,7 @@
                     "label": "Open Access",
                     "name": "open_access",
                     "aria-label": "",
-                    "type": "text",
+                    "type": "true_false",
                     "instructions": "Auto-inherited from parent Magazine. Automatically updates when parent Magazine's Open Access setting changes.",
                     "required": 0,
                     "conditional_logic": 0,
@@ -1700,12 +1816,12 @@
                         "class": "",
                         "id": ""
                     },
-                    "default_value": "",
-                    "maxlength": "",
+                    "message": "",
+                    "default_value": 0,
                     "allow_in_bindings": 0,
-                    "placeholder": "Inherited from parent Magazine",
-                    "prepend": "",
-                    "append": "",
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1,
                     "readonly": 1,
                     "disabled": 1
                 },
@@ -1716,7 +1832,7 @@
                     "aria-label": "",
                     "type": "relationship",
                     "instructions": "Select the parent Magazine for this Article. Each Article can only have one parent Magazine.",
-                    "required": 0,
+                    "required": 1,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1734,7 +1850,7 @@
                         "search"
                     ],
                     "return_format": "object",
-                    "min": "",
+                    "min": 1,
                     "max": 1,
                     "allow_in_bindings": 0,
                     "elements": "",
@@ -1742,12 +1858,12 @@
                     "bidirectional_target": []
                 },
                 {
-                    "key": "field_685162f41fcaf",
-                    "label": "Page Range",
-                    "name": "page_number",
+                    "key": "field_article_doi_link",
+                    "label": "DOI Link",
+                    "name": "doi_link",
                     "aria-label": "",
-                    "type": "text",
-                    "instructions": "Enter the page range in plain text, following the format used in the old system (e.g., pp. 112–125). Use a single page number if the content is only on one page (e.g., p. 45).",
+                    "type": "url",
+                    "instructions": "Assigned by CrossRef. This field is not manually editable.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1756,9 +1872,53 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "maxlength": "",
                     "allow_in_bindings": 0,
                     "placeholder": "",
+                    "readonly": 1
+                },
+                {
+                    "key": "field_article_page_from",
+                    "label": "From",
+                    "name": "page_from",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "For a single-page article, enter the same page number in From and To.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": 1,
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": 1,
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_article_page_to",
+                    "label": "To",
+                    "name": "page_to",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "For a single-page article, enter the same page number in From and To.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "min": 1,
+                    "max": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "step": 1,
                     "prepend": "",
                     "append": ""
                 },
@@ -2110,5 +2270,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1762168430
+    "modified": 1788848039
 }

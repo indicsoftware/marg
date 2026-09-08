@@ -105,6 +105,10 @@ require_once __DIR__ . '/src/ProductCategoryResolver.php';
 $product_category_resolver = new \TenUpTheme\ProductCategoryResolver();
 $product_category_resolver->init();
 
+require_once __DIR__ . '/src/ProductEditorialFields.php';
+$product_editorial_fields = new \TenUpTheme\ProductEditorialFields();
+$product_editorial_fields->init();
+
 // Initialize WooCommerce Customizations to remove grouped product type
 require_once __DIR__ . '/src/WooCommerceCustomizations.php';
 $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();

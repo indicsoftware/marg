@@ -391,14 +391,14 @@ class WooCommerceCustomizations {
 			$magazine_details['print_details'] = array();
 		}
 		$magazine_details['print_details']['sku']  = $print_sku;
-		$magazine_details['print_details']['issn'] = $print_issn;
+		$magazine_details['print_details']['issn'] = ! empty( $magazine_details['print_details']['issn'] ) ? $magazine_details['print_details']['issn'] : $print_issn;
 
 		// Populate Digital Details
 		if ( ! isset( $magazine_details['digital_details'] ) ) {
 			$magazine_details['digital_details'] = array();
 		}
 		$magazine_details['digital_details']['sku']  = $digital_sku;
-		$magazine_details['digital_details']['issn'] = $digital_issn;
+		$magazine_details['digital_details']['issn'] = ! empty( $magazine_details['digital_details']['issn'] ) ? $magazine_details['digital_details']['issn'] : $digital_issn;
 
 		// Update the magazine_details field
 		update_field( 'magazine_details', $magazine_details, $product_id );
