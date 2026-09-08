@@ -70,6 +70,11 @@ require_once __DIR__ . '/src/AdminMenuCustomizer.php';
 $admin_menu_customizer = new \TenUpTheme\AdminMenuCustomizer();
 $admin_menu_customizer->init();
 
+// Keep production ACF schema changes in the deployed Local JSON files.
+require_once __DIR__ . '/src/ACFSchemaPolicy.php';
+$acf_schema_policy = new \TenUpTheme\ACFSchemaPolicy();
+$acf_schema_policy->init();
+
 // Initialize Disable Comments independently of vendor autoloader
 require_once __DIR__ . '/src/DisableComments.php';
 $disable_comments = new \TenUpTheme\DisableComments();

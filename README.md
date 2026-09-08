@@ -85,6 +85,7 @@ For more detailed information, refer to:
 
 - [10up Toolkit Documentation](https://github.com/10up/10up-toolkit)
 - [10up WP Scaffold Documentation](https://github.com/10up/wp-scaffold)
+- [ACF schema ownership and production editing policy](docs/acf-schema.md)
 
 ## Production deployment
 
