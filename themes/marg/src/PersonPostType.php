@@ -26,6 +26,37 @@ class PersonPostType {
 
 		// Optional: Hide the title field in the editor since it's auto-generated
 		add_action( 'admin_head', array( $this, 'hide_person_title_field' ) );
+
+		add_filter( 'acf/load_field', array( $this, 'resolve_person_type_conditions' ), 20 );
+	}
+
+	/**
+	 * Resolve portable Person Type slugs to the IDs expected by ACF conditions.
+	 *
+	 * @param array $field ACF field settings.
+	 * @return array
+	 */
+	public function resolve_person_type_conditions( $field ) {
+		if ( empty( $field['conditional_logic'] ) ) {
+			return $field;
+		}
+
+		foreach ( $field['conditional_logic'] as $group_index => $rules ) {
+			foreach ( $rules as $rule_index => $rule ) {
+				if ( 'field_68590e9943090' !== $rule['field'] ||
+					! in_array( $rule['value'], array( 'team', 'contributor', 'general-editor' ), true ) ) {
+					continue;
+				}
+
+				$term = get_term_by( 'slug', $rule['value'], 'person-type' );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$field['conditional_logic'][ $group_index ][ $rule_index ]['value'] = (string) $term->term_id;
+				}
+				// Missing terms retain their slug, which cannot match a selected term ID.
+			}
+		}
+
+		return $field;
 	}
 
 	/**
