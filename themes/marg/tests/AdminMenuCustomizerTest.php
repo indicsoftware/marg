@@ -28,6 +28,21 @@ function wp_die( $message, $code ) {
 	throw new RuntimeException( $message, $code );
 }
 
+function remove_submenu_page( $parent, $slug ) {}
+
+function get_terms( $args ) {
+	return array( (object) array( 'name' => 'Team', 'slug' => 'team' ) );
+}
+
+function is_wp_error( $value ) {
+	return false;
+}
+
+function add_submenu_page( $parent, $page_title, $menu_title, $capability, $slug ) {
+	global $submenu;
+	$submenu[$parent][] = array( $menu_title, $capability, $slug );
+}
+
 function assert_same( $expected, $actual, $message ) {
 	if ( $expected !== $actual ) {
 		throw new RuntimeException( $message );
@@ -60,6 +75,20 @@ foreach ( $native as $slug ) {
 	$_GET['page'] = 'novamira-settings';
 	assert_same( $slug, $customizer->adjust_parent_file( $slug ), 'Native parent highlighting must be preserved.' );
 	assert_same( 'child', $customizer->adjust_submenu_file( 'child', $slug ), 'Native child highlighting must be preserved.' );
+}
+
+assert_same( false, in_array( 'grant_custom_post_type_caps', $hooks['init'], true ), 'Do not grant unused People or Events capabilities.' );
+$customizer->customize_people_submenu();
+assert_same(
+	array( array( 'Team', 'edit_posts', 'edit.php?post_type=person&person-type=team' ) ),
+	$submenu['edit.php?post_type=person'],
+	'People submenu permissions must match the standard post capability.'
+);
+foreach ( array( 'post_type_68524a7250d7a', 'post_type_683d648e31fe0' ) as $key ) {
+	$schema = json_decode( file_get_contents( dirname( __DIR__ ) . '/acf-json/' . $key . '.json' ), true, 512, JSON_THROW_ON_ERROR );
+	assert_same( false, $schema['rename_capabilities'], 'People and Events must retain standard post capabilities.' );
+	assert_same( 'post', $schema['singular_capability_name'], 'Keep standard singular capability names.' );
+	assert_same( 'posts', $schema['plural_capability_name'], 'Keep standard plural capability names.' );
 }
 
 $_GET['page'] = 'global-settings';

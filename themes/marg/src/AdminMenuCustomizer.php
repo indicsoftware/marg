@@ -27,9 +27,6 @@ class AdminMenuCustomizer {
 		// Grant WooCommerce product capabilities to Editors
 		add_action( 'init', array( $this, 'grant_editor_woocommerce_caps' ) );
 
-		// Grant custom post type capabilities to Editors and Administrators
-		add_action( 'init', array( $this, 'grant_custom_post_type_caps' ) );
-
 		// Enable revisions for WooCommerce products
 		add_filter( 'woocommerce_register_post_type_product', array( $this, 'enable_product_revisions' ) );
 
@@ -113,18 +110,6 @@ class AdminMenuCustomizer {
 			$contributor->remove_cap( 'edit_published_posts' );
 			$contributor->remove_cap( 'edit_published_pages' );
 
-			// Add capabilities for custom post types - People
-			$contributor->add_cap( 'edit_people' );
-			$contributor->add_cap( 'edit_others_people' );
-			// Don't allow editing published people - enforce review workflow
-			$contributor->remove_cap( 'edit_published_people' );
-
-			// Add capabilities for custom post types - Events
-			$contributor->add_cap( 'edit_events' );
-			$contributor->add_cap( 'edit_others_events' );
-			// Don't allow editing published events - enforce review workflow
-			$contributor->remove_cap( 'edit_published_events' );
-
 			// Add capabilities for custom post types - Products (WooCommerce)
 			$contributor->add_cap( 'edit_products' );
 			$contributor->add_cap( 'edit_others_products' );
@@ -160,66 +145,6 @@ class AdminMenuCustomizer {
 			$editor->add_cap( 'edit_product_terms' );
 			$editor->add_cap( 'delete_product_terms' );
 			$editor->add_cap( 'assign_product_terms' );
-		}
-	}
-
-	/**
-	 * Grant custom post type capabilities to Editors and Administrators
-	 *
-	 * @return void
-	 */
-	public function grant_custom_post_type_caps() {
-		$editor = get_role( 'editor' );
-		$administrator = get_role( 'administrator' );
-
-		// Custom post type capabilities for People
-		$people_caps = array(
-			'edit_people',
-			'read_people',
-			'delete_people',
-			'edit_others_people',
-			'publish_people',
-			'read_private_people',
-			'delete_private_people',
-			'delete_published_people',
-			'delete_others_people',
-			'edit_private_people',
-			'edit_published_people',
-		);
-
-		// Custom post type capabilities for Events
-		$events_caps = array(
-			'edit_events',
-			'read_events',
-			'delete_events',
-			'edit_others_events',
-			'publish_events',
-			'read_private_events',
-			'delete_private_events',
-			'delete_published_events',
-			'delete_others_events',
-			'edit_private_events',
-			'edit_published_events',
-		);
-
-		// Grant capabilities to Editors
-		if ( $editor ) {
-			foreach ( $people_caps as $cap ) {
-				$editor->add_cap( $cap );
-			}
-			foreach ( $events_caps as $cap ) {
-				$editor->add_cap( $cap );
-			}
-		}
-
-		// Grant capabilities to Administrators
-		if ( $administrator ) {
-			foreach ( $people_caps as $cap ) {
-				$administrator->add_cap( $cap );
-			}
-			foreach ( $events_caps as $cap ) {
-				$administrator->add_cap( $cap );
-			}
 		}
 	}
 
@@ -574,7 +499,7 @@ class AdminMenuCustomizer {
 				'edit.php?post_type=person',
 				$person_type['name'],
 				$person_type['name'],
-				'edit_people', // Use the proper capability for the person post type
+				'edit_posts', // People uses standard post capabilities in ACF.
 				'edit.php?post_type=person&person-type=' . $person_type['slug']
 			);
 		}
