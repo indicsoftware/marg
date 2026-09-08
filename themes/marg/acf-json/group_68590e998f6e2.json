@@ -9,7 +9,7 @@
             "aria-label": "",
             "type": "text",
             "instructions": "",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -30,7 +30,7 @@
             "aria-label": "",
             "type": "text",
             "instructions": "",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -51,7 +51,7 @@
             "aria-label": "",
             "type": "taxonomy",
             "instructions": "Select all applicable types. Classify trustees and board members as Team. General Editors also count as contributors, so selecting Contributor as well is optional.",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -97,8 +97,8 @@
             "name": "designation",
             "aria-label": "",
             "type": "text",
-            "instructions": "Enter the person's role or job title. Required when Person Type includes Team.",
-            "required": 1,
+            "instructions": "Enter the person's role or job title, if available.",
+            "required": 0,
             "conditional_logic": [
                 [
                     {
@@ -161,8 +161,8 @@
             "name": "contributor_type",
             "aria-label": "",
             "type": "taxonomy",
-            "instructions": "Select the applicable contributor roles. Required for Contributors and General Editors.",
-            "required": 1,
+            "instructions": "Select the applicable contributor roles, if known.",
+            "required": 0,
             "conditional_logic": [
                 [
                     {
@@ -220,5 +220,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788850923
+    "modified": 1788852564
 }

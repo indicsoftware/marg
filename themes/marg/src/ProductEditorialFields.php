@@ -37,7 +37,7 @@ class ProductEditorialFields {
 	 * @return mixed
 	 */
 	public function validate_hover_image( $valid, $value ) {
-		if ( true !== $valid ) {
+		if ( true !== $valid || empty( $value ) ) {
 			return $valid;
 		}
 		$metadata = wp_get_attachment_metadata( (int) $value );
@@ -145,7 +145,7 @@ class ProductEditorialFields {
 	}
 
 	/**
-	 * Require both page endpoints when either is supplied.
+	 * Check page order when both optional endpoints are supplied.
 	 *
 	 * @param mixed $valid Existing validation result.
 	 * @param array $value Article group submitted by ACF.
@@ -157,11 +157,11 @@ class ProductEditorialFields {
 		}
 		$from = $value['field_article_page_from'] ?? '';
 		$to   = $value['field_article_page_to'] ?? '';
-		if ( '' === (string) $from && '' === (string) $to ) {
+		if ( '' === (string) $from || '' === (string) $to ) {
 			return $valid;
 		}
-		if ( '' === (string) $from || '' === (string) $to || (int) $to < (int) $from ) {
-			return __( 'Enter both From and To pages. To must be greater than or equal to From.', 'tenup' );
+		if ( (int) $to < (int) $from ) {
+			return __( 'To must be greater than or equal to From.', 'tenup' );
 		}
 		return $valid;
 	}
@@ -204,17 +204,17 @@ class ProductEditorialFields {
 		if ( ! $type ) {
 			return;
 		}
-		if ( isset( $_POST['post_title'] ) && '' === trim( sanitize_text_field( wp_unslash( $_POST['post_title'] ) ) ) ) {
-			acf_add_validation_error( 'post_title', __( 'Enter a product title.', 'tenup' ) );
-		}
 		if ( ProductCategoryResolver::id( 'magazines' ) !== $type ) {
 			return;
 		}
 		$post_id  = isset( $_POST['post_ID'] ) ? absint( $_POST['post_ID'] ) : 0;
-		$image_id = isset( $_POST['_thumbnail_id'] ) ? absint( $_POST['_thumbnail_id'] ) : get_post_thumbnail_id( $post_id );
+		$image_id = isset( $_POST['_thumbnail_id'] ) ? max( 0, (int) $_POST['_thumbnail_id'] ) : get_post_thumbnail_id( $post_id );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		if ( ! $image_id ) {
+			return;
+		}
 		$metadata = wp_get_attachment_metadata( $image_id );
-		if ( ! $image_id || ! wp_attachment_is_image( $image_id ) || empty( $metadata['width'] ) || $metadata['width'] < 1000 ) {
+		if ( ! wp_attachment_is_image( $image_id ) || empty( $metadata['width'] ) || $metadata['width'] < 1000 ) {
 			acf_add_validation_error( '_thumbnail_id', __( 'Choose a magazine cover image at least 1000px wide.', 'tenup' ) );
 		}
 	}

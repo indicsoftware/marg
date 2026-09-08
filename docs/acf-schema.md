@@ -32,17 +32,19 @@ The restriction lives in the Marg theme and applies while that theme is active. 
 
 Use `Backend-SourceOfTruth-1.xlsx` and the decisions agreed on 8 September 2026. Exclude a row only when Field Status is Parked. Ignore the For Marg column when determining scope. Existing parked fields and data remain unchanged. Gift sets is also excluded.
 
-Person Type stays multi-select. Bio is a plain textarea. Bio Last Updated On captures date and time, displays `d/m/Y H:i` and returns `Y-m-d H:i:s`. Designation is required for Team; Contributor Type is required for Contributor and General Editor.
+All ACF fields are optional, superseding the workbook's Required column. Conditional visibility remains unchanged. Format, positive-number and image-size checks still apply to supplied values. Article parent selection allows zero or one Magazine. The custom ACF submission checks also allow an empty native product title and cover; WordPress and WooCommerce retain their own save behavior.
 
-Magazine volume, issue and publication Start date are required. Publication End date is optional and cannot precede Start. The separate read-only Year field is reserved for migration from the old CMS. It does not reuse Publication month and year (Reference). Volume Info is removed from the form; its database values are retained.
+Person Type stays multi-select. Bio is a plain textarea. Bio Last Updated On captures date and time, displays `d/m/Y H:i` and returns `Y-m-d H:i:s`. Designation is shown for Team; Contributor Type is shown for Contributor and General Editor.
 
-Magazine additions are photograph and illustration counts, Print Length, Open Access Featured Text and Sightseeing Scan. Use WooCommerce's native product image for covers and Article featured images. The ACF editor submission requires a magazine cover at least 1000px wide. Article galleries and the other parked media fields are deferred.
+Magazine volume, issue and publication dates are optional. When both dates are provided, End cannot precede Start. The separate read-only Year field is reserved for migration from the old CMS. It does not reuse Publication month and year (Reference). Volume Info is removed from the form; its database values are retained.
 
-Open Access Hover Image is required for every Magazine, including those with Open Access set to No, as the workbook specifies no additional condition. It accepts images at least 500px wide and preserves their natural proportions. ACF enforces the required value; the theme also validates image width during form submission, because ACF's media-picker constraint alone does not reject undersized existing attachments on save. Existing Magazines need this image supplied when next saved through the editor. This field stores an attachment ID; adding it does not implement a front-end hover effect.
+Magazine additions are photograph and illustration counts, Print Length, Open Access Featured Text and Sightseeing Scan. Use WooCommerce's native product image for covers and Article featured images. A supplied magazine cover must be at least 1000px wide. Article galleries and the other parked media fields are deferred.
+
+Open Access Hover Image is optional for every Magazine. A supplied image must be at least 500px wide and retains its natural proportions. The theme validates image width during form submission, because ACF's media-picker constraint alone does not reject undersized existing attachments on save. This field stores an attachment ID; adding it does not implement a front-end hover effect.
 
 Magazine print pricing, stock, Out of Print and shipping weight are in scope because their Field Status is Added. These fields already exist. The workbook labels shipping weight in kilograms, while the existing ACF field stores grams and the sync converts grams to the WooCommerce unit. Preserve this previously approved behavior until a separate unit change and data migration are agreed.
 
-Article From and To are optional positive integers. Supply both or neither; To must be at least From. The theme reads unambiguous legacy `article_details_page_number` strings such as `pp. 10-11` and `p. 12` into the new controls only when the new metadata does not yet exist. Original text is never deleted. Unparseable references remain available in field instructions for manual review. Saving the form stores the new numeric values. Explicitly clearing them leaves them blank on later loads.
+Article From and To are independently optional positive integers. When both are provided, To must be at least From. The theme reads unambiguous legacy `article_details_page_number` strings such as `pp. 10-11` and `p. 12` into the new controls only when the new metadata does not yet exist. Original text is never deleted. Unparseable references remain available in field instructions for manual review. Saving the form stores the new numeric values. Explicitly clearing them leaves them blank on later loads.
 
 Migration targets use these ACF keys:
 
@@ -65,7 +67,7 @@ ISSN stays editable, defaults from Global Settings when blank, and preserves ove
 
 Magazine Open Access defaults to No. The Article toggle is disabled and derives its value from the current parent, including when read after an API/import changes the relationship. Normal ACF saves also persist the inherited boolean. Direct attempts to write an independent Article Open Access value are replaced with the parent's value. Consumers needing current inheritance should use ACF's value API rather than raw Article metadata.
 
-The paired-page, date-order, integer and native-image checks run through ACF's editor validation hooks. Imports and custom API callers that bypass ACF form validation must validate their input separately. Bulk migration and third-party save paths require staging checks before use.
+The page-order, date-order, integer and image-size checks run through ACF's editor validation hooks. Imports and custom API callers that bypass ACF form validation must validate their input separately. Bulk migration and third-party save paths require staging checks before use.
 
 Run the focused checks with:
 

@@ -49,8 +49,10 @@ $validate_hover = $hooks['acf/validate_value/key=field_magazine_open_access_hove
 same( true, $validate_hover( true, 9 ) ); // Exactly 500px.
 same( true, $validate_hover( true, 8 ) ); // Wider images retain their dimensions.
 same( true, is_string( $validate_hover( true, 7 ) ) ); // 499px must fail.
-same( true, is_string( $validate_hover( true, '' ) ) );
-same( 'required error', $validate_hover( 'required error', '' ) );
+foreach ( array( '', null, false, 0 ) as $empty ) {
+	same( true, $validate_hover( true, $empty ) );
+}
+same( 'prior error', $validate_hover( 'prior error', '' ) );
 
 foreach ( array( 'pp. 10-11' => array( 10, 11 ), 'p. 12' => array( 12, 12 ), '112–125' => array( 112, 125 ), '45' => array( 45, 45 ), '12-10' => array(), 'iv–vi' => array(), '10, 12' => array() ) as $text => $expected ) {
 	same( $expected, $fields::legacy_pages( $text ) );
@@ -89,11 +91,13 @@ same( 0, $load( 'field_article_open_access', 1 ) );
 
 same( true, $fields->validate_pages( true, array() ) );
 same( true, $fields->validate_pages( true, array( 'field_article_page_from' => '12', 'field_article_page_to' => '12' ) ) );
-foreach ( array( array( 'field_article_page_from' => '12' ), array( 'field_article_page_to' => '12' ), array( 'field_article_page_from' => '12', 'field_article_page_to' => '10' ) ) as $value ) {
-	same( true, is_string( $fields->validate_pages( true, $value ) ) );
+foreach ( array( array( 'field_article_page_from' => '12' ), array( 'field_article_page_to' => '12' ) ) as $value ) {
+	same( true, $fields->validate_pages( true, $value ) );
 }
+same( true, is_string( $fields->validate_pages( true, array( 'field_article_page_from' => '12', 'field_article_page_to' => '10' ) ) ) );
 same( 'prior error', $fields->validate_pages( 'prior error', array() ) );
 same( true, $fields->validate_dates( true, array( 'field_689d970ca7426' => '20260901' ) ) );
+same( true, $fields->validate_dates( true, array( 'field_689d970ca7427' => '20260901' ) ) );
 same( true, is_string( $fields->validate_dates( true, array( 'field_689d970ca7426' => '20260901', 'field_689d970ca7427' => '20260801' ) ) ) );
 same( true, $fields->validate_integer( true, '0' ) );
 same( true, $fields->validate_integer( true, '' ) );
@@ -106,6 +110,12 @@ $_POST['_thumbnail_id'] = 9;
 $fields->validate_native_product_fields();
 same( true, isset( $errors['_thumbnail_id'] ) );
 $errors = array();
+foreach ( array( '', 0, -1 ) as $empty ) {
+	$_POST['_thumbnail_id'] = $empty;
+	$_POST['post_title'] = '';
+	$fields->validate_native_product_fields();
+	same( array(), $errors );
+}
 $_POST['acf']['field_68ac2f304ad26'] = 20;
 $fields->validate_native_product_fields();
 same( array(), $errors );

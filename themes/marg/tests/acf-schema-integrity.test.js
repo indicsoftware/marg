@@ -16,6 +16,7 @@ const collectFieldKeys = (value, source, occurrences) => {
 	}
 
 	if (typeof value.key === 'string' && value.key.startsWith('field_')) {
+		expect(value.required).toBeFalsy();
 		const sources = occurrences.get(value.key) || [];
 		sources.push(source);
 		occurrences.set(value.key, sources);
@@ -25,7 +26,7 @@ const collectFieldKeys = (value, source, occurrences) => {
 };
 
 describe('ACF local JSON schema', () => {
-	test('registers each field key exactly once', () => {
+	test('registers each field key exactly once and keeps every field optional', () => {
 		const occurrences = new Map();
 		const schemaFiles = fs
 			.readdirSync(schemaDirectory)

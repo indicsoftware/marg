@@ -23,20 +23,20 @@ describe('product schema launch scope', () => {
 		for (const name of ['volume_number', 'issue_number']) {
 			expect(subField('magazine_details', name)).toMatchObject({
 				type: 'number',
-				required: 1,
+				required: 0,
 				min: 1,
 				step: 1,
 			});
 		}
 
-		expect(publicationDate.required).toBe(1);
+		expect(publicationDate.required).toBe(0);
 		expect(publicationDate.instructions).toContain('For older issues');
 		expect(publicationDate.instructions).toContain('current issue');
 		expect(publicationDate.sub_fields).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					name: 'start_date',
-					required: 1,
+					required: 0,
 					display_format: 'F Y',
 					return_format: 'F Y',
 				}),
@@ -72,8 +72,8 @@ describe('product schema launch scope', () => {
 	test('defines the approved article relationship, pages, DOI and inherited access fields', () => {
 		expect(subField('article_details', 'parent_publication')).toMatchObject({
 			key: 'field_6851635e1fcb3',
-			required: 1,
-			min: 1,
+			required: 0,
+			min: 0,
 			max: 1,
 		});
 		expect(subField('article_details', 'page_number')).toBeUndefined();
@@ -107,7 +107,7 @@ describe('product schema launch scope', () => {
 		expect(subField('magazine_details', 'open_access_hover_image')).toMatchObject({
 			key: 'field_magazine_open_access_hover_image',
 			type: 'image',
-			required: 1,
+			required: 0,
 			conditional_logic: 0,
 			return_format: 'id',
 			min_width: 500,

@@ -9,7 +9,7 @@
             "aria-label": "",
             "type": "taxonomy",
             "instructions": "Choose between Magazines, Articles, Books and Subscription Plans",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -22,7 +22,7 @@
             "load_terms": 1,
             "return_format": "id",
             "field_type": "select",
-            "allow_null": 0,
+            "allow_null": 1,
             "allow_in_bindings": 0,
             "bidirectional": 0,
             "multiple": 0,
@@ -1010,7 +1010,7 @@
                     "aria-label": "",
                     "type": "number",
                     "instructions": "Numeric value of the volume (e.g., 70).",
-                    "required": 1,
+                    "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1033,7 +1033,7 @@
                     "aria-label": "",
                     "type": "number",
                     "instructions": "Numeric value of the issue within the volume (e.g., 3).",
-                    "required": 1,
+                    "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1055,8 +1055,8 @@
                     "name": "publication_month_year",
                     "aria-label": "",
                     "type": "group",
-                    "instructions": "Enter the publication month and year in Start Date. For older issues spanning multiple months, also enter End Date. For the current issue, use Start Date only. End Date is optional and must be on or after Start Date.",
-                    "required": 1,
+                    "instructions": "Enter available publication dates. For older issues spanning multiple months, use Start Date and End Date. For the current issue, use Start Date only. Both fields are optional. When both are entered, End Date must be on or after Start Date.",
+                    "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1072,7 +1072,7 @@
                             "aria-label": "",
                             "type": "date_picker",
                             "instructions": "",
-                            "required": 1,
+                            "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
@@ -1204,7 +1204,7 @@
                     "aria-label": "",
                     "type": "image",
                     "instructions": "Upload an image at least 500px wide. Keep its natural proportions.",
-                    "required": 1,
+                    "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1857,8 +1857,8 @@
                     "name": "parent_publication",
                     "aria-label": "",
                     "type": "relationship",
-                    "instructions": "Select the parent Magazine for this Article. Each Article can only have one parent Magazine.",
-                    "required": 1,
+                    "instructions": "Select a parent Magazine, if known. Each Article can have at most one parent Magazine.",
+                    "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
                         "width": "",
@@ -1876,7 +1876,7 @@
                         "search"
                     ],
                     "return_format": "object",
-                    "min": 1,
+                    "min": 0,
                     "max": 1,
                     "allow_in_bindings": 0,
                     "elements": "",
@@ -1908,7 +1908,7 @@
                     "name": "page_from",
                     "aria-label": "",
                     "type": "number",
-                    "instructions": "Enter the first page as a positive whole number. Fill both From and To, or leave both blank.",
+                    "instructions": "Enter the first page as a positive whole number, if known. From and To can each be left blank.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1931,7 +1931,7 @@
                     "name": "page_to",
                     "aria-label": "",
                     "type": "number",
-                    "instructions": "Enter the last page as a positive whole number, at least equal to From. For a single-page article, use the same number in both fields.",
+                    "instructions": "Enter the last page as a positive whole number, if known. When both pages are entered, To must be at least equal to From. For a single-page article, use the same number in both fields.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -2296,5 +2296,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788851591
+    "modified": 1788852564
 }
