@@ -61,7 +61,7 @@
                     "name": "subtitle",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "Optional descriptive tagline or secondary title for the issue",
+                    "instructions": "Enter an optional tagline or secondary title for the book.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -124,7 +124,7 @@
                     "name": "general_editors",
                     "aria-label": "",
                     "type": "post_object",
-                    "instructions": "Select the general editor(s) of this issue (from dropdown list).",
+                    "instructions": "Select the general editors of this book from the People records.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -153,7 +153,7 @@
                     "name": "editors",
                     "aria-label": "",
                     "type": "post_object",
-                    "instructions": "Select\/add editor(s) who contributed to the issue.",
+                    "instructions": "Select the editors who contributed to this book. Create any missing People records first.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -901,7 +901,7 @@
                     "name": "open_access",
                     "aria-label": "",
                     "type": "true_false",
-                    "instructions": "",
+                    "instructions": "Enable Open Access for this magazine. Linked Articles inherit this setting. The default is No.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1055,7 +1055,7 @@
                     "name": "publication_month_year",
                     "aria-label": "",
                     "type": "group",
-                    "instructions": "For older issues, enter the Month + Year range using Start Date and End Date. For the current issue, enter only the Start Date.",
+                    "instructions": "Enter the publication month and year in Start Date. For older issues spanning multiple months, also enter End Date. For the current issue, use Start Date only. End Date is optional and must be on or after Start Date.",
                     "required": 1,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1159,7 +1159,7 @@
                     "name": "print_length",
                     "aria-label": "",
                     "type": "number",
-                    "instructions": "",
+                    "instructions": "Enter the total number of pages in the magazine.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1182,7 +1182,7 @@
                     "name": "open_access_featured_text",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Enter annotation text for this publication's listing on the Open Access page.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1203,7 +1203,7 @@
                     "name": "sightseeing_scan",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Upload a scan of this magazine's sightseeing page.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1863,7 +1863,7 @@
                     "name": "doi_link",
                     "aria-label": "",
                     "type": "url",
-                    "instructions": "Assigned by CrossRef. This field is not manually editable.",
+                    "instructions": "Read-only URL for the Crossref DOI, populated separately by import or integration. Saving this Article does not request a DOI.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1882,7 +1882,7 @@
                     "name": "page_from",
                     "aria-label": "",
                     "type": "number",
-                    "instructions": "For a single-page article, enter the same page number in From and To.",
+                    "instructions": "Enter the first page as a positive whole number. Fill both From and To, or leave both blank.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1905,7 +1905,7 @@
                     "name": "page_to",
                     "aria-label": "",
                     "type": "number",
-                    "instructions": "For a single-page article, enter the same page number in From and To.",
+                    "instructions": "Enter the last page as a positive whole number, at least equal to From. For a single-page article, use the same number in both fields.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1928,7 +1928,7 @@
                     "name": "authors",
                     "aria-label": "",
                     "type": "post_object",
-                    "instructions": "Select the general editor(s) of this issue (from dropdown list).",
+                    "instructions": "Select the authors of this article from the People records.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -2270,5 +2270,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788848039
+    "modified": 1788850923
 }

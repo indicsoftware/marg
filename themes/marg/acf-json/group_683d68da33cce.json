@@ -28,7 +28,7 @@
             "name": "start_time",
             "aria-label": "",
             "type": "time_picker",
-            "instructions": "",
+            "instructions": "Enter the advertised start time. State its timezone in Date and Time (Text Version).",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -66,7 +66,7 @@
             "name": "end_time",
             "aria-label": "",
             "type": "time_picker",
-            "instructions": "",
+            "instructions": "Enter the end time in the same timezone as Start Time.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -84,7 +84,7 @@
             "name": "date_and_time_text",
             "aria-label": "",
             "type": "text",
-            "instructions": "",
+            "instructions": "Enter a readable schedule including the timezone, such as 8 September 2026, 6pm to 7pm IST. Keep it consistent with the separate date and time fields.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -105,7 +105,7 @@
             "name": "online_event",
             "aria-label": "",
             "type": "true_false",
-            "instructions": "",
+            "instructions": "Enable for an online event. This hides the venue map and address fields.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -126,7 +126,7 @@
             "name": "location",
             "aria-label": "",
             "type": "google_map",
-            "instructions": "",
+            "instructions": "Select the venue on the map for an in-person event.",
             "required": 0,
             "conditional_logic": [
                 [
@@ -154,7 +154,7 @@
             "name": "location_address",
             "aria-label": "",
             "type": "text",
-            "instructions": "",
+            "instructions": "Enter the venue name and full address. Keep it consistent with the map location.",
             "required": 0,
             "conditional_logic": [
                 [
@@ -222,7 +222,7 @@
             "name": "video_recording_link",
             "aria-label": "",
             "type": "oembed",
-            "instructions": "",
+            "instructions": "Paste a recording URL from a supported video service, such as YouTube or Vimeo, once the recording is available.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -253,5 +253,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1760089214
+    "modified": 1788850923
 }

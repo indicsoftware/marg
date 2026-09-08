@@ -53,7 +53,7 @@ require_once dirname( __DIR__ ) . '/src/AdminMenuCustomizer.php';
 $customizer = new \TenUpTheme\AdminMenuCustomizer();
 $customizer->init();
 assert_same(
-	array( 'create_taxonomies_menu', 'reorganize_taxonomies_menu', 'customize_products_submenu', 'customize_people_submenu', 'reorder_post_type_menus' ),
+	array( 'create_taxonomies_menu', 'reorganize_taxonomies_menu', 'customize_products_submenu', 'customize_people_submenu', 'reorder_post_type_menus', 'organize_menu_sections' ),
 	$hooks['admin_menu'],
 	'Only content-specific menu customizations should remain.'
 );
@@ -105,4 +105,44 @@ foreach ( array( 'administrator', 'shop_manager', 'editor', 'author', 'contribut
 	assert_same( ! $allowed, $denied, 'Incorrect Global Settings access for ' . $role );
 }
 
-fwrite( STDOUT, "AdminMenuCustomizer tests passed: native menus, highlighting, and Global Settings permissions.\n" );
+$section_fixture = array(
+	array( 'Dashboard', 'read', 'index.php' ),
+	array( 'Settings', 'manage_options', 'options-general.php' ),
+	array( 'Pages', 'edit_posts', 'edit.php?post_type=page' ),
+	array( 'Products', 'edit_products', 'edit.php?post_type=product' ),
+	array( '', 'read', 'separator1', '', 'wp-menu-separator' ),
+	array( 'People', 'edit_posts', 'edit.php?post_type=person' ),
+	array( 'Events', 'edit_posts', 'edit.php?post_type=event' ),
+	array( 'Media', 'edit_posts', 'upload.php' ),
+	array( 'Orders', 'manage_woocommerce', 'admin.php?page=wc-orders' ),
+	array( 'WooCommerce', 'manage_woocommerce', 'woocommerce' ),
+	array( 'Analytics', 'manage_woocommerce', 'wc-admin&path=/analytics/overview' ),
+	array( 'Global Settings', 'manage_woocommerce', 'global-settings' ),
+	array( 'Plugin menu', 'manage_options', 'unknown-plugin' ),
+);
+$menu = $section_fixture;
+$capabilities = array( 'read', 'edit_posts', 'edit_products', 'manage_woocommerce', 'manage_options' );
+$before_submenus = $submenu;
+$customizer->organize_menu_sections();
+assert_same(
+	array( 'index.php', 'separator-marg-1', 'edit.php?post_type=page', 'edit.php?post_type=person', 'edit.php?post_type=event', 'upload.php', 'separator-marg-2', 'edit.php?post_type=product', 'admin.php?page=wc-orders', 'woocommerce', 'wc-admin&path=/analytics/overview', 'separator-marg-3', 'options-general.php', 'global-settings', 'unknown-plugin' ),
+	array_column( $menu, 2 ),
+	'Menus must be grouped without losing unknown plugin entries.'
+);
+foreach ( $section_fixture as $item ) {
+	if ( 'separator1' !== $item[2] ) {
+		assert_same( true, in_array( $item, $menu, true ), 'Preserve each menu entry and its permissions.' );
+	}
+}
+assert_same( $before_submenus, $submenu, 'Section grouping must not change submenus.' );
+$grouped_menu = $menu;
+$customizer->organize_menu_sections();
+assert_same( $grouped_menu, $menu, 'Grouping twice must not duplicate separators.' );
+foreach ( array( array( 'read' ), array( 'read', 'edit_posts' ), array() ) as $capabilities ) {
+	$menu = $section_fixture;
+	$customizer->organize_menu_sections();
+	$separators = array_filter( $menu, fn( $item ) => 'wp-menu-separator' === ( $item[4] ?? '' ) );
+	assert_same( in_array( 'edit_posts', $capabilities, true ) ? 1 : 0, count( $separators ), 'No separators for inaccessible or empty sections.' );
+}
+
+fwrite( STDOUT, "AdminMenuCustomizer tests passed: menu sections, restricted roles, native links, highlighting, and Global Settings permissions.\n" );

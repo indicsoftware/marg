@@ -45,6 +45,7 @@ class AdminMenuCustomizer {
 		add_action( 'admin_menu', array( $this, 'customize_products_submenu' ), 999 );
 		add_action( 'admin_menu', array( $this, 'customize_people_submenu' ), 1000 );
 		add_action( 'admin_menu', array( $this, 'reorder_post_type_menus' ), 9999 );
+		add_action( 'admin_menu', array( $this, 'organize_menu_sections' ), 10000 );
 
 		// Adjust parent file for proper highlighting
 		add_filter( 'parent_file', array( $this, 'adjust_parent_file' ) );
@@ -599,6 +600,52 @@ class AdminMenuCustomizer {
 		}
 
 		$menu = $new_menu;
+	}
+
+	/**
+	 * Group existing top-level menus with native separators, preserving their entries.
+	 *
+	 * @return void
+	 */
+	public function organize_menu_sections() {
+		global $menu;
+
+		$sections = array_fill( 0, 4, array() );
+		$content = array( 'edit.php?post_type=page', 'edit.php?post_type=person', 'edit.php', 'edit.php?post_type=event', 'upload.php', 'edit-comments.php', 'taxonomies-menu' );
+		$commerce = array( 'edit.php?post_type=product', 'admin.php?page=wc-orders', 'wc-orders', 'edit.php?post_type=shop_order', 'woocommerce', 'wc-admin', 'wc-admin&path=/analytics/overview', 'woocommerce-marketing' );
+
+		foreach ( (array) $menu as $item ) {
+			if ( in_array( 'wp-menu-separator', explode( ' ', $item[4] ?? '' ), true ) ) {
+				continue;
+			}
+			$slug = $item[2] ?? '';
+			$section = 3;
+			if ( 'index.php' === $slug ) {
+				$section = 0;
+			} elseif ( in_array( $slug, $content, true ) ) {
+				$section = 1;
+			} elseif ( in_array( $slug, $commerce, true ) ) {
+				$section = 2;
+			}
+			$sections[ $section ][] = $item;
+		}
+
+		$menu = array();
+		$has_visible_section = false;
+		foreach ( $sections as $index => $items ) {
+			$visible = false;
+			foreach ( $items as $item ) {
+				if ( current_user_can( $item[1] ) ) {
+					$visible = true;
+					break;
+				}
+			}
+			if ( $visible && $has_visible_section ) {
+				$menu[] = array( '', 'read', 'separator-marg-' . $index, '', 'wp-menu-separator' );
+			}
+			$menu = array_merge( $menu, $items );
+			$has_visible_section = $has_visible_section || $visible;
+		}
 	}
 
 	/**

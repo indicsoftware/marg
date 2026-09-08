@@ -68,7 +68,7 @@
             "name": "price",
             "aria-label": "",
             "type": "group",
-            "instructions": "",
+            "instructions": "Record the base prices here. Verify prices on each WooCommerce product separately before publishing.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -246,7 +246,7 @@
                             "name": "inr",
                             "aria-label": "",
                             "type": "number",
-                            "instructions": "Base price for individual articles in Indian Rupees (₹). This is used as default pricing for article products.",
+                            "instructions": "Base price for individual articles in Indian rupees (₹). Enter the amount without a currency symbol.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -269,7 +269,7 @@
                             "name": "usd",
                             "aria-label": "",
                             "type": "number",
-                            "instructions": "Base price for individual articles in US Dollars ($). This is used as default pricing for article products.",
+                            "instructions": "Base price for individual articles in US dollars ($). Enter the amount without a currency symbol.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -296,7 +296,7 @@
             "name": "domestic_tax_rate_for_digital_products",
             "aria-label": "",
             "type": "number",
-            "instructions": "GST\/Tax rate for digital products sold to domestic (India) customers. Enter as percentage (e.g., 18 for 18% GST).",
+            "instructions": "Record the intended tax percentage for digital products sold in India, such as 18 for 18%. Verify the applied rate in WooCommerce tax settings and checkout separately.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -319,7 +319,7 @@
             "name": "discount_applicable_to_members",
             "aria-label": "",
             "type": "number",
-            "instructions": "Discount percentage given to members on product purchases. Enter as percentage (e.g., 10 for 10% discount).",
+            "instructions": "Record the intended member discount percentage, such as 10 for 10%. Verify the membership discount rules and checkout separately.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -355,5 +355,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1760418655
+    "modified": 1788850923
 }

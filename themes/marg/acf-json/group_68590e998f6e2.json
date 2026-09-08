@@ -50,7 +50,7 @@
             "name": "person_type",
             "aria-label": "",
             "type": "taxonomy",
-            "instructions": "",
+            "instructions": "Select all applicable types. Classify trustees and board members as Team. General Editors also count as contributors, so selecting Contributor as well is optional.",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -76,7 +76,7 @@
             "name": "bio",
             "aria-label": "",
             "type": "textarea",
-            "instructions": "",
+            "instructions": "Enter the biography as plain text. Use line breaks to separate paragraphs.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -97,7 +97,7 @@
             "name": "designation",
             "aria-label": "",
             "type": "text",
-            "instructions": "",
+            "instructions": "Enter the person's role or job title. Required when Person Type includes Team.",
             "required": 1,
             "conditional_logic": [
                 [
@@ -126,7 +126,7 @@
             "name": "bio_last_updated_on",
             "aria-label": "",
             "type": "date_time_picker",
-            "instructions": "",
+            "instructions": "Enter the date and time of the latest biography update. Update this value manually when you revise the bio.",
             "required": 0,
             "conditional_logic": [
                 [
@@ -161,7 +161,7 @@
             "name": "contributor_type",
             "aria-label": "",
             "type": "taxonomy",
-            "instructions": "",
+            "instructions": "Select the applicable contributor roles. Required for Contributors and General Editors.",
             "required": 1,
             "conditional_logic": [
                 [
@@ -220,5 +220,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1788847523
+    "modified": 1788850923
 }
