@@ -67,6 +67,19 @@ class ThemeCore {
 			)
 		);
 
+		/*
+		 * WooCommerce: declare support so WC uses template_include (and the
+		 * theme's woocommerce/single-product.php router) instead of the
+		 * "unsupported theme" the_content replacement. The product gallery
+		 * features (wc-product-gallery-zoom / -lightbox / -slider) are
+		 * intentionally NOT enabled: the Marg article and magazine templates
+		 * render their own media, and zoom/lightbox styling conflicts with the
+		 * design. Books and other products fall back to WC's default markup.
+		 * Image sizes are left to the WooCommerce settings (no size args) so
+		 * declaring support does not trigger a thumbnail regeneration.
+		 */
+		add_theme_support( 'woocommerce' );
+
 		remove_theme_support( 'core-block-patterns' );
 
 		// by adding the `theme.json` file block templates automatically get enabled.

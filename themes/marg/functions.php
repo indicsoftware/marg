@@ -109,6 +109,12 @@ require_once __DIR__ . '/src/ProductEditorialFields.php';
 $product_editorial_fields = new \TenUpTheme\ProductEditorialFields();
 $product_editorial_fields->init();
 
+// Route article / magazine products to the Marg templates and keep WC's default CSS off them.
+require_once __DIR__ . '/src/ProductTemplates.php';
+require_once __DIR__ . '/src/ProductPresenter.php';
+$product_templates = new \TenUpTheme\ProductTemplates();
+$product_templates->init();
+
 // Initialize WooCommerce Customizations to remove grouped product type
 require_once __DIR__ . '/src/WooCommerceCustomizations.php';
 $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();

@@ -1,0 +1,309 @@
+/**
+ * Marg theme: Tailwind CSS v4 entry.
+ *
+ * Compiled by @tailwindcss/postcss only (see ../../../postcss.config.js) and
+ * imported by assets/js/frontend/frontend.js, so it ships as dist/css/frontend.css.
+ *
+ * Reset: Tailwind Preflight is the only reset. modern-normalize is no longer
+ * imported (it would double-reset).
+ *
+ * Tokens: Figma has two variable modes. The @theme block holds the MOBILE
+ * values; the :root overrides below switch to the DESKTOP values from 1133px
+ * (tablet-lg). Utilities read var(--token), so text-regular, gap-medium,
+ * size-circle, h-header etc. are responsive without breakpoint prefixes.
+ * Do NOT change this to `@theme inline`, which would bake the mobile values in.
+ */
+
+@import "tailwindcss" source(none);
+
+/* Class sources: theme PHP templates, partials, WooCommerce overrides, src helpers, blocks, JS. */
+@source "../../../*.php";
+@source "../../../partials/**/*.php";
+@source "../../../woocommerce/**/*.php";
+@source "../../../src/**/*.php";
+@source "../../../blocks/**/*.{php,js,json}";
+@source "../../js/**/*.js";
+
+/* -------------------------------------------------------------------------
+ * Fonts
+ *
+ * Authentic Sans by AUTHENTIC (github.com/authenticbusiness/authentic-sans,
+ * WTFPL — see assets/fonts/authentic-sans/LICENSE.txt). The upstream OTFs were
+ * converted to WOFF2 unchanged. Figma weights 90/130/150 map to CSS 400/600/700.
+ * The face has a small Latin set (no ê â · × ° ® ₹ € £); those characters fall
+ * back per glyph to the next family in --font-sans.
+ * URLs are relative to dist/css/frontend.css (10up-toolkit copies assets/fonts
+ * to dist/fonts; css-loader does not rewrite url() for themes).
+ *
+ * Times New Roman is a commercial system font: never self-host it. The serif
+ * stack relies on the installed font, then the metric-compatible Tinos /
+ * Liberation Serif if the visitor has them.
+ * ---------------------------------------------------------------------- */
+
+@font-face {
+	font-family: "Authentic Sans";
+	src: url("../fonts/authentic-sans/authentic-sans-90.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Authentic Sans";
+	src: url("../fonts/authentic-sans/authentic-sans-130.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Authentic Sans";
+	src: url("../fonts/authentic-sans/authentic-sans-150.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme static {
+	/* Remove Tailwind defaults that must not leak into templates. */
+	--color-*: initial;
+	--font-*: initial;
+	--text-*: initial;
+	--breakpoint-*: initial;
+
+	/* Colours */
+	--color-white: #fff;
+	--color-black: #000;
+	--color-marg-red: #da100d; /* all text, rules, borders */
+	--color-marg-red-muted: #da100d4d; /* 30% red */
+	--color-marg-grey: #7e8699; /* VIEW button, captions, mobile image rule */
+	--color-marg-black: #000; /* BUY button */
+	--color-marg-cover-bg: #ecedf0; /* mobile card cover fill */
+
+	/* Font families */
+	--font-sans: "Authentic Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+	--font-serif: "Times New Roman", times, tinos, "Liberation Serif", serif;
+
+	/* Font weights (Authentic Sans 90 / 130 / 150) */
+	--font-weight-regular: 400;
+	--font-weight-normal: 400;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+
+	/* Font sizes: MOBILE values (desktop in comments, overridden below) */
+	--text-xsmall: 10px; /* 14px */
+	--text-xsmall--line-height: 1.2;
+	--text-small: 12px; /* 16px */
+	--text-small--line-height: 1.2;
+	--text-regular: 14px; /* 18px */
+	--text-regular--line-height: 1.2;
+	--text-medium: 18px; /* 24px */
+	--text-medium--line-height: 1.2;
+	--text-xlarge: 24px; /* 35px */
+	--text-xlarge--line-height: 1.2;
+
+	--leading-marg: 1.2;
+
+	/* Spacing: MOBILE values (desktop in comments, overridden below).
+	 * Named to avoid clashing with max-w-xs/sm/md/lg/xl. The numeric scale
+	 * (p-4 = 1rem etc.) from Tailwind's default --spacing is still available. */
+	--spacing-micro: 2px; /* 4px */
+	--spacing-3xsmall: 4px; /* 8px */
+	--spacing-2xsmall: 6px; /* 12px */
+	--spacing-xsmall: 8px; /* 16px */
+	--spacing-small: 10px; /* 20px */
+	--spacing-medium: 12px; /* 24px */
+	--spacing-large: 16px; /* 36px */
+	--spacing-xlarge: 32px; /* 48px */
+	--spacing-2xlarge: 24px; /* 72px */
+	--spacing-3xlarge: 48px; /* 96px (provisional, no desktop value in Figma) */
+	--spacing-jumbo: 80px; /* 120px (provisional, no desktop value in Figma) */
+
+	/* Component dimensions */
+	--spacing-header: 60px; /* 100px at 1133, 200px at 1280 */
+	--spacing-circle: 50px; /* 70px */
+	--spacing-link-icon: 16px; /* 24px */
+	--spacing-gutter: 12px; /* 0 */
+
+	/* Breakpoints (Figma frame widths; base = mobile 390) */
+	--breakpoint-tablet: 744px; /* tablet portrait, still MOBILE token mode, 4 cols */
+	--breakpoint-tablet-lg: 1133px; /* tablet landscape: DESKTOP token mode, 24 cols */
+	--breakpoint-desktop: 1280px; /* desktop small: header 200 */
+	--breakpoint-desktop-lg: 1920px; /* desktop large reference frame */
+
+	/* Containers (max-w-page etc.) */
+	--container-page: 1920px;
+	--container-article: 1440px; /* 18 of 24 cols at 1920 */
+	--container-related: 1760px; /* 22 of 24 cols at 1920 */
+	--container-mobile: 366px;
+}
+
+/* DESKTOP variable mode (Figma frames 1133 / 1280 / 1920). */
+@layer theme {
+	/* Figma variable stroke/hairline: Mobile 0.3 / Tablet 0.4 / Desktop 0.5. */
+	:root {
+		--stroke-default: 1px;
+		--stroke-hairline: 0.3px;
+	}
+
+	@media (width >= 744px) {
+		:root {
+			--stroke-hairline: 0.4px;
+		}
+	}
+
+	@media (width >= 1133px) {
+		:root {
+			--text-xsmall: 14px;
+			--text-small: 16px;
+			--text-regular: 18px;
+			--text-medium: 24px;
+			--text-xlarge: 35px;
+			--spacing-micro: 4px;
+			--spacing-3xsmall: 8px;
+			--spacing-2xsmall: 12px;
+			--spacing-xsmall: 16px;
+			--spacing-small: 20px;
+			--spacing-medium: 24px;
+			--spacing-large: 36px;
+			--spacing-xlarge: 48px;
+			--spacing-2xlarge: 72px;
+			--spacing-3xlarge: 96px;
+			--spacing-jumbo: 120px;
+			--spacing-header: 100px;
+			--spacing-circle: 70px;
+			--spacing-link-icon: 24px;
+			--spacing-gutter: 0px;
+			--stroke-hairline: 0.5px;
+		}
+	}
+
+	@media (width >= 1280px) {
+		:root {
+			--spacing-header: 200px;
+		}
+	}
+}
+
+/*
+ * Every serif (Times New Roman) text layer in Figma carries a centre-aligned
+ * stroke in its own text colour, bound to stroke/hairline. -webkit-text-stroke
+ * is also centre-aligned, so currentColor + the token reproduces it. The stroke
+ * is inherited, so sans text nested inside a serif element switches it off.
+ */
+@layer utilities {
+	.font-serif {
+		-webkit-text-stroke: var(--stroke-hairline) currentColor;
+	}
+
+	.font-serif .font-sans {
+		-webkit-text-stroke-width: 0;
+	}
+}
+
+/* Figma trims every text box to cap height; add to text elements so gaps match Figma. */
+@utility text-trim {
+	text-box: trim-both cap alphabetic;
+}
+
+@layer base {
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
+	}
+
+	body {
+		background-color: var(--color-white);
+		color: var(--color-marg-red);
+		font-family: var(--font-sans);
+		font-weight: 400;
+		line-height: 1.2;
+		letter-spacing: 0;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	::selection {
+		background-color: var(--color-marg-red);
+		color: var(--color-white);
+	}
+
+	/* Preflight makes buttons cursor:default in v4; keep pointer for real actions. */
+	button:not(:disabled),
+	[role="button"]:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
+
+	[hidden]:where(:not([hidden="until-found"])) {
+		display: none !important;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001s !important;
+			transition-duration: 0.001s !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}
+
+@layer components {
+	/* WordPress / WooCommerce screen-reader helpers (core and plugins output these). */
+	.screen-reader-text,
+	.visually-hidden,
+	.visually-hidden-focusable:not(:focus, :active) {
+		position: absolute !important;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	/* WordPress generated alignment classes (post content). */
+	.alignleft {
+		float: left;
+		margin-right: 1rem;
+	}
+
+	.alignright {
+		float: right;
+		margin-left: 1rem;
+	}
+
+	.aligncenter {
+		display: block;
+		margin-inline: auto;
+	}
+
+	.wp-caption {
+		max-width: 100%;
+	}
+
+	/* Minimal WooCommerce notices (WC's own CSS is dequeued on Marg product templates). */
+	.woocommerce-notices-wrapper:empty {
+		display: none;
+	}
+
+	.woocommerce-message,
+	.woocommerce-info,
+	.woocommerce-error {
+		list-style: none;
+		margin: 0 0 var(--spacing-medium);
+		padding: var(--spacing-xsmall) var(--spacing-gutter);
+		border-top: 1px solid var(--color-marg-red);
+		border-bottom: 1px solid var(--color-marg-red);
+		font-size: var(--text-small);
+	}
+
+	.woocommerce-message a,
+	.woocommerce-info a,
+	.woocommerce-error a {
+		text-decoration: underline;
+	}
+}
