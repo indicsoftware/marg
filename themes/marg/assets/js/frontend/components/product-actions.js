@@ -8,12 +8,16 @@
  * - cite:  toggles the element referenced by aria-controls (hidden attribute)
  *          and keeps aria-expanded in sync.
  *
- * Copy feedback: the element's [data-marg-label] text switches to
- * data-marg-copied-label (default "copied") for two seconds and data-state="copied"
- * is set, so templates can style it with data-[state=copied]:... utilities.
+ * Copy feedback (Figma link/action copy/active 269:285): the element's
+ * [data-marg-label] text switches to data-marg-copied-label (default "copied!") for
+ * two seconds and data-state="copied" is set, so templates can style it with
+ * group-data-[state=copied]:... utilities (e.g. reveal a visually hidden label).
+ * The label is an aria-live="polite" region: "copied!" is announced, while the
+ * restore to the original label is made silently.
  */
 
 const COPIED_MS = 2000;
+const DEFAULT_COPIED_LABEL = 'copied!';
 
 /**
  * Copy text to the clipboard.
@@ -55,18 +59,25 @@ async function copyText(text) {
  */
 function flagCopied(el) {
 	const label = el.querySelector('[data-marg-label]');
-	const copiedLabel = el.dataset.margCopiedLabel || 'copied';
+	const copiedLabel = el.dataset.margCopiedLabel || DEFAULT_COPIED_LABEL;
 	if (label && !label.dataset.margOriginal) {
 		label.dataset.margOriginal = label.textContent;
 	}
 	if (label) {
+		window.clearTimeout(label.margLiveTimer);
+		label.setAttribute('aria-live', 'polite');
 		label.textContent = copiedLabel;
 	}
 	el.dataset.state = 'copied';
 	window.clearTimeout(el.margCopiedTimer);
 	el.margCopiedTimer = window.setTimeout(() => {
 		if (label && label.dataset.margOriginal) {
+			// Restore without re-announcing the original label.
+			label.setAttribute('aria-live', 'off');
 			label.textContent = label.dataset.margOriginal;
+			label.margLiveTimer = window.setTimeout(() => {
+				label.setAttribute('aria-live', 'polite');
+			}, 250);
 		}
 		delete el.dataset.state;
 	}, COPIED_MS);

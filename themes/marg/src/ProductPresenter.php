@@ -1668,4 +1668,207 @@ final class ProductPresenter {
 	public static function related_cards( $p = null, $limit = 3 ) {
 		return array_map( array( __CLASS__, 'card' ), self::related_ids( $p, $limit ) );
 	}
+
+	/* ---------------------------------------------------------------------
+	 * Issue names / magazine archive
+	 * ------------------------------------------------------------------- */
+
+	/**
+	 * Whether a title is an imported placeholder ("Volume 12 Number 3") rather than a real issue name.
+	 *
+	 * @param string $title Title (raw or rendered; tags and entities are handled).
+	 * @return bool
+	 */
+	public static function is_placeholder_title( $title ) {
+		$title = html_entity_decode( wp_strip_all_tags( (string) $title ), ENT_QUOTES, 'UTF-8' );
+		return 1 === preg_match( '/^\s*Volume\s+\d+\s+Number\s+\d+\s*$/iu', $title );
+	}
+
+	/**
+	 * Real issue name of a product: its title, or '' when the title is empty or a
+	 * "Volume N Number M" placeholder (Figma 311:67 annotation: such issues have no name).
+	 *
+	 * @param int|\WP_Post|\WC_Product|null $p Product reference.
+	 * @return string Raw (unescaped) name or ''.
+	 */
+	public static function issue_name( $p = null ) {
+		$id    = self::id( $p );
+		$title = $id ? trim( html_entity_decode( wp_strip_all_tags( get_the_title( $id ) ), ENT_QUOTES, 'UTF-8' ) ) : '';
+		return ( '' === $title || self::is_placeholder_title( $title ) ) ? '' : $title;
+	}
+
+	/**
+	 * Unix timestamp (UTC midnight) of an ACF date_picker raw value (Ymd), or 0.
+	 *
+	 * @param mixed $ymd Raw value, e.g. "19461001".
+	 * @return int
+	 */
+	private static function ymd_timestamp( $ymd ) {
+		$ymd = self::str( $ymd );
+		if ( ! preg_match( '/^\d{8}$/', $ymd ) ) {
+			return 0;
+		}
+		$date = \DateTime::createFromFormat( '!Ymd', $ymd, new \DateTimeZone( 'UTC' ) );
+		return $date ? $date->getTimestamp() : 0;
+	}
+
+	/**
+	 * One magazine archive row (Figma 852:157 desktop row, 866:170 mobile row).
+	 *
+	 * Reads raw post meta only (no ACF formatting, no taxonomy lookups), so a loop
+	 * over a main query whose meta cache is primed costs no extra queries.
+	 * Returns [] when the product has no positive numeric volume AND issue number.
+	 *
+	 * @param int|\WP_Post|\WC_Product|null $p Magazine reference.
+	 * @return array{id:int,url:string,date:string,year:string,volume:int,issue:int,volume_label:string,
+	 *   vol_issue:string,title:string,has_title:bool,annotation:string,image_id:int,sku:string,has_date:bool}|array{}
+	 *   date "1946, Oct" (falls back to the free-text publication reference), volume_label is filled
+	 *   in by archive_rows() ('' unless the row opens a volume), title '' for unnamed issues.
+	 */
+	public static function archive_row( $p = null ) {
+		$id = self::id( $p );
+		return self::memo(
+			"archive_row:{$id}",
+			static function () use ( $id ) {
+				return self::build_archive_row( $id );
+			}
+		);
+	}
+
+	/**
+	 * Build archive_row() (unmemoised).
+	 *
+	 * @param int $id Product ID.
+	 * @return array
+	 */
+	private static function build_archive_row( $id ) {
+		if ( $id < 1 ) {
+			return array();
+		}
+		$volume = self::positive_int( get_post_meta( $id, 'magazine_details_volume_number', true ) );
+		$issue  = self::positive_int( get_post_meta( $id, 'magazine_details_issue_number', true ) );
+		if ( null === $volume || null === $issue ) {
+			return array();
+		}
+
+		$start = self::ymd_timestamp( get_post_meta( $id, 'magazine_details_publication_month_year_start_date', true ) );
+		if ( $start ) {
+			$date = date_i18n( _x( 'Y, M', 'magazine archive date format', 'tenup-theme' ), $start, true );
+			$year = gmdate( 'Y', $start );
+		} else {
+			$date = self::str( get_post_meta( $id, 'magazine_details_publication_month_year_reference', true ) );
+			$year = preg_match( '/\b(1[89]\d{2}|20\d{2})\b/', $date, $m ) ? $m[1] : '';
+		}
+
+		$image_id = self::attachment_id( get_post_meta( $id, 'magazine_details_open_access_hover_image', true ) );
+		if ( ! $image_id ) {
+			$image_id = (int) get_post_thumbnail_id( $id );
+		}
+
+		$title = self::issue_name( $id );
+
+		return array(
+			'id'           => $id,
+			'url'          => self::permalink( $id ),
+			'date'         => $date,
+			'year'         => $year,
+			'volume'       => $volume,
+			'issue'        => $issue,
+			'volume_label' => '',
+			/* translators: 1: volume number, 2: issue number. */
+			'vol_issue'    => sprintf( __( 'Vol. %1$d No. %2$d', 'tenup-theme' ), $volume, $issue ),
+			'title'        => $title,
+			'has_title'    => '' !== $title,
+			'annotation'   => self::str( get_post_meta( $id, 'magazine_details_open_access_featured_text', true ) ),
+			'image_id'     => $image_id,
+			'sku'          => self::str( get_post_meta( $id, '_sku', true ) ),
+			'has_date'     => (bool) $start,
+		);
+	}
+
+	/**
+	 * Magazine archive rows, one per issue, in the order given (the archive query sorts by volume, issue, ID).
+	 *
+	 * Duplicates: the archive lists each volume/issue once. When several published products
+	 * claim the same volume and issue (test fixtures, re-imports), the canonical record wins:
+	 * the one whose SKU follows the catalogue convention "margmagv{volume}i{issue}" (every
+	 * imported issue has one), then the one with a publication date, then the first in
+	 * query order (lowest ID).
+	 *
+	 * Also fills 'volume_label' ("Vol. 8") on the first row of each volume and primes the
+	 * attachment caches of the row images in one query.
+	 *
+	 * @param array $posts WP_Post objects or IDs (e.g. $wp_query->posts).
+	 * @return array<int, array> See archive_row().
+	 */
+	public static function archive_rows( array $posts ) {
+		$picked = array();
+		$scores = array();
+		foreach ( $posts as $post ) {
+			$row = self::archive_row( $post );
+			if ( ! $row ) {
+				continue;
+			}
+			$key   = $row['volume'] . '/' . $row['issue'];
+			$sku   = sprintf( '/^margmagv0*%di0*%d$/i', $row['volume'], $row['issue'] );
+			$score = ( preg_match( $sku, $row['sku'] ) ? 2 : 0 ) + ( $row['has_date'] ? 1 : 0 );
+			if ( ! isset( $scores[ $key ] ) || $score > $scores[ $key ] ) {
+				$picked[ $key ] = $row;
+				$scores[ $key ] = $score;
+			}
+		}
+
+		$rows = array_values( $picked );
+		usort(
+			$rows,
+			static function ( $a, $b ) {
+				return array( $a['volume'], $a['issue'], $a['id'] ) <=> array( $b['volume'], $b['issue'], $b['id'] );
+			}
+		);
+
+		$previous  = null;
+		$image_ids = array();
+		foreach ( $rows as $i => $row ) {
+			if ( $row['volume'] !== $previous ) {
+				/* translators: %d: volume number. */
+				$rows[ $i ]['volume_label'] = sprintf( __( 'Vol. %d', 'tenup-theme' ), $row['volume'] );
+			}
+			$previous = $row['volume'];
+			if ( $row['image_id'] ) {
+				$image_ids[] = $row['image_id'];
+			}
+		}
+
+		if ( $image_ids && function_exists( '_prime_post_caches' ) ) {
+			_prime_post_caches( array_unique( $image_ids ), false, true );
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * Image data for the mobile archive strip (Figma 880:4949: natural proportions,
+	 * top left, max height 160px, max width 100%).
+	 *
+	 * @param int    $attachment_id Attachment ID.
+	 * @param string $size          Image size.
+	 * @param int    $max_height    Rendered max height in px (used for the sizes hint).
+	 * @return array{src:string,srcset:string,sizes:string,width:int,height:int}|array{} Raw values, [] when unusable.
+	 */
+	public static function archive_image( $attachment_id, $size = 'medium_large', $max_height = 160 ) {
+		$attachment_id = (int) $attachment_id;
+		$src           = $attachment_id ? wp_get_attachment_image_src( $attachment_id, $size ) : false;
+		if ( ! is_array( $src ) || empty( $src[0] ) || empty( $src[1] ) || empty( $src[2] ) ) {
+			return array();
+		}
+		$srcset = wp_get_attachment_image_srcset( $attachment_id, $size );
+		return array(
+			'src'    => (string) $src[0],
+			'srcset' => is_string( $srcset ) ? $srcset : '',
+			// Rendered width at the max height; the CSS max-width (100%) can only make it smaller.
+			'sizes'  => (int) ceil( $max_height * (int) $src[1] / (int) $src[2] ) . 'px',
+			'width'  => (int) $src[1],
+			'height' => (int) $src[2],
+		);
+	}
 }

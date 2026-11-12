@@ -67,7 +67,8 @@ $has_details = $specs || '' !== $description || $editor_groups;
 			<?php if ( $cover_id ) : ?>
 				<?php
 				// m-0! beats WP global styles' unlayered `:where(figure){margin:0 0 1em}`.
-				// Mobile: the band slides under the transparent site header (Figma 836:919), unless a WooCommerce notice sits above it.
+				// Mobile: the band slides under the transparent 44px sticky site header (Figma 897:6296,
+				// "Header-interim / mobile"), unless a WooCommerce notice sits above it.
 				?>
 				<figure class="m-0! flex justify-center max-tablet-lg:in-[.woocommerce-notices-wrapper:empty+.marg-product-template]:-mt-header! bg-linear-to-b from-[#1e1e1e] to-[rgba(30,30,30,0.8)] px-gutter py-jumbo tablet-lg:col-span-7 tablet-lg:block tablet-lg:bg-none tablet-lg:p-0">
 					<?php
@@ -202,7 +203,9 @@ $has_details = $specs || '' !== $description || $editor_groups;
 	</div>
 
 	<?php
-	// Related publications (837:651 desktop, 839:941 mobile carousel).
+	// Related publications (837:651 desktop, 839:941 mobile carousel). Mobile: no bottom
+	// padding and a fixed 414px carousel viewport, so the footer (922:7051, pt-jumbo) starts
+	// flush with the viewport's bottom edge as drawn; desktop keeps the section's 35px.
 	$related = array_values(
 		array_filter(
 			$related,
@@ -213,7 +216,7 @@ $has_details = $specs || '' !== $description || $editor_groups;
 	);
 	if ( $related ) :
 		?>
-		<section class="flex flex-col gap-medium px-gutter pb-large pt-xlarge tablet:mx-auto tablet:max-w-[640px] tablet-lg:mx-0 tablet-lg:max-w-none tablet-lg:gap-[64px] tablet-lg:pb-[35px] tablet-lg:pt-0" aria-labelledby="<?php echo esc_attr( $uid . '-related' ); ?>">
+		<section class="flex flex-col gap-medium px-gutter pt-xlarge tablet:mx-auto tablet:max-w-[640px] tablet-lg:mx-0 tablet-lg:max-w-none tablet-lg:gap-[64px] tablet-lg:pb-[35px] tablet-lg:pt-0" aria-labelledby="<?php echo esc_attr( $uid . '-related' ); ?>">
 			<?php
 			get_template_part(
 				'partials/components/separator-section',
@@ -227,23 +230,21 @@ $has_details = $specs || '' !== $description || $editor_groups;
 				]
 			);
 			?>
-			<ul class="-mx-gutter flex snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)]">
+			<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)]">
 				<?php foreach ( $related as $card ) : ?>
-					<?php
-					// Mobile meta line is "Vol. 75 No. 4, March 2023" for magazines (Figma 839:946).
-					$mobile_meta         = implode( ', ', array_filter( [ $card['meta_primary'] ?? '', $card['meta_secondary'] ?? '' ] ) );
-					$card['mobile_meta'] = '' !== $mobile_meta ? $mobile_meta : ( $card['mobile_meta'] ?? '' );
-					?>
 					<li class="w-[224px] shrink-0 snap-start tablet-lg:w-auto">
 						<?php
 						get_template_part(
 							'partials/components/card-publication',
 							null,
 							[
-								'card'          => $card,
-								'variant'       => 'magazine',
+								'card'             => $card,
+								'variant'          => 'magazine',
 								// Mobile shows optional "edited by" + OPEN ACCESS lines (Figma 839:972).
-								'mobile_byline' => true,
+								'mobile_byline'    => true,
+								// Mobile meta line is "Vol. 75 No. 4, March 2023" (Figma 839:946); just the
+								// date for an unnamed issue, whose title is then "Vol. 75 No. 4" (311:67).
+								'mobile_meta_rows' => true,
 							]
 						);
 						?>

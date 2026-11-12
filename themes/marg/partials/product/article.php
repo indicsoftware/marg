@@ -59,6 +59,16 @@ $related     = array_values(
 
 $has_image = $image_id > 0 && wp_attachment_is_image( $image_id );
 
+// Parent issues without a real name (empty, or the placeholder "Volume N Number M") are
+// named by their volume / issue instead (Figma 311:67 annotation), so the link does not
+// read "from Vol. 66 No. 3, Volume 66 Number 3".
+if ( $parent && '' !== $parent['volume_issue'] ) {
+	if ( '' === ProductPresenter::issue_name( $parent['id'] ) ) {
+		$parent['title']        = $parent['volume_issue'];
+		$parent['volume_issue'] = '';
+	}
+}
+
 // Metadata table: the Figma "LABEL / Value" slot (desktop) is PERMALINK on
 // mobile. It shows the DOI when there is one, else the product permalink,
 // and gets a "copy" control. Other rows come from the presenter.
@@ -139,7 +149,16 @@ $print_people = static function ( array $people ) {
 	}
 };
 ?>
-<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 pb-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-[130px] tablet-lg:pb-20', $has_image ? 'pt-[6px]' : 'pt-12' ) ); ?>">
+<?php
+/*
+ * Top: the mobile image sits 22px below the 44px sticky header (Figma 550:106: image top
+ * at y 66), under the header's 115px white fade as drawn. Without an image (not drawn on
+ * mobile) the first text starts at y 115 (44 + 71), where that fade ends, so the title is
+ * not washed out at scroll 0. Bottom: no mobile padding, the footer's own pt-jumbo follows
+ * the related row (the mobile frame leaves only footer space there); desktop keeps the drawn ~80px.
+ */
+?>
+<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-[130px] tablet-lg:pb-20', $has_image ? 'pt-[22px]' : 'pt-[71px]' ) ); ?>">
 
 	<?php /* ---------------------------------------------------------------- body (Figma "body", 18 cols) */ ?>
 	<div class="flex w-full flex-col gap-12 tablet:mx-auto tablet:max-w-[642px] tablet-lg:col-span-18 tablet-lg:col-start-4 tablet-lg:mx-0 tablet-lg:grid tablet-lg:max-w-none tablet-lg:grid-cols-18 tablet-lg:gap-x-0 tablet-lg:gap-y-12">
@@ -275,8 +294,10 @@ $print_people = static function ( array $people ) {
 										'partials/components/button-action',
 										null,
 										[
-											'action'   => 'buy',
-											'sr_label' => trim(
+											'action'     => 'buy',
+											// Switches to "IN CART" (Figma 243:67) once the article is in the cart.
+											'product_id' => $product_id,
+											'sr_label'   => trim(
 												sprintf(
 													/* translators: 1: article title, 2: currency, 3: price. */
 													__( 'Buy %1$s %2$s %3$s', 'tenup-theme' ),
@@ -285,7 +306,7 @@ $print_people = static function ( array $people ) {
 													(string) ( $buy['amount'] ?? '' )
 												)
 											),
-											'attrs'    => [
+											'attrs'      => [
 												'type'                 => 'submit',
 												'name'                 => 'add-to-cart',
 												'value'                => $product_id,
@@ -422,7 +443,7 @@ $print_people = static function ( array $people ) {
 									<dt class="text-trim col-span-2 self-start font-sans text-xsmall font-bold uppercase tablet-lg:col-span-3"><?php echo esc_html( $meta_row['label'] ); ?></dt>
 									<dd class="col-span-2 col-start-3 flex min-w-0 items-start justify-between gap-3xsmall font-sans text-small font-semibold tablet-lg:col-span-5 tablet-lg:col-start-4">
 										<a class="text-trim min-w-0 truncate hover:underline" href="<?php echo esc_url( $meta_row['url'] ); ?>"><?php echo esc_html( $meta_row['value'] ); ?></a>
-										<button type="button" class="flex shrink-0 opacity-30 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current" data-marg-action="copy" data-marg-copy="<?php echo esc_attr( $meta_row['value'] ); ?>" data-marg-copied-label="<?php esc_attr_e( 'copied', 'tenup-theme' ); ?>">
+										<button type="button" class="flex shrink-0 opacity-30 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current" data-marg-action="copy" data-marg-copy="<?php echo esc_attr( $meta_row['value'] ); ?>" data-marg-copied-label="<?php esc_attr_e( 'copied!', 'tenup-theme' ); ?>">
 											<span class="text-trim" data-marg-label aria-live="polite"><?php esc_html_e( 'copy', 'tenup-theme' ); ?></span><span class="sr-only"> <?php echo esc_html( $meta_row['label'] ); ?></span>
 										</button>
 									</dd>

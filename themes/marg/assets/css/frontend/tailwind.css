@@ -117,12 +117,12 @@
 	--spacing-xlarge: 32px; /* 48px */
 	--spacing-2xlarge: 24px; /* 72px */
 	--spacing-3xlarge: 48px; /* 96px (provisional, no desktop value in Figma) */
-	--spacing-jumbo: 80px; /* 120px (provisional, no desktop value in Figma) */
+	--spacing-jumbo: 80px; /* 100px (Figma 848:2819 desktop footer pt) */
 
 	/* Component dimensions */
-	--spacing-header: 60px; /* 100px at 1133, 200px at 1280 */
+	--spacing-header: 44px; /* Header-interim / mobile 881:183 (below 1133, incl. 744); 100px at 1133, 200px at 1280 */
 	--spacing-circle: 50px; /* 70px */
-	--spacing-link-icon: 16px; /* 24px */
+	--spacing-link-icon: 12px; /* 24px. Mobile instances are hard-sized 12 (article 564:646, magazine 838:1042); the Figma variable still says 16 */
 	--spacing-gutter: 12px; /* 0 */
 
 	/* Breakpoints (Figma frame widths; base = mobile 390) */
@@ -169,7 +169,7 @@
 			--spacing-xlarge: 48px;
 			--spacing-2xlarge: 72px;
 			--spacing-3xlarge: 96px;
-			--spacing-jumbo: 120px;
+			--spacing-jumbo: 100px;
 			--spacing-header: 100px;
 			--spacing-circle: 70px;
 			--spacing-link-icon: 24px;
@@ -236,6 +236,25 @@
 
 	[hidden]:where(:not([hidden="until-found"])) {
 		display: none !important;
+	}
+
+	/*
+	 * Below 1133px the site header is sticky (with JS, header.php) and reveals itself
+	 * on any upward scroll, so reserve it as scroll padding: a focused element or an
+	 * anchor target scrolled into view from above is not left under the 44px bar
+	 * (WCAG 2.2 SC 2.4.11). On article pages the 115px white fade is always on, so
+	 * reserve all of it. The magazine archive opts out where its sticky stage and
+	 * scroll-snap are active ("Archive page" below): its rows carry their own
+	 * scroll-margin-top for the open position.
+	 */
+	@media (width < 1133px) {
+		html.js {
+			scroll-padding-top: var(--spacing-header);
+		}
+
+		html.js:has(> body.marg-product--article) {
+			scroll-padding-top: 115px;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -305,5 +324,30 @@
 	.woocommerce-info a,
 	.woocommerce-error a {
 		text-decoration: underline;
+	}
+
+	/* Archive page */
+	/*
+	 * Magazine archive (woocommerce/taxonomy-product_cat-magazines.php, partials/archive/).
+	 * Only rules utilities cannot express: a page-scoped rule on <html> and a cross-element
+	 * focus rule.
+	 *
+	 * Mobile list snapping (Figma 879:1388: "the focused card should snap into the top
+	 * position"). The rows carry snap-start + scroll-mt (issue-row.php). proximity, not
+	 * mandatory: rows are 18.3px apart, so every resting point inside the list is close to a
+	 * snap position, while the footer below the list stays freely scrollable. Same media
+	 * query and html.js gate as the sticky stage (stage.php); archive-list.js matches it.
+	 */
+	@media (width < 1133px) and (height >= 520px) {
+		html.js:has(> body.marg-archive--magazines) {
+			scroll-snap-type: y proximity;
+			scroll-padding-top: 0;
+		}
+	}
+
+	/* Keyboard focus on the open row (hidden behind the open card): draw the ring on the card. */
+	[data-archive]:has([data-archive-row][data-active] .archive-row-link:focus-visible) [data-archive-panel] {
+		outline: 1px solid var(--color-marg-red);
+		outline-offset: -1px;
 	}
 }

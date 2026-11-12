@@ -94,3 +94,69 @@ function html_attrs( array $attrs ): string {
 	}
 	return $out;
 }
+
+/**
+ * Inline a theme SVG from assets/svg/{name}.svg.
+ *
+ * The files are the Figma exports with the hard-coded #DA100D fill swapped for
+ * currentColor, so colour (and the 30% muted red) comes from the text colour
+ * class on the element or an ancestor. Read-only: the file is read once per
+ * request and nothing is written.
+ *
+ * The root <svg> keeps its own attributes (width, height, viewBox, fill...) except
+ * Figma's inline style, and $attrs are merged over them (null removes one).
+ * Decorative by default (aria-hidden, focusable=false); pass 'aria-label' to
+ * expose it as role="img". Figma layer ids on <g>/<path> are dropped so the same
+ * icon can appear twice on a page without duplicate ids (clipPath ids are kept,
+ * they are referenced by clip-path).
+ *
+ * @param string               $name  File name without extension, [a-z0-9-] only.
+ * @param array<string, mixed> $attrs Root attributes, escaped by html_attrs().
+ * @return string SVG markup ('' if the file is missing). Theme-owned file: echo as is.
+ */
+function inline_svg( string $name, array $attrs = [] ): string {
+	static $files = [];
+
+	if ( ! preg_match( '/^[a-z0-9][a-z0-9-]*$/', $name ) ) {
+		return '';
+	}
+
+	if ( ! array_key_exists( $name, $files ) ) {
+		$path = get_template_directory() . '/assets/svg/' . $name . '.svg';
+		$svg  = is_readable( $path ) ? (string) file_get_contents( $path ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local theme file.
+		$svg  = (string) preg_replace( '/(<(?:g|path)\b[^>]*?)\s+id="[^"]*"/i', '$1', $svg );
+
+		$files[ $name ] = false !== stripos( $svg, '<svg' ) ? trim( $svg ) : '';
+	}
+
+	if ( '' === $files[ $name ] ) {
+		return '';
+	}
+
+	$labelled = isset( $attrs['aria-label'] ) && '' !== (string) $attrs['aria-label'];
+	$attrs    = array_merge(
+		[
+			'aria-hidden' => $labelled ? null : 'true',
+			'focusable'   => 'false',
+			'role'        => $labelled ? 'img' : null,
+		],
+		$attrs
+	);
+
+	return (string) preg_replace_callback(
+		'/<svg\b([^>]*)>/i',
+		static function ( array $match ) use ( $attrs ): string {
+			$root = [];
+			if ( preg_match_all( '/([a-zA-Z_:][-a-zA-Z0-9_:.]*)="([^"]*)"/', $match[1], $pairs, PREG_SET_ORDER ) ) {
+				foreach ( $pairs as $pair ) {
+					$root[ $pair[1] ] = html_entity_decode( $pair[2], ENT_QUOTES | ENT_XML1, 'UTF-8' );
+				}
+			}
+			unset( $root['style'] );
+
+			return '<svg' . html_attrs( array_merge( $root, $attrs ) ) . '>';
+		},
+		$files[ $name ],
+		1
+	);
+}

@@ -13,6 +13,11 @@
  *    data-product-id (digital variation) for the SecurePDFViewer.
  *  - BUY when at least one medium is purchasable. One medium: a direct add-to-cart link.
  *    Two media: BUY opens a popover with one WooCommerce add-to-cart form per medium.
+ *    When the magazine or any of its variations is in the cart, BUY renders its "IN CART"
+ *    active state (Figma 243:67) linking to the cart (button-action.php does the cart check).
+ *
+ * Copy link: mobile shows the icon only (838:1042); the "copied!" feedback label is
+ * revealed while data-state="copied" (Figma 269:285).
  *
  * @package TenUpTheme
  *
@@ -63,8 +68,9 @@ $price_text = static function ( $entry ) {
 					'label'       => __( 'copy link', 'tenup-theme' ),
 					'url'         => ProductPresenter::permalink( $product_id ),
 					'share_title' => $title,
-					// Mobile shows the icon only (Figma 838:1042); keep the label for screen readers.
-					'class'       => 'max-tablet-lg:min-w-[100px] max-tablet-lg:[&_[data-marg-label]]:sr-only',
+					// Mobile shows the icon only (Figma 838:1042); keep the label for screen readers,
+					// and reveal it for the "copied!" feedback.
+					'class'       => 'max-tablet-lg:min-w-[100px] max-tablet-lg:[&:not([data-state=copied])_[data-marg-label]]:sr-only',
 				]
 			);
 			if ( '' !== $citation ) {
@@ -124,11 +130,12 @@ $price_text = static function ( $entry ) {
 						'partials/components/button-action',
 						null,
 						[
-							'action'   => 'buy',
+							'action'     => 'buy',
 							/* translators: 1: "Buy print copy" / "Buy digital copy", 2: magazine title, 3: price e.g. INR 500. */
-							'sr_label' => trim( sprintf( __( '%1$s of %2$s, %3$s', 'tenup-theme' ), $entry['label'], $title, $price_text( $entry ) ), ', ' ),
-							'url'      => $entry['url'],
-							'attrs'    => [
+							'sr_label'   => trim( sprintf( __( '%1$s of %2$s, %3$s', 'tenup-theme' ), $entry['label'], $title, $price_text( $entry ) ), ', ' ),
+							'url'        => $entry['url'],
+							'product_id' => $product_id,
+							'attrs'      => [
 								'rel'             => 'nofollow',
 								'data-product-id' => $product_id,
 								'data-variation'  => (int) $entry['variation_id'],
@@ -140,10 +147,11 @@ $price_text = static function ( $entry ) {
 						'partials/components/button-action',
 						null,
 						[
-							'action'   => 'buy',
+							'action'     => 'buy',
 							/* translators: %s: magazine title. */
-							'sr_label' => sprintf( __( 'Buy %s: choose print or digital copy', 'tenup-theme' ), $title ),
-							'attrs'    => [
+							'sr_label'   => sprintf( __( 'Buy %s: choose print or digital copy', 'tenup-theme' ), $title ),
+							'product_id' => $product_id,
+							'attrs'      => [
 								'popovertarget' => $buy_id,
 								'aria-haspopup' => 'dialog',
 							],
@@ -152,6 +160,9 @@ $price_text = static function ( $entry ) {
 				}
 				?>
 			</div>
+		<?php else : ?>
+			<?php // Keep Figma's three-slot justify-between on desktop so CITE stays mid-row, not flush right. ?>
+			<span class="hidden tablet-lg:block" aria-hidden="true"></span>
 		<?php endif; ?>
 	</div>
 
@@ -202,9 +213,19 @@ $price_text = static function ( $entry ) {
 								<input type="hidden" name="variation_id" value="<?php echo esc_attr( (int) $entry['variation_id'] ); ?>">
 								<input type="hidden" name="attribute_pa_medium" value="<?php echo esc_attr( $entry['medium'] ); ?>">
 								<input type="hidden" name="quantity" value="1">
-								<button type="submit" class="inline-flex size-circle shrink-0 items-center justify-center rounded-full border border-marg-black font-serif text-medium uppercase text-marg-black hover:bg-current/5 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current" aria-label="<?php echo esc_attr( $entry['label'] . ', ' . $price_text( $entry ) ); ?>">
-									<span class="text-trim"><?php esc_html_e( 'Buy', 'tenup-theme' ); ?></span>
-								</button>
+								<?php
+								// Same circle as the row's BUY (hover: black fill, white label); IN CART per medium.
+								get_template_part(
+									'partials/components/button-action',
+									null,
+									[
+										'action'     => 'buy',
+										'sr_label'   => $entry['label'] . ', ' . $price_text( $entry ),
+										'product_id' => (int) $entry['variation_id'],
+										'attrs'      => [ 'type' => 'submit' ],
+									]
+								);
+								?>
 							</form>
 						</li>
 					<?php endforeach; ?>

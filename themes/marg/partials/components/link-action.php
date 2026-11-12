@@ -1,14 +1,18 @@
 <?php
 /**
  * Component: link/action, checkbox square + label: share / copy link / CITE
- * (Figma 605:319, I836:567;296:359, I836:567;296:360).
+ * (Figma 605:319, I836:567;296:359, I836:567;296:360; states on frame 266:77).
  *
- * 16px (mobile) / 24px (>= tablet-lg) empty bordered square (`size-link-icon`,
+ * 12px (mobile) / 24px (>= tablet-lg) empty bordered square (`size-link-icon`,
  * decorative) + Sans bold text-xsmall label, gap 3xsmall. Always a <button>.
  * Behaviour comes from assets/js/frontend/components/product-actions.js:
  *   share -> Web Share API, clipboard fallback (data-marg-url / data-marg-title)
- *   copy  -> copies data-marg-copy (or data-marg-url, or location.href); label flips to "copied"
+ *   copy  -> copies data-marg-copy (or data-marg-url, or location.href); for ~2s the label
+ *            reads "copied!" (Figma 269:285, announced via aria-live) and data-state="copied"
+ *            is set. The square stays empty, as drawn. A visually hidden label
+ *            (`hide_label`) is revealed while it says "copied!".
  *   cite  -> toggles the element whose id is `controls` (render it with the `hidden` attribute)
+ * The Figma copy/hover state (269:288, blur(1px) + "copy link") is intentionally not built.
  *
  * Usage:
  * get_template_part( 'partials/components/link-action', null, [
@@ -29,7 +33,7 @@
  *     @type string $url          URL to share/copy. Default: current product permalink (get_permalink()).
  *     @type string $share_title  Title for navigator.share. Default: get_the_title().
  *     @type string $copy         Text to copy for 'copy' (overrides url), e.g. a DOI.
- *     @type string $copied_label Feedback label after copying. Default "copied".
+ *     @type string $copied_label Feedback label after copying. Default "copied!".
  *     @type string $controls     For 'cite': id of the citation panel (aria-controls).
  *     @type array  $attrs        Extra attributes. Escaped by html_attrs().
  *     @type string $class        Extra classes for the root element.
@@ -49,7 +53,7 @@ $args = wp_parse_args(
 		'url'          => '',
 		'share_title'  => '',
 		'copy'         => '',
-		'copied_label' => __( 'copied', 'tenup-theme' ),
+		'copied_label' => __( 'copied!', 'tenup-theme' ),
 		'controls'     => '',
 		'attrs'        => [],
 		'class'        => '',
@@ -89,6 +93,6 @@ $attrs = array_merge(
 );
 ?>
 <button<?php echo html_attrs( $attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in html_attrs(). ?>>
-	<span class="size-link-icon shrink-0 border border-marg-red group-aria-expanded:bg-marg-red group-data-[state=copied]:bg-marg-red" aria-hidden="true"></span>
-	<span data-marg-label aria-live="polite" class="<?php echo esc_attr( class_names( 'text-trim whitespace-nowrap font-sans text-xsmall font-bold', $args['uppercase'] ? 'uppercase' : '', $args['hide_label'] ? 'sr-only' : '' ) ); ?>"><?php echo esc_html( $label ); ?></span>
+	<span class="size-link-icon shrink-0 border border-marg-red group-aria-expanded:bg-marg-red" aria-hidden="true"></span>
+	<span data-marg-label<?php echo 'cite' !== $args['action'] ? ' aria-live="polite"' : ''; // Only share/copy labels change ("copied!"); CITE is static. ?> class="<?php echo esc_attr( class_names( 'text-trim whitespace-nowrap font-sans text-xsmall font-bold', $args['uppercase'] ? 'uppercase group-data-[state=copied]:normal-case' : '', $args['hide_label'] ? 'sr-only group-data-[state=copied]:not-sr-only' : '' ) ); ?>"><?php echo esc_html( $label ); ?></span>
 </button>

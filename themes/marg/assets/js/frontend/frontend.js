@@ -8,5 +8,9 @@
 import '../../css/frontend/tailwind.css';
 
 import { initProductActions } from './components/product-actions';
+import { initSiteHeader } from './components/site-header';
+import { initArchiveList } from './components/archive-list';
 
 initProductActions();
+initSiteHeader();
+initArchiveList();

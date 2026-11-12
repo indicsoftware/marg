@@ -2,8 +2,10 @@
 /**
  * The template for displaying the footer.
  *
- * Minimal placeholder (no footer is designed in Figma yet): a 1px marg-red
- * top rule with the site name.
+ * Site-wide Figma footer-interim (partials/site/footer-interim.php): mobile
+ * component 908:214 / 908:230 below 1133px, desktop component 922:6730 from
+ * 1133px; "archive" variant on the magazine archive, "non-archive" elsewhere.
+ * No top margin: the footer's own pt-jumbo (80 / 100) is the gap above it.
  *
  * @package TenUpTheme
  */
@@ -11,11 +13,7 @@
 ?>
 		</main>
 
-		<footer class="site-footer mt-3xlarge border-t border-marg-red px-gutter py-medium tablet-lg:px-[calc(100%/24)]" role="contentinfo">
-			<p class="text-trim font-sans text-xsmall font-bold uppercase">
-				&copy; <?php echo esc_html( wp_date( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>
-			</p>
-		</footer>
+		<?php get_template_part( 'partials/site/footer-interim' ); ?>
 
 		<?php wp_footer(); ?>
 	</body>

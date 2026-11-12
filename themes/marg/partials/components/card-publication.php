@@ -10,6 +10,10 @@
  *    magazine: text-xlarge, centred), byline, then a meta-row with a 1px top rule:
  *    meta_primary / meta_secondary on the left, OPEN ACCESS (wins when open access)
  *    or the lowest price on the right.
+ * Unnamed issues (Figma 311:67 annotation): when a magazine's name is empty or the
+ * placeholder "Volume N Number M", the title becomes "Vol. N No. M" and the vol/issue part
+ * leaves the meta-row (only the date remains). Article cards whose parent issue is unnamed
+ * read "from Vol. N No. M" instead of repeating the placeholder.
  * The root sets no width: it stretches in a grid cell / column flex; in a
  * horizontal carousel pass a width
  * (mobile carousel e.g. `w-[250px] shrink-0 snap-start tablet-lg:w-auto`, via `class`).
@@ -32,11 +36,15 @@
  *     @type bool   $mobile_byline  Mobile only (magazine carousel, Figma 839:972): show the byline as
  *                                  text-small and an "OPEN ACCESS" Sans bold caps line under the title,
  *                                  without the desktop meta-row. Default false.
+ *     @type bool   $mobile_meta_rows Mobile meta line built from the meta-row values, "Vol. 75 No. 4, March 2023"
+ *                                  (magazine carousel, Figma 839:946) instead of $card['mobile_meta']
+ *                                  ("Magazine, 2023"). Applied after the unnamed-issue rule. Default false.
  *     @type string $image_size     Image size for wp_get_attachment_image(). Default 'medium_large'.
  *     @type string $class          Extra classes for the root <article>.
  * }
  */
 
+use TenUpTheme\ProductPresenter;
 use function TenUpTheme\class_names;
 
 $args = wp_parse_args(
@@ -46,8 +54,9 @@ $args = wp_parse_args(
 		'variant'        => '',
 		'heading_tag'    => 'h3',
 		'mobile_details' => false,
-		'mobile_byline'  => false,
-		'image_size'     => 'medium_large',
+		'mobile_byline'    => false,
+		'mobile_meta_rows' => false,
+		'image_size'       => 'medium_large',
 		'class'          => '',
 	]
 );
@@ -55,6 +64,38 @@ $args = wp_parse_args(
 $card = is_array( $args['card'] ) ? $args['card'] : [];
 if ( empty( $card['id'] ) || empty( $card['title'] ) ) {
 	return;
+}
+
+/**
+ * Whether a magazine has no real name: empty, or the import placeholder "Volume N Number M".
+ *
+ * @param int $post_id Magazine ID.
+ * @return bool
+ */
+$is_unnamed = static function ( $post_id ) {
+	return '' === ProductPresenter::issue_name( (int) $post_id );
+};
+
+if ( 'magazine' === ( $card['type'] ?? '' ) ) {
+	$vol_issue = ProductPresenter::volume_issue( (int) $card['id'] )['label'];
+	if ( '' !== $vol_issue && $is_unnamed( $card['id'] ) ) {
+		$card['title'] = $vol_issue;
+		// Drop the vol/issue part from the meta-row; the date (meta_secondary) stays.
+		if ( (string) ( $card['meta_primary'] ?? '' ) === $vol_issue ) {
+			$card['meta_primary'] = '';
+		}
+	}
+} elseif ( 'article' === ( $card['type'] ?? '' ) ) {
+	$parent = ProductPresenter::parent_magazine( (int) $card['id'] );
+	if ( $parent && '' !== $parent['volume_issue'] && $is_unnamed( $parent['id'] ) ) {
+		/* translators: %s: "Vol. X No. Y". */
+		$card['meta_secondary'] = sprintf( __( 'from %s', 'tenup-theme' ), $parent['volume_issue'] );
+	}
+}
+
+if ( $args['mobile_meta_rows'] ) {
+	$rows_meta           = implode( ', ', array_filter( [ (string) ( $card['meta_primary'] ?? '' ), (string) ( $card['meta_secondary'] ?? '' ) ] ) );
+	$card['mobile_meta'] = '' !== $rows_meta ? $rows_meta : ( $card['mobile_meta'] ?? '' );
 }
 
 $variant     = in_array( $args['variant'], [ 'article', 'magazine' ], true ) ? $args['variant'] : ( 'article' === ( $card['type'] ?? '' ) ? 'article' : 'magazine' );
@@ -104,7 +145,7 @@ $has_meta    = ! empty( $card['meta_primary'] ) || ! empty( $card['meta_secondar
 		<?php endif; ?>
 		<<?php echo tag_escape( $heading_tag ); ?> class="<?php echo esc_attr( class_names( 'text-trim break-words font-sans text-regular font-semibold', $is_magazine ? 'tablet-lg:text-xlarge' : 'tablet-lg:text-medium' ) ); ?>">
 			<?php if ( $url ) : ?>
-				<a href="<?php echo esc_url( $url ); ?>" class="hover:underline"><?php echo esc_html( $card['title'] ); ?></a>
+				<a href="<?php echo esc_url( $url ); ?>" class="hover:underline focus-visible:underline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current"><?php echo esc_html( $card['title'] ); ?></a>
 			<?php else : ?>
 				<?php echo esc_html( $card['title'] ); ?>
 			<?php endif; ?>
