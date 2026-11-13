@@ -43,7 +43,7 @@ if ( 'archive' === $marg_context['type'] ) :
 	<div class="group/view absolute right-0 top-0 hidden w-[82px] font-sans text-small font-regular leading-[1.2] text-marg-red max-tablet-lg:in-[.js]:block" data-archive-view>
 		<button type="button" class="flex h-[44px] w-full items-center px-large <?php echo esc_attr( $marg_focus ); ?> focus-visible:-outline-offset-4" aria-expanded="false" aria-controls="archive-view-options" data-archive-view-toggle>
 			<span class="text-trim"><?php esc_html_e( 'Titles', 'tenup-theme' ); ?></span>
-			<?php echo inline_svg( 'header-arrow-down', [ 'class' => 'block size-[12px] shrink-0 transition-transform duration-200 motion-reduce:transition-none group-data-open/view:rotate-180' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs(). ?>
+			<?php echo inline_svg( 'icon-arrow-down', [ 'class' => 'block size-[12px] shrink-0 transition-transform duration-200 motion-reduce:transition-none group-data-open/view:rotate-180' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs(). ?>
 			<span class="sr-only"><?php esc_html_e( '(change view)', 'tenup-theme' ); ?></span>
 		</button>
 		<div id="archive-view-options" class="flex h-[36px] items-center px-large" hidden data-archive-view-options>

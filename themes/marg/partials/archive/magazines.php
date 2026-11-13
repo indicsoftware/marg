@@ -44,7 +44,7 @@ if ( $years ) {
 
 $logo = function_exists( 'TenUpTheme\inline_svg' )
 	? inline_svg(
-		'marg-logo-880-4407',
+		'marg-logo',
 		[
 			'class' => 'block aspect-[124.14/106.43] h-auto w-full',
 		]

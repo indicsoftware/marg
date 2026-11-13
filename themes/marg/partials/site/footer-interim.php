@@ -55,8 +55,15 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 				<span class="flex items-center gap-micro">
 					<?php
 					// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG files; root attributes escaped by html_attrs().
-					echo inline_svg( $marg_is_archive ? 'footer-mobile-arrow-up' : 'footer-mobile-nonarchive-arrow-left', [ 'class' => $marg_icon_m ] );
-					echo inline_svg( $marg_is_archive ? 'icon-link-arrow-up' : 'icon-link-arrow-left', [ 'class' => $marg_icon_d ] );
+					if ( $marg_is_archive ) {
+						// Designer's Marg up arrow (icon-arrow-up, square viewBox around the glyph): 16px on
+						// mobile; on desktop 16px inside the 24px slot, so the glyph keeps its Figma size.
+						echo inline_svg( 'icon-arrow-up', [ 'class' => $marg_icon_m ] );
+						echo inline_svg( 'icon-arrow-up', [ 'class' => 'hidden box-content size-4 shrink-0 p-1 tablet-lg:block' ] );
+					} else {
+						echo inline_svg( 'footer-mobile-nonarchive-arrow-left', [ 'class' => $marg_icon_m ] );
+						echo inline_svg( 'icon-link-arrow-left', [ 'class' => $marg_icon_d ] );
+					}
 					// phpcs:enable
 					?>
 					<span class="whitespace-nowrap leading-[1.2]"><?php echo esc_html( SiteChrome::archive_years( true ) ); ?></span>
@@ -81,8 +88,9 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 		<?php // Foundation column (908:219-908:223 mobile, 922:6689 desktop). ?>
 		<div class="flex flex-col items-center pt-[50px] tablet-lg:col-[9/17] tablet-lg:row-start-1 tablet-lg:pt-0">
 			<?php
-			// Logo: 96x82 (mobile 922:6605); desktop frame 112.43x98.16 = the same vector plus 8px padding (922:6690).
-			echo inline_svg( 'footer-mobile-marg-logo', [ 'class' => 'box-content h-[82px] w-[96px] shrink-0 tablet-lg:p-[8px]' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
+			// Logo: the designer's MargLogo master (assets/svg/marg-logo.svg), 96x82 (mobile 922:6605);
+			// desktop frame 112.43x98.16 = the same vector plus 8px padding (922:6690).
+			echo inline_svg( 'marg-logo', [ 'class' => 'box-content h-[82px] w-[96px] shrink-0 tablet-lg:p-[8px]' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
 			?>
 
 			<?php // Registration (908:221 / 922:6693): two centred lines, broken before "Maharashtra" on mobile (908:222) and before "under" on desktop.

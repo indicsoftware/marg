@@ -1,15 +1,17 @@
 <?php
 /**
- * Component: link/action, checkbox square + label: share / copy link / CITE
+ * Component: link/action, icon + label: share / copy link / CITE
  * (Figma 605:319, I836:567;296:359, I836:567;296:360; states on frame 266:77).
  *
- * 12px (mobile) / 24px (>= tablet-lg) empty bordered square (`size-link-icon`,
- * decorative) + Sans bold text-xsmall label, gap 3xsmall. Always a <button>.
+ * Icon: the designer's Marg icons (assets/svg/icon-share.svg for share/copy,
+ * icon-cite.svg for CITE), shown at their native 20.8x23 artboard at every width: the
+ * glyph is ~11px, matching the old 12px mobile placeholder square (decorative) + Sans bold
+ * text-xsmall label, gap 3xsmall. Always a <button>.
  * Behaviour comes from assets/js/frontend/components/product-actions.js:
  *   share -> Web Share API, clipboard fallback (data-marg-url / data-marg-title)
  *   copy  -> copies data-marg-copy (or data-marg-url, or location.href); for ~2s the label
  *            reads "copied!" (Figma 269:285, announced via aria-live) and data-state="copied"
- *            is set. The square stays empty, as drawn. A visually hidden label
+ *            is set. The icon does not change. A visually hidden label
  *            (`hide_label`) is revealed while it says "copied!".
  *   cite  -> toggles the element whose id is `controls` (render it with the `hidden` attribute)
  * The Figma copy/hover state (269:288, blur(1px) + "copy link") is intentionally not built.
@@ -42,6 +44,7 @@
 
 use function TenUpTheme\class_names;
 use function TenUpTheme\html_attrs;
+use function TenUpTheme\inline_svg;
 
 $args = wp_parse_args(
 	$args ?? [],
@@ -93,6 +96,6 @@ $attrs = array_merge(
 );
 ?>
 <button<?php echo html_attrs( $attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in html_attrs(). ?>>
-	<span class="size-link-icon shrink-0 border border-marg-red group-aria-expanded:bg-marg-red" aria-hidden="true"></span>
+	<?php echo inline_svg( 'cite' === $args['action'] ? 'icon-cite' : 'icon-share', [ 'class' => 'block h-[23px] w-[20.8px] shrink-0' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs(). ?>
 	<span data-marg-label<?php echo 'cite' !== $args['action'] ? ' aria-live="polite"' : ''; // Only share/copy labels change ("copied!"); CITE is static. ?> class="<?php echo esc_attr( class_names( 'text-trim whitespace-nowrap font-sans text-xsmall font-bold', $args['uppercase'] ? 'uppercase group-data-[state=copied]:normal-case' : '', $args['hide_label'] ? 'sr-only group-data-[state=copied]:not-sr-only' : '' ) ); ?>"><?php echo esc_html( $label ); ?></span>
 </button>
