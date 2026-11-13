@@ -35,6 +35,14 @@ class ProductTemplates {
 	);
 
 	/**
+	 * Last volume listed on the magazine archive ("1946–2015": Vol. 67, the final
+	 * issue being Jun 2016). Later volumes are current issues, not the archive.
+	 *
+	 * @var int
+	 */
+	const ARCHIVE_LAST_VOLUME = 67;
+
+	/**
 	 * Register hooks.
 	 *
 	 * @return void
@@ -109,8 +117,8 @@ class ProductTemplates {
 	}
 
 	/**
-	 * Main query of the magazine archive: every published magazine with positive numeric
-	 * volume and issue numbers, ordered by volume then issue (named NUMERIC meta clauses,
+	 * Main query of the magazine archive: every published magazine in volumes
+	 * 1–ARCHIVE_LAST_VOLUME with a positive issue number, ordered by volume then issue (named NUMERIC meta clauses,
 	 * so the sort happens in SQL), unpaginated.
 	 *
 	 * WooCommerce's catalogue visibility tax_query and other plugins' restrictions
@@ -132,8 +140,8 @@ class ProductTemplates {
 
 		$meta_query['marg_archive_volume'] = array(
 			'key'     => 'magazine_details_volume_number',
-			'value'   => 0,
-			'compare' => '>',
+			'value'   => array( 1, self::ARCHIVE_LAST_VOLUME ),
+			'compare' => 'BETWEEN',
 			'type'    => 'NUMERIC',
 		);
 		$meta_query['marg_archive_issue']  = array(
