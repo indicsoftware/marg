@@ -119,17 +119,27 @@ $has_details = $specs || '' !== $description || $editor_groups;
 				</div>
 
 				<?php
-				// Price row: desktop only in the design (mobile frame 836:918 has none).
-				get_template_part(
-					'partials/components/price-display',
-					null,
-					[
-						'items'       => $price_items,
-						'open_access' => $open_access,
-						// Small caps sit on the italic numerals' baseline (Figma I836:567;296:438).
-						'class'       => 'hidden tablet-lg:flex tablet-lg:items-baseline tablet-lg:*:items-baseline',
-					]
-				);
+				// Price row / licence: desktop only in the design (mobile frame 836:918 has none).
+				// An open-access issue with no price shows its licence (Figma I836:567;298:17:
+				// Serif/Details/Regular, centred) where the price would be.
+				if ( $open_access && ! $price_items ) :
+					?>
+					<p class="text-trim hidden w-full text-center font-serif text-xsmall leading-[1.2] tablet-lg:block">
+						<?php esc_html_e( 'This issue is licensed under CC BY. You are free to share and adapt it, provided appropriate credit is given.', 'tenup-theme' ); ?>
+					</p>
+					<?php
+				else :
+					get_template_part(
+						'partials/components/price-display',
+						null,
+						[
+							'items'       => $price_items,
+							'open_access' => $open_access,
+							// Small caps sit on the italic numerals' baseline (Figma I836:567;296:438).
+							'class'       => 'hidden tablet-lg:flex tablet-lg:items-baseline tablet-lg:*:items-baseline',
+						]
+					);
+				endif;
 
 				get_template_part(
 					'partials/product/magazine/actions',
