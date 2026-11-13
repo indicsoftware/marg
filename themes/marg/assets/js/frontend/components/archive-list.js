@@ -1,11 +1,12 @@
 /**
- * Magazine archive, mobile open card (partials/archive/magazines.php, stage.php, issue-row.php).
+ * Magazine archive: mobile open card and desktop header hover image
+ * (partials/archive/magazines.php, stage.php, issue-row.php).
  *
  * Below 1133px (and on screens at least 520px tall, where the stage is sticky) the
  * archive is a list of collapsed 18.3px rows scrolling under a sticky "stage": the image
  * strip plus the open card. The row in the last row-height of the stage (hidden behind
  * the open card) is the open one. An IntersectionObserver watches that band and copies
- * the row's data-* attributes (date, vol, title, url, img-*) into the stage.
+ * the row's data-* attributes (date, vol, title, url, img-*, annotation) into the stage.
  *
  * Also:
  *  - keyboard focus on a row scrolls it to the open position (scroll-margin-top), so the
@@ -13,11 +14,17 @@
  *  - [data-archive-spacer] is sized so the last row can reach the open position;
  *  - the next and previous rows' images are preloaded.
  *
+ * At >= 1133px on hover devices, hovering a row (or focusing it from the keyboard) shows
+ * its image (open access hover image, else featured image) in the header-desktop
+ * container [data-archive-hover-image] (partials/site/header-desktop.php), contained and
+ * centred, fading out when no row is hovered. Rows without an image show nothing.
+ *
  * Progressive enhancement: without this script the stage shows the first issue and the
- * list is a plain list of links. Nothing runs at >= 1133px (desktop list, no stage).
+ * list is a plain list of links; the desktop header container stays empty.
  */
 
 const MEDIA = '(width < 1133px) and (height >= 520px)';
+const HOVER_MEDIA = '(width >= 1133px) and (hover: hover)';
 
 /**
  * Copy a row's image into the strip (or show the placeholder block).
@@ -61,11 +68,136 @@ function showImage(img, placeholder, data) {
 }
 
 /**
- * Start the mobile archive behaviour.
+ * Desktop: show the hovered / keyboard-focused row's image in the header container.
+ *
+ * @param {HTMLElement} root [data-archive] section.
+ */
+function initHoverImage(root) {
+	const box = document.querySelector('[data-archive-hover-image]');
+	const list = root.querySelector('[data-archive-list]');
+	if (!box || !list || !window.matchMedia) {
+		return;
+	}
+
+	const media = window.matchMedia(HOVER_MEDIA);
+	let img = null;
+	let hovered = null;
+	let focused = null;
+	let shown = null;
+
+	const ensureImage = () => {
+		if (!img) {
+			img = document.createElement('img');
+			img.alt = '';
+			img.decoding = 'async';
+			img.className =
+				'pointer-events-none block size-full object-contain object-center opacity-0 transition-opacity duration-200 motion-reduce:transition-none';
+			box.appendChild(img);
+		}
+		return img;
+	};
+
+	const hide = () => {
+		shown = null;
+		if (img) {
+			img.classList.remove('opacity-100');
+			img.classList.add('opacity-0');
+		}
+	};
+
+	const show = (row) => {
+		if (!row || !media.matches || !row.dataset.imgSrc) {
+			hide();
+			return;
+		}
+		if (row === shown) {
+			return;
+		}
+		shown = row;
+		const data = row.dataset;
+		const el = ensureImage();
+		const reveal = () => {
+			if (shown === row) {
+				el.classList.remove('opacity-0');
+				el.classList.add('opacity-100');
+			}
+		};
+		if (el.getAttribute('src') === data.imgSrc) {
+			reveal();
+			return;
+		}
+		// New image: fade the current one out and fade the new one in once it has loaded,
+		// so the previous issue's image never shows under the new row.
+		el.classList.remove('opacity-100');
+		el.classList.add('opacity-0');
+		el.onload = reveal;
+		if (data.imgSrcset) {
+			el.setAttribute('sizes', data.imgHoverSizes || data.imgSizes || '');
+			el.setAttribute('srcset', data.imgSrcset);
+		} else {
+			el.removeAttribute('srcset');
+			el.removeAttribute('sizes');
+		}
+		el.setAttribute('width', data.imgWidth || '');
+		el.setAttribute('height', data.imgHeight || '');
+		el.setAttribute('src', data.imgSrc);
+		if (el.complete && el.naturalWidth) {
+			reveal();
+		}
+	};
+
+	const update = () => show(hovered || focused);
+
+	const rowOf = (target) =>
+		target instanceof Element ? target.closest('[data-archive-row]') : null;
+
+	list.addEventListener('pointerover', (event) => {
+		if (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
+			return;
+		}
+		const row = rowOf(event.target);
+		if (row && row !== hovered) {
+			hovered = row;
+			update();
+		}
+	});
+	list.addEventListener('pointerleave', () => {
+		hovered = null;
+		update();
+	});
+	list.addEventListener('focusin', (event) => {
+		const row = rowOf(event.target);
+		focused = row && event.target.matches(':focus-visible') ? row : null;
+		update();
+	});
+	list.addEventListener('focusout', (event) => {
+		if (!rowOf(event.relatedTarget) || !list.contains(event.relatedTarget)) {
+			focused = null;
+			update();
+		}
+	});
+
+	if (typeof media.addEventListener === 'function') {
+		media.addEventListener('change', () => {
+			hovered = null;
+			focused = null;
+			hide();
+		});
+	}
+}
+
+/**
+ * Start the archive behaviour (mobile open card, desktop hover image).
  */
 export function initArchiveList() {
 	const root = document.querySelector('[data-archive]');
-	if (!root || !('IntersectionObserver' in window) || !window.matchMedia) {
+	if (!root) {
+		return;
+	}
+
+	initHoverImage(root);
+
+	if (!('IntersectionObserver' in window) || !window.matchMedia) {
 		return;
 	}
 
@@ -84,6 +216,7 @@ export function initArchiveList() {
 	const spacer = root.querySelector('[data-archive-spacer]');
 	const img = stage.querySelector('[data-archive-img]');
 	const placeholder = stage.querySelector('[data-archive-placeholder]');
+	const annotationEl = stage.querySelector('[data-archive-annotation]');
 	const dateEl = panel.querySelector('[data-archive-panel-date]');
 	const volEl = panel.querySelector('[data-archive-panel-vol]');
 	const titleEl = panel.querySelector('[data-archive-panel-title]');
@@ -134,6 +267,10 @@ export function initArchiveList() {
 			panel.setAttribute('href', data.url);
 		}
 		showImage(img, placeholder, data);
+		if (annotationEl) {
+			annotationEl.textContent = data.annotation || '';
+			annotationEl.hidden = !data.annotation;
+		}
 
 		const index = rows.indexOf(row);
 		preload(rows[index + 1]);

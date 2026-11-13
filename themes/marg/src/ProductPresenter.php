@@ -1871,4 +1871,26 @@ final class ProductPresenter {
 			'height' => (int) $src[2],
 		);
 	}
+
+	/**
+	 * `sizes` hint for an archive image shown in the desktop header's hover-image container
+	 * (header-desktop "main", Frame 24 951:2797: cols 14-17 x rows 4-7, 320 x 209.5 at 1920).
+	 *
+	 * The image is contained (object-fit: contain) in the box, so its rendered width is the
+	 * smaller of the box width and the box height times its aspect ratio. The box is never
+	 * wider than 320px (the header grid is capped at 1920), so a fixed px upper bound is used.
+	 *
+	 * @param array     $image      archive_image() result (width and height are read).
+	 * @param int|float $box_width  Container max width in px.
+	 * @param int|float $box_height Container height in px.
+	 * @return string e.g. "155px"; '' when the image has no usable dimensions.
+	 */
+	public static function archive_hover_sizes( array $image, $box_width = 320, $box_height = 209.5 ) {
+		$width  = isset( $image['width'] ) ? (int) $image['width'] : 0;
+		$height = isset( $image['height'] ) ? (int) $image['height'] : 0;
+		if ( $width < 1 || $height < 1 ) {
+			return '';
+		}
+		return (int) ceil( min( (float) $box_width, (float) $box_height * $width / $height ) ) . 'px';
+	}
 }

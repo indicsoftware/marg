@@ -16,8 +16,10 @@
  * one centred muted line: the title (ellipsis) or "Vol. N No. M" for unnamed issues.
  * The list's own bottom hairline closes the last row.
  *
- * The <li> carries the data the mobile open card (partials/archive/stage.php) needs;
- * archive-list.js reads it. Accessible name: "Vol. N No. M, <date>" (+ the title).
+ * The <li> carries the data the mobile open card (partials/archive/stage.php: image,
+ * annotation) and the desktop header hover image (data-img-*, data-img-hover-sizes) need;
+ * archive-list.js reads it. Accessible name: "Vol. N No. M, <date>" (+ the title and the
+ * annotation; on mobile the annotation is visually hidden in the row and shown in the strip).
  *
  * @package TenUpTheme
  *
@@ -41,18 +43,20 @@ $annotation = (string) ( $row['annotation'] ?? '' );
 $image      = ProductPresenter::archive_image( $row['image_id'] ?? 0 );
 
 $li_attrs = [
-	'class'            => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[332.3px] max-tablet-lg:px-gutter',
-	'data-archive-row' => true,
-	'data-active'      => ! empty( $args['active'] ),
-	'data-date'        => (string) ( $row['date'] ?? '' ),
-	'data-vol'         => (string) ( $row['vol_issue'] ?? '' ),
-	'data-title'       => $has_title ? (string) $row['title'] : false,
-	'data-url'         => (string) $row['url'],
-	'data-img-src'     => $image ? $image['src'] : false,
-	'data-img-srcset'  => $image ? $image['srcset'] : false,
-	'data-img-sizes'   => $image ? $image['sizes'] : false,
-	'data-img-width'   => $image ? (string) $image['width'] : false,
-	'data-img-height'  => $image ? (string) $image['height'] : false,
+	'class'                => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[332.3px] max-tablet-lg:px-gutter',
+	'data-archive-row'     => true,
+	'data-active'          => ! empty( $args['active'] ),
+	'data-date'            => (string) ( $row['date'] ?? '' ),
+	'data-vol'             => (string) ( $row['vol_issue'] ?? '' ),
+	'data-title'           => $has_title ? (string) $row['title'] : false,
+	'data-url'             => (string) $row['url'],
+	'data-img-src'         => $image ? $image['src'] : false,
+	'data-img-srcset'      => $image ? $image['srcset'] : false,
+	'data-img-sizes'       => $image ? $image['sizes'] : false,
+	'data-img-width'       => $image ? (string) $image['width'] : false,
+	'data-img-height'      => $image ? (string) $image['height'] : false,
+	'data-img-hover-sizes' => $image ? ProductPresenter::archive_hover_sizes( $image ) : false,
+	'data-annotation'      => '' !== $annotation ? $annotation : false,
 ];
 
 $sr_label = trim( implode( ', ', array_filter( [ (string) ( $row['vol_issue'] ?? '' ), (string) ( $row['date'] ?? '' ) ] ) ) );
@@ -82,7 +86,7 @@ $sr_label = trim( implode( ', ', array_filter( [ (string) ( $row['vol_issue'] ??
 		<?php endif; ?>
 
 		<?php if ( '' !== $annotation ) : ?>
-			<span class="<?php echo esc_attr( class_names( 'text-trim col-[1/span_3] row-start-1 hidden self-end break-words text-center font-serif text-small font-regular tablet-lg:block', $has_title ? 'row-span-2' : '' ) ); ?>"><?php echo esc_html( $annotation ); ?></span>
+			<span class="<?php echo esc_attr( class_names( 'text-trim col-[1/span_3] row-start-1 self-end break-words text-center font-serif text-small font-regular max-tablet-lg:sr-only', $has_title ? 'row-span-2' : '' ) ); ?>"><?php echo esc_html( $annotation ); ?></span>
 		<?php endif; ?>
 	</a>
 </li>

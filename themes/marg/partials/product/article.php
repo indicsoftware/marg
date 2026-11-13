@@ -156,9 +156,11 @@ $print_people = static function ( array $people ) {
  * mobile) the first text starts at y 115 (44 + 71), where that fade ends, so the title is
  * not washed out at scroll 0. Bottom: no mobile padding, the footer's own pt-jumbo follows
  * the related row (the mobile frame leaves only footer space there); desktop keeps the drawn ~80px.
+ * Desktop top: 72px (pt-2xlarge) below the 210.5px header-desktop, as in 605:309 (Frame 6 itemSpacing 72);
+ * the no-image article uses the same gap (608:791 still shows the old 200px header and is treated as stale).
  */
 ?>
-<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-[130px] tablet-lg:pb-20', $has_image ? 'pt-[22px]' : 'pt-[71px]' ) ); ?>">
+<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-2xlarge tablet-lg:pb-20', $has_image ? 'pt-[22px]' : 'pt-[71px]' ) ); ?>">
 
 	<?php /* ---------------------------------------------------------------- body (Figma "body", 18 cols) */ ?>
 	<div class="flex w-full flex-col gap-12 tablet:mx-auto tablet:max-w-[642px] tablet-lg:col-span-18 tablet-lg:col-start-4 tablet-lg:mx-0 tablet-lg:grid tablet-lg:max-w-none tablet-lg:grid-cols-18 tablet-lg:gap-x-0 tablet-lg:gap-y-12">

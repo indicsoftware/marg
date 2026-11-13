@@ -8,7 +8,8 @@
  * - Results are memoised per request.
  *
  * Figma: "Header-interim / mobile" 881:183 (static variant 897:6278, archive
- * toggle variants 881:151..881:175), "Footer-interim" 897:6385 (mobile Archive
+ * toggle variants 881:151..881:175), "header-desktop" 951:2811 (main 951:2810,
+ * magazine 951:2862, article 951:2887), "Footer-interim" 897:6385 (mobile Archive
  * 908:214 / Non-archive 908:230) and "footer-interim/desktop" 922:6730.
  *
  * @package TenUpTheme
@@ -184,6 +185,96 @@ final class SiteChrome {
 				return $context;
 			}
 		);
+	}
+
+	/**
+	 * Desktop header (>= 1133px), Figma "header-desktop" 951:2811.
+	 *
+	 * - main     (951:2810): the magazine archive and every non-product page. The
+	 *            hover-image container is archive-only (show_hover_image).
+	 * - magazine (951:2862): back link + the issue's "Vol. N No. M" (current page).
+	 *            Without volume / issue numbers, the issue title instead.
+	 * - article  (951:2887): muted back link + "article from Vol. N No. M, Issue
+	 *            name", linking to the parent magazine. Unnamed (placeholder) issues
+	 *            read "article from Vol. N No. M" (same rule as issue_title()). No
+	 *            parent: the back link only (title '').
+	 *
+	 * @return array{variant:string, archive_url:string, is_archive:bool, show_hover_image:bool, title:string, title_url:string, title_is_label:bool}
+	 *   title_is_label: the title is a short "Vol. N No. M" label (kept on one line).
+	 */
+	public static function header_desktop() {
+		return self::memo(
+			'header_desktop',
+			static function () {
+				$context = self::header_context();
+				$id      = (int) get_queried_object_id();
+				$header  = array(
+					'variant'          => 'main',
+					'archive_url'      => $context['archive_url'],
+					'is_archive'       => 'archive' === $context['type'],
+					'show_hover_image' => 'archive' === $context['type'],
+					'title'            => '',
+					'title_url'        => '',
+					'title_is_label'   => false,
+				);
+
+				if ( 'magazine' === $context['type'] ) {
+					$label                    = ProductPresenter::volume_issue( $id )['label'];
+					$header['variant']        = 'magazine';
+					$header['title']          = '' !== $label ? $label : self::issue_title( $id );
+					$header['title_is_label'] = '' !== $label;
+				} elseif ( 'article' === $context['type'] ) {
+					$header['variant'] = 'article';
+					$parent            = ProductPresenter::parent_magazine( $id );
+					if ( $parent ) {
+						$header['title']     = self::article_from( (int) $parent['id'] );
+						$header['title_url'] = (string) $parent['url'];
+					}
+				}
+
+				return $header;
+			}
+		);
+	}
+
+	/**
+	 * Desktop article header line: "article from Vol. 70 No. 2, Ars Botanica".
+	 *
+	 * The issue name is dropped when it is a placeholder ("Volume 70 Number 2") or
+	 * repeats the label; without volume / issue numbers the issue title stands alone.
+	 *
+	 * @param int $magazine_id Parent magazine ID.
+	 * @return string
+	 */
+	private static function article_from( $magazine_id ) {
+		$label = ProductPresenter::volume_issue( $magazine_id )['label'];
+		$name  = ProductPresenter::issue_name( $magazine_id );
+		$parts = array_unique( array_filter( array( $label, $name ), 'strlen' ) );
+		$ref   = $parts ? implode( ', ', $parts ) : ProductPresenter::title( $magazine_id );
+
+		if ( '' === $ref ) {
+			return '';
+		}
+
+		/* translators: %s: parent issue, e.g. "Vol. 70 No. 2, Ars Botanica" (lower-case "article" as drawn). */
+		return sprintf( __( 'article from %s', 'tenup-theme' ), $ref );
+	}
+
+	/**
+	 * Cart item count for the desktop header's decorative "Cart(N)", or null
+	 * when WooCommerce has no cart on this request (then it reads "Cart").
+	 *
+	 * @return int|null
+	 */
+	public static function cart_count() {
+		if ( ! function_exists( 'WC' ) ) {
+			return null;
+		}
+		$wc = \WC();
+		if ( ! $wc || empty( $wc->cart ) || ! is_object( $wc->cart ) ) {
+			return null;
+		}
+		return (int) $wc->cart->get_cart_contents_count();
 	}
 
 	/**

@@ -5,7 +5,7 @@
  *
  * One DOM for both layouts:
  *  - Mobile (flex column, px-gutter, pt-jumbo 80, pb-small 10, min-w 280, all
- *    marg-red-muted 30%): 0.5px divider + two-column navigation (pt 15) / logo
+ *    marg-red-muted-40, 40%): 0.5px divider + two-column navigation (pt 15) / logo
  *    96x82 (pt 50) / registration (pt 30, 10px) / address + phones on one line
  *    (pt 22, Times 12) / Terms | Privacy row and the © line (pt 50, gap 4).
  *  - Desktop (24-col page grid, content in cols 2-23 = Figma's 22-col grid,
@@ -40,7 +40,7 @@ $marg_legal      = 'text-trim whitespace-nowrap';
 $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus;
 
 ?>
-<footer class="site-footer bg-white text-marg-red-muted tablet-lg:text-marg-red" role="contentinfo">
+<footer class="site-footer bg-white text-marg-red-muted-40 tablet-lg:text-marg-red" role="contentinfo">
 	<div class="mx-auto flex w-full min-w-[280px] max-w-page flex-col px-gutter pt-jumbo pb-small font-sans tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-y-[72px] tablet-lg:px-0 tablet-lg:pb-[10px]">
 
 		<?php

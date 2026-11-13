@@ -4,7 +4,7 @@
  *
  * Absolutely centred in the 44px bar, 12px (text-small mobile token), red,
  * cap-trimmed, baseline-aligned with a 3.3px gap, no wrapping. Below 1133px only:
- * the desktop header stays blank.
+ * from 1133 the desktop header is partials/site/header-desktop.php.
  *  - static variant 897:6278 (product pages): "Archives" (400, link) | title (600).
  *  - archive toggle variants 881:151: "1946–2015 | ARCHIVES", all 600. The
  *    Titles/Covers toggle is not built (the Covers view is not designed).

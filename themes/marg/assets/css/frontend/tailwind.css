@@ -10,7 +10,7 @@
  * Tokens: Figma has two variable modes. The @theme block holds the MOBILE
  * values; the :root overrides below switch to the DESKTOP values from 1133px
  * (tablet-lg). Utilities read var(--token), so text-regular, gap-medium,
- * size-circle, h-header etc. are responsive without breakpoint prefixes.
+ * size-circle, size-link-icon etc. are responsive without breakpoint prefixes.
  * Do NOT change this to `@theme inline`, which would bake the mobile values in.
  */
 
@@ -76,6 +76,7 @@
 	--color-black: #000;
 	--color-marg-red: #da100d; /* all text, rules, borders */
 	--color-marg-red-muted: #da100d4d; /* 30% red */
+	--color-marg-red-muted-40: #da100d66; /* 40% red: Color/mard-red/muted-40, mobile footer (Footer-interim 897:6385) */
 	--color-marg-grey: #7e8699; /* VIEW button, captions, mobile image rule */
 	--color-marg-black: #000; /* BUY button */
 	--color-marg-cover-bg: #ecedf0; /* mobile card cover fill */
@@ -120,7 +121,7 @@
 	--spacing-jumbo: 80px; /* 100px (Figma 848:2819 desktop footer pt) */
 
 	/* Component dimensions */
-	--spacing-header: 44px; /* Header-interim / mobile 881:183 (below 1133, incl. 744); 100px at 1133, 200px at 1280 */
+	--spacing-header: 44px; /* Header-interim / mobile 881:183, below 1133 only (incl. 744). From 1133 header-desktop 951:2811 is sized by its own grid rows (partials/site/header-desktop.php), so there is no desktop value */
 	--spacing-circle: 50px; /* 70px */
 	--spacing-link-icon: 12px; /* 24px. Mobile instances are hard-sized 12 (article 564:646, magazine 838:1042); the Figma variable still says 16 */
 	--spacing-gutter: 12px; /* 0 */
@@ -128,7 +129,7 @@
 	/* Breakpoints (Figma frame widths; base = mobile 390) */
 	--breakpoint-tablet: 744px; /* tablet portrait, still MOBILE token mode, 4 cols */
 	--breakpoint-tablet-lg: 1133px; /* tablet landscape: DESKTOP token mode, 24 cols */
-	--breakpoint-desktop: 1280px; /* desktop small: header 200 */
+	--breakpoint-desktop: 1280px; /* desktop small */
 	--breakpoint-desktop-lg: 1920px; /* desktop large reference frame */
 
 	/* Containers (max-w-page etc.) */
@@ -170,17 +171,10 @@
 			--spacing-2xlarge: 72px;
 			--spacing-3xlarge: 96px;
 			--spacing-jumbo: 100px;
-			--spacing-header: 100px;
 			--spacing-circle: 70px;
 			--spacing-link-icon: 24px;
 			--spacing-gutter: 0px;
 			--stroke-hairline: 0.5px;
-		}
-	}
-
-	@media (width >= 1280px) {
-		:root {
-			--spacing-header: 200px;
 		}
 	}
 }

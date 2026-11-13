@@ -2,17 +2,24 @@
 /**
  * Magazine archive, mobile "stage": image strip + open card (below tablet-lg only).
  *
- * Figma: image strip 880:4949 ("Frame 17", 252px: pt 12, px 12, image max 160px tall,
- * natural proportions, top left), gap 8, open card 866:150 / 866:162
+ * Figma: image strip 880:5749 / 880:4949 ("hover image frame", a fixed 252px: image flush
+ * at 0,0, max 160px tall, natural proportions, pr 103 so portrait covers stay left; a
+ * landscape image may run the full strip width), the annotation row 951:2587 (strip y 170,
+ * 390 x 82, full strip width with no padding, content centred; text 951:2585 Times 10/400,
+ * lh 1.2, cap-trimmed, full marg-red), gap 8, open card 866:150 / 866:162
  * ("Publication / Issue header / Mobile", state Active, 90.6px).
+ *
+ * The strip stays 252px even without an annotation (880:4951 draws 240 for that case):
+ * the annotation slot is always reserved so the snap line below never moves.
  *
  * The stage is one sticky block at the top of the viewport (it slides under the
  * transparent 44px site header, like the magazine cover band). Every list row stays a
  * collapsed 18.3px row; the row sitting in the last 18.3px of the stage (hidden behind
  * the open card) is the "open" one. assets/js/frontend/components/archive-list.js
- * copies that row's data-* attributes into this stage as the list scrolls. Without JS
- * (html.no-js) the stage is not sticky and the page does not snap: the stage shows the
- * first issue at the top and the list below it is a plain list of links.
+ * copies that row's data-* attributes (image, annotation, card text) into this stage as
+ * the list scrolls. Without JS (html.no-js) the stage is not sticky and the page does not
+ * snap: the stage shows the first issue at the top and the list below it is a plain list
+ * of links.
  *
  * Heights are fixed (252 + 8 + 90.6 = 350.6px) because the list's snap offset
  * (scroll-mt-[332.3px] in issue-row.php) and the script's band depend on them.
@@ -35,13 +42,15 @@ if ( empty( $row['id'] ) ) {
 	return;
 }
 
-$image     = ProductPresenter::archive_image( $row['image_id'] ?? 0 );
-$has_title = ! empty( $row['has_title'] );
+$image      = ProductPresenter::archive_image( $row['image_id'] ?? 0 );
+$has_title  = ! empty( $row['has_title'] );
+$annotation = (string) ( $row['annotation'] ?? '' );
 ?>
 <div class="relative top-0 z-[5] -mt-header flex flex-col gap-xsmall bg-white tablet-lg:hidden [@media(height>=520px)]:in-[.js]:sticky" data-archive-stage aria-hidden="true">
-	<div class="h-[252px] overflow-hidden px-gutter pt-[12px]" data-archive-strip>
+	<div class="relative h-[252px] overflow-hidden pr-[103px]" data-archive-strip>
+		<?php // max-w-[calc(100%_+_103px)]: the image may overflow the 103px right padding, up to the full strip width (landscape covers, 864:3637). ?>
 		<img
-			class="block h-auto max-h-[160px] w-auto max-w-full"
+			class="block h-auto max-h-[160px] w-auto max-w-[calc(100%_+_103px)]"
 			alt=""
 			decoding="async"
 			data-archive-img
@@ -58,6 +67,11 @@ $has_title = ! empty( $row['has_title'] );
 			<?php endif; ?>
 		/>
 		<span class="block h-[160px] w-[118px] bg-marg-cover-bg" data-archive-placeholder<?php echo $image ? ' hidden' : ''; ?>></span>
+
+		<?php // Annotation row (951:2587): pinned at strip y 170 whatever the image height, full strip width. ?>
+		<div class="absolute inset-x-0 top-[170px] flex h-[82px] items-center justify-center overflow-hidden">
+			<p class="text-trim m-0 w-full break-words text-center font-serif text-xsmall font-regular leading-[1.2] text-marg-red" data-archive-annotation<?php echo '' === $annotation ? ' hidden' : ''; ?>><?php echo esc_html( $annotation ); ?></p>
+		</div>
 	</div>
 
 	<a

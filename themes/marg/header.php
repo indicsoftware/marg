@@ -17,8 +17,10 @@
  * tailwind.css reserves the bar (or the fade on articles) as scroll-padding-top, so
  * focused elements and anchor targets are not scrolled underneath it.
  *
- * From 1133px: unchanged Figma desktop headers (550:111, 550:99, 605:310): a blank
- * bar with a 1px marg-red bottom rule, 100px (1133) / 200px (1280+), in normal flow.
+ * From 1133px: Figma "header-desktop" 951:2811 (partials/site/header-desktop.php),
+ * in normal flow, not sticky, no fade, sized by its own grid rows (`h-auto`): the
+ * "main" variant (archive and non-product pages, 420px incl. a full-bleed 1px
+ * marg-red bottom rule) or the "magazine" / "article" variants (210.5px, no rule).
  *
  * The header stays in normal flow on mobile too (sticky, not fixed), so templates
  * can still slide a band under it with -mt-header (magazine cover band 838:1042).
@@ -30,6 +32,9 @@
 use TenUpTheme\SiteChrome;
 
 $marg_header_fade = SiteChrome::header_fade();
+
+// Desktop bottom rule: only the "main" header-desktop variant (951:2810) draws one, full-bleed.
+$marg_header_rule = 'main' === SiteChrome::header_desktop()['variant'] ? ' tablet-lg:border-b tablet-lg:border-marg-red' : '';
 
 // Fade classes: shown always / once scrolled; on the archive, hidden while its sticky stage sits under the bar.
 $marg_fade_class = 'always' === $marg_header_fade ? 'opacity-100' : 'opacity-0 group-data-scrolled/header:opacity-100';
@@ -55,7 +60,7 @@ if ( SiteChrome::is_archive_page() ) {
 
 		<header
 			id="site-header"
-			class="site-header group/header relative top-0 z-30 h-header w-full transition-transform duration-200 ease-out focus-within:transition-none motion-reduce:transition-none max-tablet-lg:in-[.js]:sticky max-tablet-lg:data-hidden:not-focus-within:-translate-y-[115px] tablet-lg:border-b tablet-lg:border-marg-red"
+			class="<?php echo esc_attr( 'site-header group/header relative top-0 z-30 h-header w-full transition-transform duration-200 ease-out focus-within:transition-none motion-reduce:transition-none max-tablet-lg:in-[.js]:sticky max-tablet-lg:data-hidden:not-focus-within:-translate-y-[115px] tablet-lg:h-auto' . $marg_header_rule ); ?>"
 			role="banner"
 			data-site-header
 			data-fade="<?php echo esc_attr( $marg_header_fade ); ?>"
@@ -74,6 +79,8 @@ if ( SiteChrome::is_archive_page() ) {
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sr-only focus:not-sr-only focus:absolute focus:left-gutter focus:top-full focus:bg-white focus:px-3xsmall focus:py-micro focus:text-small focus:outline-1 focus:outline-marg-red tablet-lg:focus:left-[calc(100%/24)] tablet-lg:focus:top-1/2 tablet-lg:focus:-translate-y-1/2" rel="home"><?php bloginfo( 'name' ); ?></a>
 
 			<?php get_template_part( 'partials/site/header-context' ); ?>
+
+			<?php get_template_part( 'partials/site/header-desktop' ); ?>
 		</header>
 
 		<main id="main" tabindex="-1" class="block focus:outline-none">

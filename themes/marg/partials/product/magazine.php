@@ -59,8 +59,8 @@ $has_details = $specs || '' !== $description || $editor_groups;
 ?>
 <article class="mx-auto w-full max-w-page text-marg-red" aria-labelledby="<?php echo esc_attr( $uid . '-title' ); ?>">
 
-	<?php // No bottom padding on the row: the last article row meets the related rule (Figma 836:914). The cover header carries pb-xlarge for issues with a short right column. ?>
-	<div class="tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:items-start tablet-lg:pt-[112px]">
+	<?php // No bottom padding on the row: the last article row meets the related rule (Figma 836:914). The cover header carries pb-xlarge for issues with a short right column. Desktop top: 72px (pt-2xlarge) below the 210.5px header-desktop (834:370 Frame 19 itemSpacing 72). ?>
+	<div class="tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:items-start tablet-lg:pt-2xlarge">
 
 		<?php /* Publication cover header (836:567 desktop, 838:1042 mobile). */ ?>
 		<header class="tablet-lg:col-[2/16] tablet-lg:grid tablet-lg:grid-cols-14 tablet-lg:pb-xlarge">
