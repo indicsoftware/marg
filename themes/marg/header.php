@@ -40,6 +40,10 @@ $marg_header_rule = 'main' === SiteChrome::header_desktop()['variant'] ? ' table
 $marg_fade_class = 'always' === $marg_header_fade ? 'opacity-100' : 'opacity-0 group-data-scrolled/header:opacity-100';
 if ( SiteChrome::is_archive_page() ) {
 	$marg_fade_class .= ' [@media(height>=520px)]:in-[.js]:hidden';
+	// Desktop archive: the 420px header stays fixed while the list scrolls under it (white
+	// background), so its hover-image box stays in view. Only on viewports tall enough to
+	// leave room for the list (>= 720px); shorter screens scroll it away as before.
+	$marg_header_rule .= ' tablet-lg:[@media(height>=720px)]:sticky tablet-lg:[@media(height>=720px)]:bg-white';
 }
 
 ?>
