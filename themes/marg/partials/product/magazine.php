@@ -71,13 +71,14 @@ $has_details = $specs || '' !== $description || $editor_groups;
 
 		<?php /* Publication cover header (836:567 desktop, 838:1042 mobile). */ ?>
 		<header class="tablet-lg:col-[2/16] tablet-lg:grid tablet-lg:grid-cols-14 tablet-lg:pb-xlarge">
+			<?php
+			// m-0! beats WP global styles' unlayered `:where(figure){margin:0 0 1em}`.
+			// Mobile: the band slides under the transparent 44px sticky site header (Figma 897:6296,
+			// "Header-interim / mobile"), unless a WooCommerce notice sits above it.
+			$cover_band = 'm-0! flex justify-center max-tablet-lg:in-[.woocommerce-notices-wrapper:empty+.marg-product-template]:-mt-header! bg-linear-to-b from-[#1e1e1e] to-[rgba(30,30,30,0.8)] px-gutter py-jumbo tablet-lg:col-span-7 tablet-lg:block tablet-lg:bg-none tablet-lg:p-0';
+			?>
 			<?php if ( $cover_id ) : ?>
-				<?php
-				// m-0! beats WP global styles' unlayered `:where(figure){margin:0 0 1em}`.
-				// Mobile: the band slides under the transparent 44px sticky site header (Figma 897:6296,
-				// "Header-interim / mobile"), unless a WooCommerce notice sits above it.
-				?>
-				<figure class="m-0! flex justify-center max-tablet-lg:in-[.woocommerce-notices-wrapper:empty+.marg-product-template]:-mt-header! bg-linear-to-b from-[#1e1e1e] to-[rgba(30,30,30,0.8)] px-gutter py-jumbo tablet-lg:col-span-7 tablet-lg:block tablet-lg:bg-none tablet-lg:p-0">
+				<figure class="<?php echo esc_attr( $cover_band ); ?>">
 					<?php
 					echo wp_get_attachment_image(
 						$cover_id,
@@ -95,7 +96,10 @@ $has_details = $specs || '' !== $description || $editor_groups;
 					?>
 				</figure>
 			<?php else : ?>
-				<div class="hidden aspect-[350/480.392] w-full bg-marg-cover-bg tablet-lg:col-span-7 tablet-lg:block" aria-hidden="true"></div>
+				<?php // No cover: the same band with a cover-sized placeholder (mobile 275px wide, desktop the 7-column cell). ?>
+				<div class="<?php echo esc_attr( $cover_band ); ?>" aria-hidden="true">
+					<div class="block aspect-[350/480.392] w-[275px] max-w-full bg-marg-cover-bg tablet-lg:w-full"></div>
+				</div>
 			<?php endif; ?>
 
 			<div class="flex flex-col gap-3xlarge px-gutter py-3xlarge tablet:mx-auto tablet:max-w-[640px] tablet-lg:col-[9/15] tablet-lg:mx-0 tablet-lg:max-w-none tablet-lg:items-start tablet-lg:justify-between tablet-lg:gap-[24px] tablet-lg:p-0 desktop-lg:col-[9/14]">
