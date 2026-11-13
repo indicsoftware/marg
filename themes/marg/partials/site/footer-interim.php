@@ -86,16 +86,16 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 			?>
 
 			<?php // Registration (908:221 / 922:6693): two centred lines, broken before "Maharashtra" on mobile (908:222) and before "under" on desktop.
-			// Desktop lines are 18px each (36 total): the Sans run is an inline-block aligned top so its own baseline does not grow line 1. ?>
-			<p class="w-full pt-[30px] text-center font-serif text-[10px] leading-[12px] tablet-lg:pt-0 tablet-lg:text-small tablet-lg:leading-[18px]">
+			// Desktop (922:6695): Times 16 / 1.2, cap-trimmed both ends, directly under the logo frame; the Sans run is an inline-block aligned top so its own baseline does not grow line 1. ?>
+			<p class="w-full pt-[30px] text-center font-serif text-[10px] leading-[12px] tablet-lg:pt-0 tablet-lg:text-small tablet-lg:leading-[1.2] tablet-lg:text-trim">
 				<span class="font-sans font-semibold uppercase tracking-[1px] tablet-lg:inline-block tablet-lg:align-top tablet-lg:text-[13px] tablet-lg:font-bold tablet-lg:tracking-[1.56px]"><?php esc_html_e( 'The Marg Foundation', 'tenup-theme' ); ?></span>
 				<?php esc_html_e( 'is a registered trust', 'tenup-theme' ); ?><br class="max-tablet-lg:hidden">
 				<?php esc_html_e( 'under the', 'tenup-theme' ); ?><br class="tablet-lg:hidden">
 				<?php esc_html_e( 'Maharashtra Public Trusts Act.', 'tenup-theme' ); ?>
 			</p>
 
-			<?php // Address and telephone (908:223 / 922:6697): mobile 4 centred lines; desktop address left, phones right, trimmed at the top only (54px block, so row 2 sits 72px below its box as in Figma). ?>
-			<address class="w-full pt-[22px] not-italic tablet-lg:pt-0">
+			<?php // Address and telephone (908:223 / 922:6697): mobile 4 centred lines; desktop address left, phones right, 8px (3xsmall) below the registration (group 980:2935), trimmed at the top only (54px block, so row 2 sits 72px below its box as in Figma). ?>
+			<address class="w-full pt-[22px] not-italic tablet-lg:pt-3xsmall">
 				<p class="text-trim text-center font-serif text-small leading-[1.2] tablet-lg:flex tablet-lg:items-start tablet-lg:justify-between tablet-lg:text-left">
 					<span class="tablet-lg:block tablet-lg:[text-box:trim-start_cap_alphabetic]">
 						<?php echo implode( '<br>', array_map( 'esc_html', SiteChrome::address_lines() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each line escaped. ?>
