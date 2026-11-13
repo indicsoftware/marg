@@ -278,19 +278,13 @@ final class SiteChrome {
 	}
 
 	/**
-	 * When the mobile white fade (Figma 897:6351) shows: 'always' on article
-	 * pages, 'scrolled' elsewhere (so the magazine cover band stays dark at the top).
-	 *
-	 * The archive also gets 'scrolled', but header.php hides the fade there while the
-	 * archive's own sticky stage sits under the bar (html.js and a viewport at least
-	 * 520px tall, the stage.php / archive-list.js condition; the archive frames
-	 * 880:5747 / 864:3637 / 880:4951 have no fade). Without JS or on a landscape phone
-	 * the stage scrolls away, and the fade keeps list rows from running under the title.
+	 * When the mobile white fade (Figma 897:6351) shows: 'always' on article pages
+	 * (the only frame that draws it, 550:106) and 'none' everywhere else.
 	 *
 	 * @return string 'always' | 'scrolled' | 'none'
 	 */
 	public static function header_fade() {
-		$fade = 'article' === ProductTemplates::current_template() ? 'always' : 'scrolled';
+		$fade = 'article' === ProductTemplates::current_template() ? 'always' : 'none';
 
 		/**
 		 * Filter when the mobile header's white fade shows.
@@ -298,7 +292,7 @@ final class SiteChrome {
 		 * @param string $fade 'always' | 'scrolled' | 'none'.
 		 */
 		$fade = (string) apply_filters( 'tenup_theme_site_header_fade', $fade );
-		return in_array( $fade, array( 'always', 'scrolled', 'none' ), true ) ? $fade : 'scrolled';
+		return in_array( $fade, array( 'always', 'scrolled', 'none' ), true ) ? $fade : 'none';
 	}
 
 	/**
