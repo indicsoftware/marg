@@ -159,7 +159,7 @@ $has_meta    = ! empty( $card['meta_primary'] ) || ! empty( $card['meta_secondar
 	</div>
 
 	<?php if ( $has_meta ) : ?>
-		<div class="<?php echo esc_attr( class_names( 'w-full items-start justify-between gap-xsmall overflow-hidden border-t border-marg-red pt-2xsmall', $row_vis ) ); ?>">
+		<div class="<?php echo esc_attr( class_names( 'w-full items-start justify-between gap-xsmall overflow-x-clip border-t border-marg-red pt-2xsmall', $row_vis ) ); ?>">
 			<div class="flex min-w-0 flex-col gap-3xsmall">
 				<?php if ( ! empty( $card['meta_primary'] ) ) : ?>
 					<p class="text-trim font-sans text-regular font-semibold"><?php echo esc_html( $card['meta_primary'] ); ?></p>
