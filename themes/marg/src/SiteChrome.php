@@ -310,9 +310,12 @@ final class SiteChrome {
 		/**
 		 * Filter whether the mobile site header hides on scroll down.
 		 *
-		 * @param bool $autohide Default true.
+		 * Default true, except on the magazine archive: Figma 880:5044 "this header on
+		 * archive doesn't hide on mobile, stays present and on top of the hover images".
+		 *
+		 * @param bool $autohide Default true (false on the magazine archive).
 		 */
-		return (bool) apply_filters( 'tenup_theme_site_header_autohide', true );
+		return (bool) apply_filters( 'tenup_theme_site_header_autohide', ! self::is_archive_page() );
 	}
 
 	/* ---------------------------------------------------------------------
