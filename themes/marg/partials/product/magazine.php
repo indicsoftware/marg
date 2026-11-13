@@ -30,7 +30,14 @@ $subtitle    = ProductPresenter::subtitle( $product_id );
 $date        = ProductPresenter::publication_date( $product_id );
 $cover_id    = ProductPresenter::cover_id( $product_id );
 $specs       = ProductPresenter::physical_specs( $product_id );
-$description = ProductPresenter::description_html( $product_id );
+/**
+ * Filter whether the issue description ("About this issue") is shown. Hidden for now:
+ * many descriptions hold raw contents lists. Return true to show it again.
+ *
+ * @param bool $show       Default false.
+ * @param int  $product_id Magazine product ID.
+ */
+$description = apply_filters( 'tenup_theme_magazine_show_description', false, $product_id ) ? ProductPresenter::description_html( $product_id ) : '';
 $editors     = ProductPresenter::editors( $product_id );
 $articles    = ProductPresenter::issue_articles( $product_id );
 $related     = ProductPresenter::related_cards( $product_id, 3 );
