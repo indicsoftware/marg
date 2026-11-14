@@ -2,8 +2,49 @@
 /**
  * The template for displaying the header.
  *
+ * Below 1133px (MOBILE token mode, 390 and 744): Figma "Header-interim / mobile"
+ * (881:183; static variant 897:6278 on article 897:6340 and magazine 897:6296).
+ * 44px tall (`h-header`), transparent, no bottom rule, sticky at the top (with JS only:
+ * html.no-js keeps it in flow, as the fade and auto-hide need site-header.js). It hides
+ * on scroll down and reveals on scroll up (assets/js/frontend/components/site-header.js
+ * sets data-hidden / data-scrolled), never while it holds focus or near the top.
+ * Hidden = translated up by 115px rather than -100% (44px), so the fade below
+ * the bar leaves the viewport with it.
+ * A centred context title comes from partials/site/header-context.php. A 115px
+ * white fade (897:6351) travels with it: always on article pages, elsewhere only
+ * once the page has scrolled, so the magazine cover band stays dark at the top
+ * (on the magazine archive only while its sticky image strip is not under the bar).
+ * tailwind.css reserves the bar (or the fade on articles) as scroll-padding-top, so
+ * focused elements and anchor targets are not scrolled underneath it.
+ *
+ * From 1133px: Figma "header-desktop" 951:2811 (partials/site/header-desktop.php),
+ * in normal flow, not sticky, no fade, sized by its own grid rows (`h-auto`): the
+ * "main" variant (archive and non-product pages, 420px incl. a full-bleed 1px
+ * marg-red bottom rule) or the "magazine" / "article" variants (210.5px, no rule).
+ *
+ * The header stays in normal flow on mobile too (sticky, not fixed), so templates
+ * can still slide a band under it with -mt-header (magazine cover band 838:1042).
+ * The page's <h1> belongs to the template, not the header.
+ *
  * @package TenUpTheme
  */
+
+use TenUpTheme\SiteChrome;
+
+$marg_header_fade = SiteChrome::header_fade();
+
+// Desktop bottom rule: only the "main" header-desktop variant (951:2810) draws one, full-bleed.
+$marg_header_rule = 'main' === SiteChrome::header_desktop()['variant'] ? ' tablet-lg:border-b tablet-lg:border-marg-red' : '';
+
+// Fade classes: shown always / once scrolled; on the archive, hidden while its sticky stage sits under the bar.
+$marg_fade_class = 'always' === $marg_header_fade ? 'opacity-100' : 'opacity-0 group-data-scrolled/header:opacity-100';
+if ( SiteChrome::is_archive_page() ) {
+	$marg_fade_class .= ' [@media(height>=520px)]:in-[.js]:hidden';
+	// Desktop archive: the 420px header stays fixed while the list scrolls under it (white
+	// background), so its hover-image box stays in view. Only on viewports tall enough to
+	// leave room for the list (>= 720px); shorter screens scroll it away as before.
+	$marg_header_rule .= ' tablet-lg:[@media(height>=720px)]:sticky tablet-lg:[@media(height>=720px)]:bg-white';
+}
 
 ?>
 <!DOCTYPE html>
@@ -13,11 +54,37 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<?php wp_head(); ?>
 	</head>
-	<body <?php body_class(); ?>>
+	<body <?php body_class( 'bg-white font-sans text-marg-red antialiased' ); ?>>
 		<?php wp_body_open(); ?>
 
-		<a href="#main" class="skip-to-content-link visually-hidden-focusable"><?php esc_html_e( 'Skip to main content', 'tenup-theme' ); ?></a>
+		<?php // Target of the footer's "Back to Archives" (#top) on the archive: takes focus, so keyboard users land back at the top too. ?>
+		<div id="top" class="absolute top-0 left-0 size-px focus:outline-none" tabindex="-1"></div>
 
-		<main id="main" role="main" tabindex="-1">
+		<a href="#main" class="skip-to-content-link sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:bg-white focus:px-xsmall focus:py-3xsmall focus:text-small focus:font-bold focus:outline-1 focus:outline-marg-red"><?php esc_html_e( 'Skip to main content', 'tenup-theme' ); ?></a>
 
-			<h1><?php bloginfo( 'name' ); ?></h1>
+		<header
+			id="site-header"
+			class="<?php echo esc_attr( 'site-header group/header relative top-0 z-30 h-header w-full transition-transform duration-200 ease-out focus-within:transition-none motion-reduce:transition-none max-tablet-lg:in-[.js]:sticky max-tablet-lg:data-hidden:not-focus-within:-translate-y-[115px] tablet-lg:h-auto' . $marg_header_rule ); ?>"
+			role="banner"
+			data-site-header
+			data-fade="<?php echo esc_attr( $marg_header_fade ); ?>"
+			<?php echo esc_attr( SiteChrome::header_autohide() ? 'data-autohide' : '' ); ?>
+		>
+			<?php
+			// White fade 897:6351: 115px, solid to 43.75% then transparent; under the title, above the page.
+			if ( 'none' !== $marg_header_fade ) :
+				?>
+				<div
+					class="<?php echo esc_attr( 'pointer-events-none absolute inset-x-0 top-0 h-[115px] bg-[linear-gradient(to_bottom,#fff_43.75%,rgba(255,255,255,0)_100%)] transition-opacity duration-200 motion-reduce:transition-none tablet-lg:hidden ' . $marg_fade_class ); ?>"
+					aria-hidden="true"
+				></div>
+			<?php endif; ?>
+
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sr-only focus:not-sr-only focus:absolute focus:left-gutter focus:top-full focus:bg-white focus:px-3xsmall focus:py-micro focus:text-small focus:outline-1 focus:outline-marg-red tablet-lg:focus:left-[calc(100%/24)] tablet-lg:focus:top-1/2 tablet-lg:focus:-translate-y-1/2" rel="home"><?php bloginfo( 'name' ); ?></a>
+
+			<?php get_template_part( 'partials/site/header-context' ); ?>
+
+			<?php get_template_part( 'partials/site/header-desktop' ); ?>
+		</header>
+
+		<main id="main" tabindex="-1" class="block focus:outline-none">

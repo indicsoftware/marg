@@ -1,4 +1,14 @@
 /**
+ * LEGACY scaffold stylesheet: no longer built.
+ *
+ * The front end now uses Tailwind CSS v4 only: see tailwind.css (imported by
+ * assets/js/frontend/frontend.js). Everything still needed from these partials
+ * (reduced motion, WP alignment classes, visually-hidden, skip link) was ported
+ * into tailwind.css. Kept for reference; safe to delete with base/, global/,
+ * components/, layout/ and templates/ once nobody needs it.
+ */
+
+/**
  * TenUpTheme
  * https://project-website.tld
  *
