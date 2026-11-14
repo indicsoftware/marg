@@ -326,33 +326,31 @@ final class SiteChrome {
 	}
 
 	/**
-	 * Terms & Conditions URL: the WooCommerce terms page, else a published page
-	 * with the slug terms-and-conditions, else '' (render as plain text).
+	 * Terms & Conditions URL: the page on the current Marg website.
 	 *
 	 * @return string
 	 */
 	public static function terms_url() {
-		return (string) self::memo(
-			'terms_url',
-			static function () {
-				$page_id = function_exists( 'wc_terms_and_conditions_page_id' ) ? (int) wc_terms_and_conditions_page_id() : 0;
-				if ( $page_id < 1 || 'publish' !== get_post_status( $page_id ) ) {
-					$page    = get_page_by_path( 'terms-and-conditions' );
-					$page_id = ( $page && 'publish' === $page->post_status ) ? (int) $page->ID : 0;
-				}
-				$url = $page_id ? get_permalink( $page_id ) : '';
-				return is_string( $url ) ? $url : '';
-			}
-		);
+		/**
+		 * Filter the footer Terms & Conditions URL ('' renders the label as plain text).
+		 *
+		 * @param string $url Default https://marg-art.org/terms-and-conditions.
+		 */
+		return (string) apply_filters( 'tenup_theme_terms_url', self::MARG_ART_URL . '/terms-and-conditions' );
 	}
 
 	/**
-	 * Privacy Policy URL ('' unless the privacy page is published).
+	 * Privacy Policy URL: the page on the current Marg website.
 	 *
 	 * @return string
 	 */
 	public static function privacy_url() {
-		return (string) get_privacy_policy_url();
+		/**
+		 * Filter the footer Privacy Policy URL ('' renders the label as plain text).
+		 *
+		 * @param string $url Default https://marg-art.org/privacy-policy.
+		 */
+		return (string) apply_filters( 'tenup_theme_privacy_url', self::MARG_ART_URL . '/privacy-policy' );
 	}
 
 	/**

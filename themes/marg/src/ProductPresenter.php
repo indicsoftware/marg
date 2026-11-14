@@ -1721,9 +1721,11 @@ final class ProductPresenter {
 	 *
 	 * @param int|\WP_Post|\WC_Product|null $p Magazine reference.
 	 * @return array{id:int,url:string,date:string,year:string,volume:int,issue:int,volume_label:string,
-	 *   vol_issue:string,title:string,has_title:bool,annotation:string,image_id:int,sku:string,has_date:bool}|array{}
+	 *   vol_issue:string,title:string,has_title:bool,annotation:string,image_id:int,cover_id:int,sku:string,has_date:bool}|array{}
 	 *   date "1946, Oct" (falls back to the free-text publication reference), volume_label is filled
 	 *   in by archive_rows() ('' unless the row opens a volume), title '' for unnamed issues.
+	 *   image_id is the open access hover image, else the featured image (Titles view);
+	 *   cover_id is the featured image only (the cover, Covers view card), 0 when none.
 	 */
 	public static function archive_row( $p = null ) {
 		$id = self::id( $p );
@@ -1760,9 +1762,10 @@ final class ProductPresenter {
 			$year = preg_match( '/\b(1[89]\d{2}|20\d{2})\b/', $date, $m ) ? $m[1] : '';
 		}
 
+		$cover_id = (int) get_post_thumbnail_id( $id );
 		$image_id = self::attachment_id( get_post_meta( $id, 'magazine_details_open_access_hover_image', true ) );
 		if ( ! $image_id ) {
-			$image_id = (int) get_post_thumbnail_id( $id );
+			$image_id = $cover_id;
 		}
 
 		$title = self::issue_name( $id );
@@ -1781,6 +1784,7 @@ final class ProductPresenter {
 			'has_title'    => '' !== $title,
 			'annotation'   => self::str( get_post_meta( $id, 'magazine_details_open_access_featured_text', true ) ),
 			'image_id'     => $image_id,
+			'cover_id'     => $cover_id,
 			'sku'          => self::str( get_post_meta( $id, '_sku', true ) ),
 			'has_date'     => (bool) $start,
 		);
@@ -1796,7 +1800,7 @@ final class ProductPresenter {
 	 * query order (lowest ID).
 	 *
 	 * Also fills 'volume_label' ("Vol. 8") on the first row of each volume and primes the
-	 * attachment caches of the row images in one query.
+	 * attachment caches of the row images and covers in one query.
 	 *
 	 * @param array $posts WP_Post objects or IDs (e.g. $wp_query->posts).
 	 * @return array<int, array> See archive_row().
@@ -1837,6 +1841,9 @@ final class ProductPresenter {
 			if ( $row['image_id'] ) {
 				$image_ids[] = $row['image_id'];
 			}
+			if ( ! empty( $row['cover_id'] ) ) {
+				$image_ids[] = $row['cover_id'];
+			}
 		}
 
 		if ( $image_ids && function_exists( '_prime_post_caches' ) ) {
@@ -1844,6 +1851,51 @@ final class ProductPresenter {
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Requested magazine archive view: 'covers' for ?view=covers, else 'titles'.
+	 *
+	 * The Covers view (Figma 1019:2672) exists below 744px only; from 744 the Titles
+	 * layout always shows, whatever this returns. Read-only view switch, so no nonce.
+	 *
+	 * @return string 'titles' | 'covers'.
+	 */
+	public static function archive_view() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view switch, no state change.
+		$view = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '';
+		return 'covers' === $view ? 'covers' : 'titles';
+	}
+
+	/**
+	 * Cover image markup for an archive Covers card (partials/archive/cover-card.php).
+	 *
+	 * The card is 75vw wide and the cover 230/280 of it (Figma 1035:3165), so about 62vw;
+	 * medium_large (768w) and its srcset cover 3x screens. Decorative (alt ''): the card
+	 * link carries the issue's name. Lazy by default; WordPress would otherwise decide.
+	 *
+	 * @param int  $attachment_id Featured image (cover) ID.
+	 * @param bool $eager         Load eagerly (default false: covers.php keeps every cover lazy
+	 *                            and archive-covers.js promotes the visible ones).
+	 * @param bool $priority      Add fetchpriority="high".
+	 * @return string Escaped <img> markup, '' when there is no usable image.
+	 */
+	public static function archive_cover_html( $attachment_id, $eager = false, $priority = false ) {
+		$attachment_id = (int) $attachment_id;
+		if ( ! $attachment_id ) {
+			return '';
+		}
+		$attrs = array(
+			'class'    => 'block size-full object-cover',
+			'alt'      => '',
+			'loading'  => $eager ? 'eager' : 'lazy',
+			'decoding' => 'async',
+			'sizes'    => '62vw',
+		);
+		if ( $priority ) {
+			$attrs['fetchpriority'] = 'high';
+		}
+		return (string) wp_get_attachment_image( $attachment_id, 'medium_large', false, $attrs );
 	}
 
 	/**

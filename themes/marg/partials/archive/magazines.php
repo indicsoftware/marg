@@ -8,7 +8,7 @@
  * $args = [ 'rows' => ProductPresenter::archive_rows() ].
  *
  * Layout:
- *  - < tablet-lg (mobile token mode, incl. 744): a sticky stage (image strip + open card,
+ *  - < tablet-lg (mobile layout; tablet token values from 744): a sticky stage (image strip + open card,
  *    partials/archive/stage.php) over a list of collapsed 18.3px rows that snap to the
  *    line under the open card. The list starts one row higher than the stage bottom, so
  *    the open row sits hidden behind the open card. A spacer (sized by archive-list.js)
@@ -22,6 +22,14 @@
  *    wrapper so their columns match the header-desktop and footer grids above 1920.
  *  - >= tablet-lg, hover devices: hovering or keyboard-focusing a row shows its image in
  *    the header-desktop container [data-archive-hover-image] (archive-list.js).
+ *  - < tablet, with JS and a viewport at least 520px tall (where the stage is sticky): a
+ *    fixed background gradient (Figma 1019:2596) runs from the open card's bottom line to
+ *    the viewport bottom, behind the stage, the header, the list and the footer.
+ *  - < tablet, Covers view (Figma 1019:2672): the root carries data-view="covers"
+ *    (ProductPresenter::archive_view(), from ?view=covers; archive-view-toggle.js flips it
+ *    without a reload). The stage, list and gradient hide and partials/archive/covers.php
+ *    shows its horizontal track instead; the site footer hides too (tailwind.css "Archive
+ *    Covers view"). From tablet up the Titles layout always shows, whatever data-view says.
  *
  * @package TenUpTheme
  *
@@ -30,6 +38,7 @@
  * }
  */
 
+use TenUpTheme\ProductPresenter;
 use function TenUpTheme\inline_svg;
 
 $rows = isset( $args['rows'] ) && is_array( $args['rows'] ) ? array_values( $args['rows'] ) : [];
@@ -42,6 +51,13 @@ if ( $years ) {
 	$heading = __( 'Archives', 'tenup-theme' );
 }
 
+// 'titles' | 'covers' (?view=covers). Guarded so this partial works before archive_view() exists.
+$view = method_exists( ProductPresenter::class, 'archive_view' ) ? (string) ProductPresenter::archive_view() : 'titles';
+$view = 'covers' === $view ? 'covers' : 'titles';
+
+// Hide a Titles-view element below tablet while the Covers view is shown.
+$titles_only = 'max-tablet:group-data-[view=covers]/archive:hidden';
+
 $logo = function_exists( 'TenUpTheme\inline_svg' )
 	? inline_svg(
 		'marg-logo',
@@ -51,7 +67,7 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 	)
 	: '';
 ?>
-<section class="relative text-marg-red tablet-lg:pb-jumbo" data-archive aria-labelledby="marg-archive-heading">
+<section class="group/archive relative text-marg-red tablet-lg:pb-jumbo" data-archive data-view="<?php echo esc_attr( $view ); ?>" aria-labelledby="marg-archive-heading">
 	<h1 id="marg-archive-heading" class="sr-only"><?php echo esc_html( $heading ); ?></h1>
 
 	<?php if ( ! $rows ) : ?>
@@ -63,7 +79,18 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 	<?php else : ?>
 		<?php get_template_part( 'partials/archive/stage', null, [ 'row' => $rows[0] ] ); ?>
 
-		<div class="relative mx-auto w-full max-w-page tablet-lg:-mt-px">
+		<?php
+		/*
+		 * Figma 1019:2596 "Rectangle 9": 20% grey gradient from the open card's bottom line
+		 * (the stage bottom: 350.6px, 370.8px from tablet; see stage.php) to the viewport
+		 * bottom. Only where the stage is sticky (html.js, height >= 520, < tablet-lg).
+		 * -z-1 paints it on the canvas, under every in-flow box: the white stage and header
+		 * cover its top and the white site footer covers it, so it never tints the footer.
+		 */
+		?>
+		<div class="<?php echo esc_attr( 'pointer-events-none fixed inset-x-0 top-[350.6px] bottom-0 -z-1 hidden bg-[linear-gradient(to_bottom,transparent_0%,var(--color-marg-grey)_90.385%)] opacity-20 tablet:top-[370.8px] max-tablet-lg:[@media(height>=520px)]:in-[.js]:block max-tablet:group-data-[view=covers]/archive:hidden!' ); ?>" data-archive-gradient aria-hidden="true"></div>
+
+		<div class="<?php echo esc_attr( 'relative mx-auto w-full max-w-page tablet-lg:-mt-px ' . $titles_only ); ?>">
 			<ol class="-mt-[18.3px] tablet-lg:mt-0 tablet-lg:ml-[calc(100%/12)] tablet-lg:w-3/4" data-archive-list aria-label="<?php esc_attr_e( 'Issues', 'tenup-theme' ); ?>">
 				<?php
 				foreach ( $rows as $index => $row ) {
@@ -90,5 +117,15 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 				</div>
 			<?php endif; ?>
 		</div>
+
+		<?php
+		get_template_part(
+			'partials/archive/covers',
+			null,
+			[
+				'rows' => $rows,
+			]
+		);
+		?>
 	<?php endif; ?>
 </section>

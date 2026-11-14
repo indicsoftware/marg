@@ -12,7 +12,19 @@
  *  - keyboard focus on a row scrolls it to the open position (scroll-margin-top), so the
  *    focused issue is the one shown in the open card (which then draws the focus ring);
  *  - [data-archive-spacer] is sized so the last row can reach the open position;
- *  - the next and previous rows' images are preloaded.
+ *  - the next and previous rows' images are preloaded;
+ *  - the strip's annotation slot shows the open row's annotation; while the first row is
+ *    open (the unscrolled first view) and it has none, it shows the open-access tagline
+ *    from the slot's data-archive-tagline (stage.php, Figma 951:2585).
+ *
+ * Covers view (Figma 1019:2672, below 744px only): while [data-archive] has
+ * data-view="covers" the stage and list are hidden (partials/archive/covers.php shows
+ * instead), so the observer is disconnected and the spacer cleared. The view is read
+ * from the attribute on init and on every 'marg:archive-view' CustomEvent on document
+ * (detail: { view: 'titles' | 'covers', index?: number }, from archive-view-toggle.js /
+ * archive-covers.js). Back in Titles, the row at detail.index (the card that was in the
+ * first slot) or else the previously open row is opened and scrolled to the open position.
+ * The open row keeps data-active in both views, so the Covers track can start from it.
  *
  * At >= 1133px on hover devices, hovering a row (or focusing it from the keyboard) shows
  * its image (open access hover image, else featured image) in the header-desktop
@@ -25,6 +37,8 @@
 
 const MEDIA = '(width < 1133px) and (height >= 520px)';
 const HOVER_MEDIA = '(width >= 1133px) and (hover: hover)';
+const COVERS_MEDIA = '(width < 744px)';
+const VIEW_EVENT = 'marg:archive-view';
 
 /**
  * Copy a row's image into the strip (or show the placeholder block).
@@ -220,7 +234,9 @@ export function initArchiveList() {
 	const dateEl = panel.querySelector('[data-archive-panel-date]');
 	const volEl = panel.querySelector('[data-archive-panel-vol]');
 	const titleEl = panel.querySelector('[data-archive-panel-title]');
+	const tagline = annotationEl ? annotationEl.getAttribute('data-archive-tagline') || '' : '';
 	const media = window.matchMedia(MEDIA);
+	const coversMedia = window.matchMedia(COVERS_MEDIA);
 	const visible = new Set();
 	const preloaded = new Set();
 
@@ -267,12 +283,14 @@ export function initArchiveList() {
 			panel.setAttribute('href', data.url);
 		}
 		showImage(img, placeholder, data);
+		const index = rows.indexOf(row);
 		if (annotationEl) {
-			annotationEl.textContent = data.annotation || '';
-			annotationEl.hidden = !data.annotation;
+			// The tagline belongs to the first view only: the first row open, list unscrolled.
+			const text = data.annotation || (index === 0 ? tagline : '');
+			annotationEl.textContent = text;
+			annotationEl.hidden = !text;
 		}
 
-		const index = rows.indexOf(row);
 		preload(rows[index + 1]);
 		preload(rows[index - 1]);
 	};
@@ -282,6 +300,9 @@ export function initArchiveList() {
 	 *
 	 * @returns {{top: number, bottom: number}} Band in viewport px.
 	 */
+	const isCovers = () => root.dataset.view === 'covers' && coversMedia.matches;
+	let coversShown = isCovers();
+
 	const band = () => {
 		const stageHeight = stage.getBoundingClientRect().height;
 		const rowHeight = rows[0].getBoundingClientRect().height;
@@ -312,7 +333,7 @@ export function initArchiveList() {
 			return;
 		}
 		let height = '';
-		if (media.matches) {
+		if (media.matches && !isCovers()) {
 			// Measure with the current spacer in place (it has no height of its own) and
 			// subtract it: collapsing it first would force a layout with a shorter document,
 			// which clamps scrollY near the page bottom and makes the page jump on resize
@@ -339,7 +360,8 @@ export function initArchiveList() {
 
 	const connect = () => {
 		disconnect();
-		if (!media.matches) {
+		coversShown = isCovers();
+		if (!media.matches || coversShown) {
 			sizeSpacer();
 			return;
 		}
@@ -365,7 +387,7 @@ export function initArchiveList() {
 
 	// Keyboard focus: bring the focused row to the open position (its scroll-margin-top).
 	list.addEventListener('focusin', (event) => {
-		if (!media.matches) {
+		if (!media.matches || isCovers()) {
 			return;
 		}
 		const link = event.target instanceof Element ? event.target.closest('a') : null;
@@ -381,10 +403,43 @@ export function initArchiveList() {
 		resizeTimer = window.setTimeout(connect, 150);
 	};
 
+	/**
+	 * Titles/Covers switch (no reload). Covers: stop observing. Titles: open the row of the
+	 * card that was in the first slot (detail.index) or the previously open row, and scroll
+	 * it to the open position before observing again.
+	 *
+	 * @param {CustomEvent} event 'marg:archive-view'.
+	 */
+	const onViewChange = (event) => {
+		const detail = event && event.detail ? event.detail : {};
+		if (detail.view === 'titles' || detail.view === 'covers') {
+			root.dataset.view = detail.view;
+		}
+		const wasCovers = coversShown;
+		if (isCovers()) {
+			connect();
+			return;
+		}
+		if (!wasCovers) {
+			// Already showing Titles (e.g. data-view changed at >= 744px): nothing moves.
+			return;
+		}
+
+		const row =
+			Number.isInteger(detail.index) && rows[detail.index] ? rows[detail.index] : active;
+		activate(row);
+		connect();
+		if (media.matches) {
+			row.scrollIntoView({ block: 'start' });
+		}
+	};
+
 	window.addEventListener('resize', onResize, { passive: true });
 	window.addEventListener('load', sizeSpacer, { once: true });
+	document.addEventListener(VIEW_EVENT, onViewChange);
 	if (typeof media.addEventListener === 'function') {
 		media.addEventListener('change', connect);
+		coversMedia.addEventListener('change', connect);
 	}
 
 	preload(rows[1]);

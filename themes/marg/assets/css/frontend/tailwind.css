@@ -7,10 +7,12 @@
  * Reset: Tailwind Preflight is the only reset. modern-normalize is no longer
  * imported (it would double-reset).
  *
- * Tokens: Figma has two variable modes. The @theme block holds the MOBILE
- * values; the :root overrides below switch to the DESKTOP values from 1133px
- * (tablet-lg). Utilities read var(--token), so text-regular, gap-medium,
- * size-circle, size-link-icon etc. are responsive without breakpoint prefixes.
+ * Tokens: the Figma "responsive" collection has three variable modes (Mobile,
+ * Tablet, Desktop). The @theme block holds the MOBILE values; the :root
+ * overrides below switch to the TABLET values from 744px (tablet) and to the
+ * DESKTOP values from 1133px (tablet-lg). Utilities read var(--token), so
+ * text-regular, gap-medium, size-circle, size-link-icon etc. are responsive
+ * without breakpoint prefixes. Comments read "tablet / desktop".
  * Do NOT change this to `@theme inline`, which would bake the mobile values in.
  */
 
@@ -77,7 +79,9 @@
 	--color-marg-red: #da100d; /* all text, rules, borders */
 	--color-marg-red-muted: #da100d4d; /* 30% red */
 	--color-marg-red-muted-40: #da100d66; /* 40% red: Color/mard-red/muted-40, mobile footer (Footer-interim 897:6385) */
+	--color-marg-red-muted-50: #da100d80; /* 50% red: Color/mard-red/muted-50, mobile archive collapsed rows (866:145 / 866:157) */
 	--color-marg-grey: #7e8699; /* VIEW button, captions, mobile image rule */
+	--color-marg-grey-muted-80: #7e8699cc; /* 80% grey: color/marg-grey/muted-80, mobile archive Covers card text (1035:3165) */
 	--color-marg-black: #000; /* BUY button */
 	--color-marg-cover-bg: #ecedf0; /* mobile card cover fill */
 
@@ -91,43 +95,43 @@
 	--font-weight-semibold: 600;
 	--font-weight-bold: 700;
 
-	/* Font sizes: MOBILE values (desktop in comments, overridden below) */
-	--text-xsmall: 10px; /* 14px */
+	/* Font sizes: MOBILE values (tablet / desktop in comments, overridden below) */
+	--text-xsmall: 10px; /* 12px / 14px */
 	--text-xsmall--line-height: 1.2;
-	--text-small: 12px; /* 16px */
+	--text-small: 12px; /* 14px / 16px */
 	--text-small--line-height: 1.2;
-	--text-regular: 14px; /* 18px */
+	--text-regular: 14px; /* 16px / 18px */
 	--text-regular--line-height: 1.2;
-	--text-medium: 18px; /* 24px */
+	--text-medium: 18px; /* 20px / 24px */
 	--text-medium--line-height: 1.2;
-	--text-xlarge: 24px; /* 35px */
+	--text-xlarge: 24px; /* 28px / 35px */
 	--text-xlarge--line-height: 1.2;
 
 	--leading-marg: 1.2;
 
-	/* Spacing: MOBILE values (desktop in comments, overridden below).
+	/* Spacing: MOBILE values (tablet / desktop in comments, overridden below).
 	 * Named to avoid clashing with max-w-xs/sm/md/lg/xl. The numeric scale
 	 * (p-4 = 1rem etc.) from Tailwind's default --spacing is still available. */
-	--spacing-micro: 2px; /* 4px */
-	--spacing-3xsmall: 4px; /* 8px */
-	--spacing-2xsmall: 6px; /* 12px */
-	--spacing-xsmall: 8px; /* 16px */
-	--spacing-small: 10px; /* 20px */
-	--spacing-medium: 12px; /* 24px */
-	--spacing-large: 16px; /* 36px */
-	--spacing-xlarge: 32px; /* 48px */
-	--spacing-2xlarge: 24px; /* 72px */
-	--spacing-3xlarge: 48px; /* 96px (provisional, no desktop value in Figma) */
-	--spacing-jumbo: 80px; /* 100px (Figma 848:2819 desktop footer pt) */
+	--spacing-micro: 2px; /* 3px / 4px */
+	--spacing-3xsmall: 4px; /* 6px / 8px */
+	--spacing-2xsmall: 6px; /* 9px / 12px */
+	--spacing-xsmall: 8px; /* 12px / 16px */
+	--spacing-small: 10px; /* 15px / 20px */
+	--spacing-medium: 12px; /* 18px / 24px */
+	--spacing-large: 16px; /* 24px / 36px */
+	--spacing-xlarge: 32px; /* 39px / 48px */
+	--spacing-2xlarge: 24px; /* 48px / 72px */
+	--spacing-3xlarge: 48px; /* 72px / 100px */
+	--spacing-jumbo: 80px; /* 90px / 100px (Figma 848:2819 desktop footer pt) */
 
 	/* Component dimensions */
-	--spacing-header: 44px; /* Header-interim / mobile 881:183, below 1133 only (incl. 744). From 1133 header-desktop 951:2811 is sized by its own grid rows (partials/site/header-desktop.php), so there is no desktop value */
-	--spacing-circle: 50px; /* 70px */
-	--spacing-link-icon: 12px; /* 24px. Mobile instances are hard-sized 12 (article 564:646, magazine 838:1042); the Figma variable still says 16 */
-	--spacing-gutter: 12px; /* 0 */
+	--spacing-header: 44px; /* Header-interim / mobile 881:183, below 1133 only (incl. 744; no Figma variable, so no tablet value). From 1133 header-desktop 951:2811 is sized by its own grid rows (partials/site/header-desktop.php), so there is no desktop value */
+	--spacing-circle: 50px; /* 60px / 70px */
+	--spacing-link-icon: 12px; /* 12px / 24px. Mobile instances are hard-sized 12 (article 564:646, magazine 838:1042); the Figma variable says 16 for Mobile and Tablet, so tablet keeps the mobile 12 */
+	--spacing-gutter: 12px; /* 12px / 0. layout/grid/margin is 0 in Figma's Tablet mode, but that mode's grid is 24 cols; 744-1132 still uses the 4-col mobile layout (Tablet portrait 550:104 uses the Mobile grid), so the 12px page margin stays */
 
 	/* Breakpoints (Figma frame widths; base = mobile 390) */
-	--breakpoint-tablet: 744px; /* tablet portrait, still MOBILE token mode, 4 cols */
+	--breakpoint-tablet: 744px; /* tablet portrait: TABLET token mode, still the 4-col mobile layout */
 	--breakpoint-tablet-lg: 1133px; /* tablet landscape: DESKTOP token mode, 24 cols */
 	--breakpoint-desktop: 1280px; /* desktop small */
 	--breakpoint-desktop-lg: 1920px; /* desktop large reference frame */
@@ -139,7 +143,7 @@
 	--container-mobile: 366px;
 }
 
-/* DESKTOP variable mode (Figma frames 1133 / 1280 / 1920). */
+/* TABLET variable mode from 744px, DESKTOP variable mode from 1133px (Figma frames 1133 / 1280 / 1920). */
 @layer theme {
 	/* Figma variable stroke/hairline: Mobile 0.3 / Tablet 0.4 / Desktop 0.5. */
 	:root {
@@ -147,8 +151,28 @@
 		--stroke-hairline: 0.3px;
 	}
 
+	/* Figma "Tablet (750–1199)" mode, applied across tablet portrait (744-1132).
+	 * Only tokens whose Tablet value differs from Mobile; header, link-icon and
+	 * gutter keep their mobile values (see the @theme comments). */
 	@media (width >= 744px) {
 		:root {
+			--text-xsmall: 12px;
+			--text-small: 14px;
+			--text-regular: 16px;
+			--text-medium: 20px;
+			--text-xlarge: 28px;
+			--spacing-micro: 3px;
+			--spacing-3xsmall: 6px;
+			--spacing-2xsmall: 9px;
+			--spacing-xsmall: 12px;
+			--spacing-small: 15px;
+			--spacing-medium: 18px;
+			--spacing-large: 24px;
+			--spacing-xlarge: 39px;
+			--spacing-2xlarge: 48px;
+			--spacing-3xlarge: 72px;
+			--spacing-jumbo: 90px;
+			--spacing-circle: 60px;
 			--stroke-hairline: 0.4px;
 		}
 	}
@@ -169,7 +193,7 @@
 			--spacing-large: 36px;
 			--spacing-xlarge: 48px;
 			--spacing-2xlarge: 72px;
-			--spacing-3xlarge: 96px;
+			--spacing-3xlarge: 100px;
 			--spacing-jumbo: 100px;
 			--spacing-circle: 70px;
 			--spacing-link-icon: 24px;
@@ -351,5 +375,72 @@
 	[data-archive]:has([data-archive-row][data-active] .archive-row-link:focus-visible) [data-archive-panel] {
 		outline: 1px solid var(--color-marg-red);
 		outline-offset: -1px;
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Archive Covers view (Figma 1019:2672): mobile only, below 744px.
+	 * [data-archive] carries data-view="titles|covers" (partials/archive/magazines.php,
+	 * from ProductPresenter::archive_view(); archive-view-toggle.js flips it). The titles
+	 * stage, list and background gradient hide themselves with
+	 * max-tablet:group-data-[view=covers]/archive:hidden; the track is
+	 * partials/archive/covers.php. From 744px the Titles layout always shows.
+	 * Rules here are the page-level ones utilities cannot express.
+	 * ------------------------------------------------------------------- */
+	@media (width < 744px) {
+		/* The track does not scroll vertically: no list snapping on the page. */
+		html.js:has([data-archive][data-view="covers"]) {
+			scroll-snap-type: none;
+		}
+
+		/*
+		 * The fixed counter footer (covers.php, JS only) replaces the site footer. Without
+		 * JS there is no counter, so the site footer stays (legal links, contact).
+		 */
+		html.js:has([data-archive][data-view="covers"]) .site-footer {
+			display: none;
+		}
+	}
+
+	/* Covers view: rules for partials/archive/covers.php / archive-covers.js go here. */
+
+	/* --- end Archive Covers view ------------------------------------------ */
+
+	/* ---------------------------------------------------------------------
+	 * Footer reveal (Figma 608:740 revision): "More such" + the site footer slide up
+	 * into place together. footer.php: [data-footer-group][data-footer-reveal] >
+	 * [data-footer-group-body] (article and magazine pages only). The group is the
+	 * view-timeline subject and is never transformed. Only its body moves, and the
+	 * group clips that overflow so the page's scroll height never changes. The range
+	 * ends at entry 60%, so the move is always finished by the bottom of the page.
+	 * Reduced motion and browsers without view timelines: no movement, always visible.
+	 * Fallback: assets/js/frontend/components/footer-reveal.js (inline styles).
+	 * ------------------------------------------------------------------- */
+	[data-footer-reveal] {
+		--marg-footer-reveal-offset: clamp(96px, 20vh, 200px);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: view()) {
+			[data-footer-reveal] {
+				overflow-y: clip;
+				view-timeline: --marg-footer-reveal block;
+			}
+
+			[data-footer-reveal] > [data-footer-group-body] {
+				animation: marg-footer-reveal linear both;
+				animation-timeline: --marg-footer-reveal;
+				animation-range: entry 0% entry 60%;
+			}
+		}
+	}
+
+	@keyframes marg-footer-reveal {
+		from {
+			translate: 0 var(--marg-footer-reveal-offset);
+		}
+
+		to {
+			translate: 0 0;
+		}
 	}
 }

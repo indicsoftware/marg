@@ -13,7 +13,8 @@
  *    "Vol. N No. M" shows centred over cols 13-14. It is an absolute nowrap overlay, so
  *    the row keeps its height (Figma's hover variant grows the row by ~6px).
  * Mobile (< tablet-lg), Figma 866:170 state Inactive: 18.3px row, 0.3px top hairline,
- * one centred muted line: the title (ellipsis) or "Vol. N No. M" for unnamed issues.
+ * one centred muted line: the title (ellipsis) or "Vol. N No. M" for unnamed issues,
+ * in Color/mard-red/muted-50 (text-marg-red-muted-50, Figma 866:145 / 866:157).
  * The list's own bottom hairline closes the last row.
  *
  * The <li> carries the data the mobile open card (partials/archive/stage.php: image,
@@ -43,7 +44,7 @@ $annotation = (string) ( $row['annotation'] ?? '' );
 $image      = ProductPresenter::archive_image( $row['image_id'] ?? 0 );
 
 $li_attrs = [
-	'class'                => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[332.3px] max-tablet-lg:px-gutter',
+	'class'                => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[332.3px] tablet:max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[352.5px] max-tablet-lg:px-gutter',
 	'data-archive-row'     => true,
 	'data-active'          => ! empty( $args['active'] ),
 	'data-date'            => (string) ( $row['date'] ?? '' ),
@@ -80,9 +81,9 @@ $sr_label = trim( implode( ', ', array_filter( [ (string) ( $row['vol_issue'] ??
 
 		<?php if ( $has_title ) : ?>
 			<span class="text-trim col-[7/span_12] row-start-2 hidden break-words font-sans text-medium font-semibold tablet-lg:block"><?php echo esc_html( $row['title'] ); ?></span>
-			<span class="block w-full truncate text-center font-sans text-small font-regular text-marg-red-muted tablet-lg:hidden"><?php echo esc_html( $row['title'] ); ?></span>
+			<span class="block w-full truncate text-center font-sans text-small font-regular text-marg-red-muted-50 tablet-lg:hidden"><?php echo esc_html( $row['title'] ); ?></span>
 		<?php else : ?>
-			<span class="block w-full truncate text-center font-sans text-small font-regular text-marg-red-muted tablet-lg:hidden" aria-hidden="true"><?php echo esc_html( $row['vol_issue'] ?? '' ); ?></span>
+			<span class="block w-full truncate text-center font-sans text-small font-regular text-marg-red-muted-50 tablet-lg:hidden" aria-hidden="true"><?php echo esc_html( $row['vol_issue'] ?? '' ); ?></span>
 		<?php endif; ?>
 
 		<?php if ( '' !== $annotation ) : ?>

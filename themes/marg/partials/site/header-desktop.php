@@ -21,14 +21,21 @@
  *    (30% red, blur(2px) = Figma layer blur 4, invisible icons keep their space).
  *    aria-hidden, not focusable, no fake counts: "Shelf" alone, "Cart(N)" with the
  *    real WooCommerce cart count (just "Cart" when there is no cart).
+ *    Mouse hover (hover-capable devices only, CSS only): each one, and each half of
+ *    Shelf / Cart on its own, swaps its text for "Upcoming" and loses the blur (still
+ *    30% red, same 18/600 type; Figma has no hover state for them). "Upcoming" is
+ *    stacked absolutely over the default text (centred, or left-aligned for Shelf),
+ *    so the default text alone sets the footprint and nothing shifts (below 1440,
+ *    Cart hides while Shelf is hovered, so Shelf's "Upcoming" never runs into it). They take
+ *    pointer events for the hover only: no link, no tabindex, cursor default.
  *  - cols 2-6 / rows 4-6: the canvas animation slot (Frame 22). Empty for now: no
  *    markup, the explicit grid placement keeps the cell free.
  *  - cols 7-11 / row 6: tagline, Times 18 (.font-serif hairline stroke), bottom-
- *    aligned. One line as drawn (it may run past col 11 into the empty cols 12-13)
- *    from 1320px, where 7 columns still hold the 381px line; narrower, it wraps
- *    upwards inside cols 7-11 rather than running into the column-14 image box.
- *  - archive only, cols 14-17 / rows 4-7 (320 x 209.5 at 1920, stretched to the
- *    cell): the hover-image container. CONTRACT: a <div data-archive-hover-image
+ *    aligned. One line as drawn (it may run past col 11 into the empty col 12)
+ *    from 1524px, where cols 7-12 still hold the 381px line; narrower, it wraps
+ *    upwards inside cols 7-11 rather than running into the column-13 image box.
+ *  - archive only, cols 13-17 / rows 3-7 (400 x 261.875 at 1920, stretched to the
+ *    cell; Figma 951:2797, proportions revised): the hover-image container. CONTRACT: a <div data-archive-hover-image
  *    role="none" aria-hidden="true"> rendered EMPTY. archive-list.js appends and
  *    fades its own <img> inside it; the box only clips (overflow hidden) and gives
  *    the image a positioned, cell-sized parent.
@@ -59,8 +66,17 @@ $marg_label  = 'text-trim whitespace-nowrap';
 $marg_icon   = 'block size-link-icon shrink-0';
 $marg_years  = SiteChrome::archive_years( true );
 
-// Decorative placeholders: 30% red, Figma layer blur 4 = CSS blur(2px), never interactive.
-$marg_placeholder = 'pointer-events-none select-none self-start whitespace-nowrap text-regular font-semibold text-marg-red-muted blur-[2px]';
+// Decorative placeholders: 30% red, never interactive (hover only reveals "Upcoming").
+$marg_placeholder = 'cursor-default select-none self-start whitespace-nowrap text-regular font-semibold text-marg-red-muted';
+
+// One hover target: Figma layer blur 4 = CSS blur(2px), removed on hover with the label swap.
+$marg_soon = 'group/soon blur-[2px] hover:blur-none';
+
+// Default label (sets the footprint) and the stacked "Upcoming" label shown instead on hover.
+$marg_soon_default  = 'block text-trim group-hover/soon:invisible';
+$marg_soon_upcoming = 'invisible absolute top-0 text-trim group-hover/soon:visible';
+$marg_soon_centred  = $marg_soon_upcoming . ' left-1/2 -translate-x-1/2';
+$marg_upcoming      = __( 'Upcoming', 'tenup-theme' );
 
 $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg-red tablet-lg:grid tablet-lg:grid-cols-24 '
 	. ( $marg_main ? 'tablet-lg:grid-rows-[repeat(8,52.375px)]' : 'tablet-lg:grid-rows-[repeat(4,52.625px)]' );
@@ -80,14 +96,20 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 			</a>
 		</nav>
 
-		<div class="<?php echo esc_attr( 'col-start-6 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder ); ?>" aria-hidden="true">
+		<div class="<?php echo esc_attr( 'col-start-6 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true">
 			<span class="<?php echo esc_attr( $marg_icon ); ?>"></span>
-			<span class="text-trim"><?php echo esc_html_x( '2016 – 2026', 'future archive period (en dash with spaces)', 'tenup-theme' ); ?></span>
+			<span class="relative">
+				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php echo esc_html_x( '2016 – 2026', 'future archive period (en dash with spaces)', 'tenup-theme' ); ?></span>
+				<span class="<?php echo esc_attr( $marg_soon_centred ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
+			</span>
 		</div>
 
-		<div class="<?php echo esc_attr( 'col-start-19 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder ); ?>" aria-hidden="true">
+		<div class="<?php echo esc_attr( 'col-start-19 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true">
 			<span class="<?php echo esc_attr( $marg_icon ); ?>"></span>
-			<span class="text-trim uppercase"><?php esc_html_e( 'Search', 'tenup-theme' ); ?></span>
+			<span class="relative">
+				<span class="<?php echo esc_attr( $marg_soon_default . ' uppercase' ); ?>"><?php esc_html_e( 'Search', 'tenup-theme' ); ?></span>
+				<span class="<?php echo esc_attr( $marg_soon_centred ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
+			</span>
 		</div>
 
 		<?php
@@ -98,18 +120,30 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 			: sprintf( __( 'Cart(%d)', 'tenup-theme' ), $marg_cart_count );
 		?>
 		<div class="<?php echo esc_attr( 'col-[21/24] row-start-4 flex items-center justify-self-stretch ' . $marg_placeholder ); ?>" aria-hidden="true">
-			<span class="text-trim flex-1 basis-0 text-left"><?php esc_html_e( 'Shelf', 'tenup-theme' ); ?></span>
-			<span class="text-trim flex-1 basis-0 text-center"><?php echo esc_html( $marg_cart ); ?></span>
+			<?php
+			// Each half is its own hover target, so Shelf and Cart swap independently. Below 1440 a half is
+			// narrower than "Upcoming" (87px) plus the gap to the centred Cart label, so Shelf's left-aligned
+			// "Upcoming" would run into the blurred Cart label: while Shelf is hovered, Cart steps aside
+			// (invisible, footprint kept). Cart's own centred "Upcoming" clears "Shelf" at every desktop width.
+			?>
+			<span class="<?php echo esc_attr( 'peer/shelf relative flex-1 basis-0 text-left ' . $marg_soon ); ?>">
+				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php esc_html_e( 'Shelf', 'tenup-theme' ); ?></span>
+				<span class="<?php echo esc_attr( $marg_soon_upcoming . ' left-0' ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
+			</span>
+			<span class="<?php echo esc_attr( 'relative flex-1 basis-0 text-center max-[1440px]:peer-hover/shelf:invisible ' . $marg_soon ); ?>">
+				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php echo esc_html( $marg_cart ); ?></span>
+				<span class="<?php echo esc_attr( $marg_soon_centred ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
+			</span>
 		</div>
 
 		<?php // Canvas animation slot (Frame 22, cols 2-6 / rows 4-6): intentionally empty until the animation exists. ?>
 
-		<p class="col-[7/12] row-start-6 flex items-end font-serif text-regular min-[1320px]:whitespace-nowrap">
+		<p class="col-[7/12] row-start-6 flex items-end font-serif text-regular min-[1540px]:whitespace-nowrap">
 			<span class="text-trim"><?php esc_html_e( 'Seventy years of the Marg quarterly are open access.', 'tenup-theme' ); ?></span>
 		</p>
 
 		<?php if ( $marg_header['show_hover_image'] ) : ?>
-			<div class="relative col-[14/18] row-[4/8] overflow-hidden" data-archive-hover-image role="none" aria-hidden="true"></div>
+			<div class="relative col-[13/18] row-[3/8] overflow-hidden" data-archive-hover-image role="none" aria-hidden="true"></div>
 		<?php endif; ?>
 
 	<?php else : ?>

@@ -37,7 +37,7 @@ $marg_focus      = 'focus-visible:outline-1 focus-visible:outline-offset-2 focus
 $marg_icon_m     = 'size-4 shrink-0 tablet-lg:hidden';
 $marg_icon_d     = 'hidden size-6 shrink-0 tablet-lg:block';
 $marg_legal      = 'text-trim whitespace-nowrap';
-$marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus;
+$marg_legal_link = 'underline decoration-1 underline-offset-auto tablet-lg:decoration-from-font tablet-lg:[text-underline-position:from-font] ' . $marg_focus; // Desktop 922:6730: from-font thickness and position.
 
 ?>
 <footer class="site-footer bg-white text-marg-red-muted-40 tablet-lg:text-marg-red" role="contentinfo">
@@ -94,9 +94,11 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 			?>
 
 			<?php // Registration (908:221 / 922:6693): two centred lines, broken before "Maharashtra" on mobile (908:222) and before "under" on desktop.
-			// Desktop (922:6695): Times 16 / 1.2, cap-trimmed both ends, directly under the logo frame; the Sans run is an inline-block aligned top so its own baseline does not grow line 1. ?>
-			<p class="w-full pt-[30px] text-center font-serif text-[10px] leading-[12px] tablet-lg:pt-0 tablet-lg:text-small tablet-lg:leading-[1.2] tablet-lg:text-trim">
-				<span class="font-sans font-semibold uppercase tracking-[1px] tablet-lg:inline-block tablet-lg:align-top tablet-lg:text-[13px] tablet-lg:font-bold tablet-lg:tracking-[1.56px]"><?php esc_html_e( 'The Marg Foundation', 'tenup-theme' ); ?></span>
+			// Desktop (922:6695): Times 16 / 1.2, cap-trimmed both ends, directly under the logo frame.
+			// The Sans run stays inline on the Times baseline at every width; line-height 0 keeps its own (Sans) half-leading
+			// out of the line box, so line 1 keeps the paragraph's strut height (1.2 x xsmall: 12px mobile, 14.4px tablet; 1.2 x 16px desktop). ?>
+			<p class="w-full pt-[30px] text-center font-serif text-xsmall leading-[1.2] tablet-lg:pt-0 tablet-lg:text-small tablet-lg:leading-[1.2] tablet-lg:text-trim">
+				<span class="align-baseline font-sans font-semibold uppercase leading-[0] tracking-[1px] tablet-lg:text-[13px] tablet-lg:font-bold tablet-lg:tracking-[1.56px]"><?php esc_html_e( 'The Marg Foundation', 'tenup-theme' ); ?></span>
 				<?php esc_html_e( 'is a registered trust', 'tenup-theme' ); ?><br class="max-tablet-lg:hidden">
 				<?php esc_html_e( 'under the', 'tenup-theme' ); ?><br class="tablet-lg:hidden">
 				<?php esc_html_e( 'Maharashtra Public Trusts Act.', 'tenup-theme' ); ?>
@@ -127,10 +129,10 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 			</address>
 		</div>
 
-		<?php // Legal and copyright (922:7017 mobile, 922:6725 desktop). ?>
+		<?php // Legal and copyright (922:7017 mobile, 922:6725 desktop). Terms and Privacy open the pages on the current Marg website (SiteChrome, filterable) in a new tab, like the marg-art.org link above. ?>
 		<div class="grid grid-cols-2 gap-x-xsmall gap-y-3xsmall pt-[50px] text-xsmall font-semibold leading-[1.2] tablet-lg:col-[2/24] tablet-lg:row-start-2 tablet-lg:flex tablet-lg:items-start tablet-lg:justify-center tablet-lg:gap-x-[136px] tablet-lg:pt-0">
 			<?php if ( '' !== $marg_terms_url ) : ?>
-				<a href="<?php echo esc_url( $marg_terms_url ); ?>" class="<?php echo esc_attr( $marg_legal . ' justify-self-start ' . $marg_legal_link ); ?>"><?php esc_html_e( 'Terms & Conditions', 'tenup-theme' ); ?></a>
+				<a href="<?php echo esc_url( $marg_terms_url ); ?>" target="_blank" rel="noopener" class="<?php echo esc_attr( $marg_legal . ' justify-self-start ' . $marg_legal_link ); ?>"><?php esc_html_e( 'Terms & Conditions', 'tenup-theme' ); ?><span class="sr-only"> <?php esc_html_e( '(opens in a new tab)', 'tenup-theme' ); ?></span></a>
 			<?php else : ?>
 				<span class="<?php echo esc_attr( $marg_legal ); ?> justify-self-start"><?php esc_html_e( 'Terms & Conditions', 'tenup-theme' ); ?></span>
 			<?php endif; ?>
@@ -138,7 +140,7 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto ' . $marg_focus
 			<p class="<?php echo esc_attr( $marg_legal ); ?> col-span-2 row-start-2 text-center"><?php echo esc_html( SiteChrome::copyright() ); ?></p>
 
 			<?php if ( '' !== $marg_priv_url ) : ?>
-				<a href="<?php echo esc_url( $marg_priv_url ); ?>" class="<?php echo esc_attr( $marg_legal . ' justify-self-end text-right ' . $marg_legal_link ); ?>"><?php esc_html_e( 'Privacy Policy', 'tenup-theme' ); ?></a>
+				<a href="<?php echo esc_url( $marg_priv_url ); ?>" target="_blank" rel="noopener" class="<?php echo esc_attr( $marg_legal . ' justify-self-end text-right ' . $marg_legal_link ); ?>"><?php esc_html_e( 'Privacy Policy', 'tenup-theme' ); ?><span class="sr-only"> <?php esc_html_e( '(opens in a new tab)', 'tenup-theme' ); ?></span></a>
 			<?php else : ?>
 				<span class="<?php echo esc_attr( $marg_legal ); ?> justify-self-end text-right"><?php esc_html_e( 'Privacy Policy', 'tenup-theme' ); ?></span>
 			<?php endif; ?>
