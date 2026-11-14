@@ -12,7 +12,8 @@
  * tablet-lg it follows the desktop frames: an 18-of-24-column body with the
  * title column (cols 1-8), a spacer and the featured image (cols 11-18), the
  * metadata under the title column, the parent magazine link centred, and the
- * "More Such" row over 22 columns. With no featured image the title column
+ * "More Such" row over 22 columns (printed after </main>, in footer.php's footer
+ * group, so it slides up with the footer). With no featured image the title column
  * and the metadata are centred (cols 6-13), per 608:791.
  *
  * Wrappers that only exist for one layout use `contents` in the other one,
@@ -154,13 +155,16 @@ $print_people = static function ( array $people ) {
  * Top: the mobile image sits 22px below the 44px sticky header (Figma 550:106: image top
  * at y 66), under the header's 115px white fade as drawn. Without an image (not drawn on
  * mobile) the first text starts at y 115 (44 + 71), where that fade ends, so the title is
- * not washed out at scroll 0. Bottom: no mobile padding, the footer's own pt-jumbo follows
- * the related row (the mobile frame leaves only footer space there); desktop keeps the drawn ~80px.
+ * not washed out at scroll 0. Bottom: the related row is printed after </main> (see the end of
+ * this file), so the article keeps the 48px / 72px (gap-12 / gap-y-2xlarge) that separated it from
+ * that row; without related cards it has no mobile padding and the drawn ~80px on desktop. Below
+ * the related row: no mobile padding, the footer's own pt-jumbo follows (the mobile frame leaves only
+ * footer space there); desktop keeps the drawn ~80px.
  * Desktop top: 72px (pt-2xlarge) below the 210.5px header-desktop, as in 605:309 (Frame 6 itemSpacing 72);
  * the no-image article uses the same gap (608:791 still shows the old 200px header and is treated as stale).
  */
 ?>
-<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-2xlarge tablet-lg:pb-20', $has_image ? 'pt-[22px]' : 'pt-[71px]' ) ); ?>">
+<article class="<?php echo esc_attr( class_names( 'mx-auto flex w-full max-w-page flex-col gap-12 tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:gap-x-0 tablet-lg:gap-y-2xlarge tablet-lg:pt-2xlarge', $has_image ? 'pt-[22px]' : 'pt-[71px]', $related ? 'pb-12 tablet-lg:pb-2xlarge' : 'tablet-lg:pb-20' ) ); ?>">
 
 	<?php /* ---------------------------------------------------------------- body (Figma "body", 18 cols) */ ?>
 	<div class="flex w-full flex-col gap-12 tablet:mx-auto tablet:max-w-[642px] tablet-lg:col-span-18 tablet-lg:col-start-4 tablet-lg:mx-0 tablet-lg:grid tablet-lg:max-w-none tablet-lg:grid-cols-18 tablet-lg:gap-x-0 tablet-lg:gap-y-12">
@@ -500,37 +504,52 @@ $print_people = static function ( array $people ) {
 			</div>
 		<?php endif; ?>
 	</div>
-
-	<?php /* ---------------------------------------------------------------- related "More Such" (Figma 608:740 / 582:350) */ ?>
-	<?php if ( $related ) : ?>
-		<section class="flex min-w-0 flex-col gap-6 px-gutter tablet-lg:col-span-22 tablet-lg:col-start-2 tablet-lg:gap-xsmall" aria-labelledby="<?php echo esc_attr( $related_id ); ?>">
-			<?php
-			get_template_part(
-				'partials/components/separator-section',
-				null,
-				[
-					'label' => __( 'More Such', 'tenup-theme' ),
-					'id'    => $related_id,
-				]
-			);
-			?>
-			<ul class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
-				<?php foreach ( $related as $card ) : ?>
-					<li class="flex w-[250px] shrink-0 snap-start tablet-lg:w-auto">
-						<?php
-						get_template_part(
-							'partials/components/card-publication',
-							null,
-							[
-								'card'    => $card,
-								'variant' => 'article',
-								'class'   => 'w-full',
-							]
-						);
-						?>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		</section>
-	<?php endif; ?>
 </article>
+<?php
+/*
+ * Related "More Such" (Figma 608:740 / 582:350). Printed in footer.php's footer group, before the
+ * site footer, so it slides up into place together with the footer (608:740 revision: "the 'more
+ * such' in every article and mag page will slide from the bottom along with the footer"). It sits
+ * after </main> as a labelled complementary landmark. Same 24-col page grid as the article
+ * (cols 2-23), 80px above the footer on desktop.
+ */
+if ( $related ) {
+	add_action(
+		'tenup_theme_before_footer',
+		static function () use ( $related, $related_id ) {
+			?>
+			<aside class="mx-auto w-full max-w-page tablet-lg:grid tablet-lg:grid-cols-24 tablet-lg:pb-20" aria-labelledby="<?php echo esc_attr( $related_id ); ?>">
+				<div class="flex min-w-0 flex-col gap-6 px-gutter tablet-lg:col-span-22 tablet-lg:col-start-2 tablet-lg:gap-xsmall">
+					<?php
+					get_template_part(
+						'partials/components/separator-section',
+						null,
+						[
+							'label' => __( 'More Such', 'tenup-theme' ),
+							'id'    => $related_id,
+						]
+					);
+					?>
+					<ul class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
+						<?php foreach ( $related as $card ) : ?>
+							<li class="flex w-[250px] shrink-0 snap-start tablet-lg:w-auto">
+								<?php
+								get_template_part(
+									'partials/components/card-publication',
+									null,
+									[
+										'card'    => $card,
+										'variant' => 'article',
+										'class'   => 'w-full',
+									]
+								);
+								?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			</aside>
+			<?php
+		}
+	);
+}

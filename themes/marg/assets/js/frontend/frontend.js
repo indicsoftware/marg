@@ -11,8 +11,12 @@ import { initProductActions } from './components/product-actions';
 import { initSiteHeader } from './components/site-header';
 import { initArchiveList } from './components/archive-list';
 import { initArchiveViewToggle } from './components/archive-view-toggle';
+import { initArchiveCovers } from './components/archive-covers';
+import { initFooterReveal } from './components/footer-reveal';
 
 initProductActions();
 initSiteHeader();
 initArchiveList();
 initArchiveViewToggle();
+initArchiveCovers();
+initFooterReveal();

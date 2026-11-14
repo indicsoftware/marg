@@ -12,6 +12,8 @@
  *  - >= tablet-lg: 24-col page grid. Cover header in cols 2-15 (itself a 14-col grid: cover
  *    cols 1-7, meta column cols 9-13/14), details + article list in cols 17-23, then the
  *    full-bleed related section.
+ *  - The related section is printed after </main>, in footer.php's footer group, so it
+ *    slides up with the footer (see the end of this file).
  *
  * Every field is optional: each block is omitted when its data is empty.
  *
@@ -222,56 +224,69 @@ $has_details = $specs || '' !== $description || $editor_groups;
 			</div>
 		<?php endif; ?>
 	</div>
-
-	<?php
-	// Related publications (837:651 desktop, 839:941 mobile carousel). Mobile: no bottom
-	// padding and a fixed 414px carousel viewport, so the footer (922:7051, pt-jumbo) starts
-	// flush with the viewport's bottom edge as drawn; desktop keeps the section's 35px.
-	$related = array_values(
-		array_filter(
-			$related,
-			static function ( $card ) {
-				return ! empty( $card['id'] ) && ! empty( $card['title'] );
-			}
-		)
-	);
-	if ( $related ) :
-		?>
-		<section class="flex flex-col gap-medium px-gutter pt-xlarge tablet:mx-auto tablet:max-w-[640px] tablet-lg:mx-0 tablet-lg:max-w-none tablet-lg:gap-[64px] tablet-lg:pb-[35px] tablet-lg:pt-0" aria-labelledby="<?php echo esc_attr( $uid . '-related' ); ?>">
-			<?php
-			get_template_part(
-				'partials/components/separator-section',
-				null,
-				[
-					'label' => __( 'More such', 'tenup-theme' ),
-					'id'    => $uid . '-related',
-					// Figma: mobile pt 8 (839:942); desktop label 16px at 30% red, 24px below the rule (837:653).
-					// Only the rule is faded to 30%: the label keeps the component's contrast-safe colour.
-					'class' => 'pt-xsmall! tablet-lg:px-[calc(100%/24)] tablet-lg:pt-medium! tablet-lg:border-marg-red/30 tablet-lg:*:text-small',
-				]
-			);
-			?>
-			<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)]">
-				<?php foreach ( $related as $card ) : ?>
-					<li class="w-[224px] shrink-0 snap-start tablet-lg:w-auto">
-						<?php
-						get_template_part(
-							'partials/components/card-publication',
-							null,
-							[
-								'card'             => $card,
-								'variant'          => 'magazine',
-								// Mobile shows optional "edited by" + OPEN ACCESS lines (Figma 839:972).
-								'mobile_byline'    => true,
-								// Mobile meta line is "Vol. 75 No. 4, March 2023" (Figma 839:946); just the
-								// date for an unnamed issue, whose title is then "Vol. 75 No. 4" (311:67).
-								'mobile_meta_rows' => true,
-							]
-						);
-						?>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		</section>
-	<?php endif; ?>
 </article>
+<?php
+/*
+ * Related publications (837:651 desktop, 839:941 mobile carousel). Printed in footer.php's footer
+ * group, before the site footer, so "More such" slides up into place together with the footer
+ * (608:740 revision: "the 'more such' in every article and mag page will slide from the bottom along
+ * with the footer"). It sits after </main> as a labelled complementary landmark, in the same
+ * max-w-page frame the article used. Mobile: no bottom padding and a fixed 414px carousel viewport,
+ * so the footer (922:7051, pt-jumbo) starts flush with the viewport's bottom edge as drawn; desktop
+ * keeps the section's 35px.
+ */
+$related = array_values(
+	array_filter(
+		$related,
+		static function ( $card ) {
+			return ! empty( $card['id'] ) && ! empty( $card['title'] );
+		}
+	)
+);
+if ( $related ) {
+	add_action(
+		'tenup_theme_before_footer',
+		static function () use ( $related, $uid ) {
+			?>
+			<aside class="mx-auto w-full max-w-page text-marg-red" aria-labelledby="<?php echo esc_attr( $uid . '-related' ); ?>">
+				<div class="flex flex-col gap-medium px-gutter pt-xlarge tablet:mx-auto tablet:max-w-[640px] tablet-lg:mx-0 tablet-lg:max-w-none tablet-lg:gap-[64px] tablet-lg:pb-[35px] tablet-lg:pt-0">
+					<?php
+					get_template_part(
+						'partials/components/separator-section',
+						null,
+						[
+							'label' => __( 'More such', 'tenup-theme' ),
+							'id'    => $uid . '-related',
+							// Figma: mobile pt 8 (839:942); desktop label 16px at 30% red, 24px below the rule (837:653).
+							// Only the rule is faded to 30%: the label keeps the component's contrast-safe colour.
+							'class' => 'pt-xsmall! tablet-lg:px-[calc(100%/24)] tablet-lg:pt-medium! tablet-lg:border-marg-red/30 tablet-lg:*:text-small',
+						]
+					);
+					?>
+					<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)]">
+						<?php foreach ( $related as $card ) : ?>
+							<li class="w-[224px] shrink-0 snap-start tablet-lg:w-auto">
+								<?php
+								get_template_part(
+									'partials/components/card-publication',
+									null,
+									[
+										'card'             => $card,
+										'variant'          => 'magazine',
+										// Mobile shows optional "edited by" + OPEN ACCESS lines (Figma 839:972).
+										'mobile_byline'    => true,
+										// Mobile meta line is "Vol. 75 No. 4, March 2023" (Figma 839:946); just the
+										// date for an unnamed issue, whose title is then "Vol. 75 No. 4" (311:67).
+										'mobile_meta_rows' => true,
+									]
+								);
+								?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			</aside>
+			<?php
+		}
+	);
+}

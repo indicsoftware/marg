@@ -2,9 +2,10 @@
 /**
  * Magazine archive (WooCommerce template override for the product_cat "magazines" archive).
  *
- * Served at /product-category/magazines/ (ProductTemplates::archive_url()). WooCommerce's
- * template loader picks this file by taxonomy + slug; archive-product.php is deliberately
- * not overridden because the shop page is the site front page.
+ * Served at the site root "/" (ProductTemplates::front_page_request(); the term URL
+ * /product-category/magazines/ redirects there), or at the term URL when the
+ * tenup_theme_archive_on_front filter returns false. WooCommerce's template loader picks
+ * this file by taxonomy + slug; archive-product.php (the shop at /shop/) is not overridden.
  *
  * Figma: 848:2819 (desktop 1920), 880:5747 / 864:3637 / 880:4951 (mobile 390).
  * The main query (ProductTemplates::archive_query()) already holds every magazine with
