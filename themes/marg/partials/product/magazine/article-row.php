@@ -5,7 +5,8 @@
  * Mobile: 4-col grid. Col 1 = page range (70%) + 1px vertical rule; cols 2-4 = title + authors,
  * with the thumbnail as a 30% opacity square overlay in the middle third, behind the text.
  * Desktop (>= tablet-lg): 7-col grid with a top rule, py 12, min-height 189. Col 1 = page range,
- * cols 2-5 = title + authors (py 20), cols 6-7 = thumbnail (empty when there is no image).
+ * cols 2-5 = title + authors (py 20), cols 6-7 = thumbnail (empty when there is no image),
+ * contained in its cell rather than filling it (Figma revision on I836:650;280:67).
  * The title link is stretched over the whole row.
  *
  * @package TenUpTheme
@@ -33,7 +34,7 @@ $image_id = (int) ( $row['image_id'] ?? 0 );
 			'medium',
 			false,
 			[
-				'class'   => 'pointer-events-none absolute -z-10 left-1/2 top-0 aspect-square h-auto w-1/4 object-cover opacity-30 tablet-lg:left-[calc(500%/7)] tablet-lg:top-[12px] tablet-lg:aspect-auto tablet-lg:h-[calc(100%-24px)] tablet-lg:w-[calc(200%/7)] tablet-lg:opacity-100',
+				'class'   => 'pointer-events-none absolute -z-10 left-1/2 top-0 aspect-square h-auto w-1/4 object-cover opacity-30 tablet-lg:left-[calc(500%/7)] tablet-lg:top-[12px] tablet-lg:aspect-auto tablet-lg:h-[calc(100%-24px)] tablet-lg:w-[calc(200%/7)] tablet-lg:object-contain tablet-lg:opacity-100',
 				'alt'     => '',
 				'loading' => 'lazy',
 				'sizes'   => '(min-width: 1133px) 160px, 92px',
