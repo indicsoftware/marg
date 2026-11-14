@@ -39,6 +39,9 @@ if ( 'archive' === $marg_context['type'] ) :
 	// Titles/Covers selector, below 744px only ("Remove the cover option from the tablet
 	// breakpoint onwards", 1019:2672): an 82px column at the right edge, Sans regular 12,
 	// px 16 (fixed, not px-large, whose 24px tablet value would overflow the 82px box).
+	// The width is 82px at the mobile type size (<= 390px) and grows with the fluid
+	// --text-small ("Covers" is ~10/3 x text-small wide), so the 16px right inset of the
+	// arrow holds between 390 and 743px.
 	// Choosing an option switches the view and closes it. JS only
 	// (assets/js/frontend/components/archive-view-toggle.js); without JS it is not
 	// rendered. The options are real links (?view=covers / the bare archive URL), so the
@@ -55,9 +58,9 @@ if ( 'archive' === $marg_context['type'] ) :
 	$marg_covers_url = add_query_arg( 'view', 'covers', $marg_context['archive_url'] );
 	?>
 	<?php if ( 'covers' === $marg_view ) : ?>
-		<a href="<?php echo esc_url( $marg_context['archive_url'] ); ?>" class="absolute right-0 top-0 hidden h-[44px] w-[82px] items-center px-[16px] font-sans text-small font-regular leading-[1.2] text-marg-red max-tablet:in-[.no-js]:flex <?php echo esc_attr( $marg_focus ); ?> focus-visible:-outline-offset-4"><span class="text-trim"><?php esc_html_e( 'Titles', 'tenup-theme' ); ?></span></a>
+		<a href="<?php echo esc_url( $marg_context['archive_url'] ); ?>" class="absolute right-0 top-0 hidden h-[44px] w-[calc(82px+(var(--text-small)-12px)*10/3)] items-center px-[16px] font-sans text-small font-regular leading-[1.2] text-marg-red max-tablet:in-[.no-js]:flex <?php echo esc_attr( $marg_focus ); ?> focus-visible:-outline-offset-4"><span class="text-trim"><?php esc_html_e( 'Titles', 'tenup-theme' ); ?></span></a>
 	<?php endif; ?>
-	<div class="group/view absolute right-0 top-0 hidden w-[82px] flex-col font-sans text-small font-regular leading-[1.2] text-marg-red max-tablet:in-[.js]:flex" data-archive-view data-view="<?php echo esc_attr( $marg_view ); ?>">
+	<div class="group/view absolute right-0 top-0 hidden w-[calc(82px+(var(--text-small)-12px)*10/3)] flex-col font-sans text-small font-regular leading-[1.2] text-marg-red max-tablet:in-[.js]:flex" data-archive-view data-view="<?php echo esc_attr( $marg_view ); ?>">
 		<button type="button" class="flex h-[44px] w-full items-center px-[16px] group-[[data-view=covers][data-open]]/view:h-[36px] <?php echo esc_attr( $marg_focus ); ?> focus-visible:-outline-offset-4" aria-expanded="false" aria-controls="archive-view-options" data-archive-view-toggle>
 			<span class="text-trim group-data-[view=covers]/view:hidden"><?php esc_html_e( 'Titles', 'tenup-theme' ); ?></span>
 			<span class="text-trim hidden group-data-[view=covers]/view:block"><?php esc_html_e( 'Covers', 'tenup-theme' ); ?></span>

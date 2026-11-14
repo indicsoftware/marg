@@ -9,10 +9,20 @@
  *
  * Layout:
  *  - < tablet-lg (mobile layout; tablet token values from 744): a sticky stage (image strip + open card,
- *    partials/archive/stage.php) over a list of collapsed 18.3px rows that snap to the
- *    line under the open card. The list starts one row higher than the stage bottom, so
- *    the open row sits hidden behind the open card. A spacer (sized by archive-list.js)
- *    lets the last row reach that line before the footer.
+ *    partials/archive/stage.php) over a list of collapsed 18.3px rows (--archive-row-h,
+ *    issue-row.php) that snap strictly to the line under the open card (Figma 879:1388,
+ *    "like the iPhone time picker": every scroll inside the list comes to rest with a row
+ *    in the open position; tailwind.css "Archive page"). The list starts one row higher
+ *    than the stage bottom, so the open row sits hidden behind the open card. A spacer
+ *    (sized by archive-list.js) lets the last row reach that line before the footer; the
+ *    footer group's bottom edge is the one snap position past the list, so the footer
+ *    stays reachable.
+ *  - Measured geometry: archive-list.js sets --archive-stage-h (stage height) and
+ *    --archive-snap-offset (stage height - row height) on the root from the DOM, so the
+ *    snap offset, the gradient and the open-card band follow the stage whatever its
+ *    (fluid-type) height. Before the script runs the fallbacks are the CSS-derived
+ *    --marg-archive-stage-h / --marg-archive-open-top (tailwind.css "Type-derived
+ *    component sizes"), which hit the Figma values at 390 / 744.
  *  - >= tablet-lg: no stage. The list is 18 of 24 page columns (left 8.333%, width 75%),
  *    starting 1px above the header's bottom edge (Figma 848:2819: header 0-420, list y 419),
  *    so the first row's top rule sits on the header's 1px bottom rule; 100px (jumbo) above
@@ -67,7 +77,7 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 	)
 	: '';
 ?>
-<section class="group/archive relative text-marg-red tablet-lg:pb-jumbo" data-archive data-view="<?php echo esc_attr( $view ); ?>" aria-labelledby="marg-archive-heading">
+<section class="group/archive relative text-marg-red [--archive-row-h:max(18.3px,var(--text-small)*1.2)] tablet-lg:pb-jumbo" data-archive data-view="<?php echo esc_attr( $view ); ?>" aria-labelledby="marg-archive-heading">
 	<h1 id="marg-archive-heading" class="sr-only"><?php echo esc_html( $heading ); ?></h1>
 
 	<?php if ( ! $rows ) : ?>
@@ -82,16 +92,18 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 		<?php
 		/*
 		 * Figma 1019:2596 "Rectangle 9": 20% grey gradient from the open card's bottom line
-		 * (the stage bottom: 350.6px, 370.8px from tablet; see stage.php) to the viewport
-		 * bottom. Only where the stage is sticky (html.js, height >= 520, < tablet-lg).
+		 * (the stage bottom: --archive-stage-h, measured by archive-list.js; fallback the
+		 * CSS-derived --marg-archive-stage-h: 350.6px at 390, 370.8px at 744, fluid in
+		 * between, see stage.php) to the viewport bottom. Only where the stage is sticky
+		 * (html.js, height >= 520, < tablet-lg).
 		 * -z-1 paints it on the canvas, under every in-flow box: the white stage and header
 		 * cover its top and the white site footer covers it, so it never tints the footer.
 		 */
 		?>
-		<div class="<?php echo esc_attr( 'pointer-events-none fixed inset-x-0 top-[350.6px] bottom-0 -z-1 hidden bg-[linear-gradient(to_bottom,transparent_0%,var(--color-marg-grey)_90.385%)] opacity-20 tablet:top-[370.8px] max-tablet-lg:[@media(height>=520px)]:in-[.js]:block max-tablet:group-data-[view=covers]/archive:hidden!' ); ?>" data-archive-gradient aria-hidden="true"></div>
+		<div class="<?php echo esc_attr( 'pointer-events-none fixed inset-x-0 top-[var(--archive-stage-h,var(--marg-archive-stage-h))] bottom-0 -z-1 hidden bg-[linear-gradient(to_bottom,transparent_0%,var(--color-marg-grey)_90.385%)] opacity-20 max-tablet-lg:[@media(height>=520px)]:in-[.js]:block max-tablet:group-data-[view=covers]/archive:hidden!' ); ?>" data-archive-gradient aria-hidden="true"></div>
 
 		<div class="<?php echo esc_attr( 'relative mx-auto w-full max-w-page tablet-lg:-mt-px ' . $titles_only ); ?>">
-			<ol class="-mt-[18.3px] tablet-lg:mt-0 tablet-lg:ml-[calc(100%/12)] tablet-lg:w-3/4" data-archive-list aria-label="<?php esc_attr_e( 'Issues', 'tenup-theme' ); ?>">
+			<ol class="-mt-[var(--archive-row-h,18.3px)] tablet-lg:mt-0 tablet-lg:ml-[calc(100%/12)] tablet-lg:w-3/4" data-archive-list aria-label="<?php esc_attr_e( 'Issues', 'tenup-theme' ); ?>">
 				<?php
 				foreach ( $rows as $index => $row ) {
 					get_template_part(

@@ -24,19 +24,26 @@
  *
  * The stage is one sticky block at the top of the viewport (it slides under the
  * transparent 44px site header, like the magazine cover band). Every list row stays a
- * collapsed 18.3px row; the row sitting in the last 18.3px of the stage (hidden behind
- * the open card) is the "open" one. assets/js/frontend/components/archive-list.js
+ * collapsed row (--archive-row-h, 18.3px at the anchors); the row sitting in the last
+ * row-height of the stage (hidden behind the open card) is the "open" one. assets/js/frontend/components/archive-list.js
  * copies that row's data-* attributes (image, annotation, card text) into this stage as
  * the list scrolls. Without JS (html.no-js) the stage is not sticky and the page does not
  * snap: the stage shows the first issue at the top and the list below it is a plain list
  * of links.
  *
- * Heights are fixed (252 + 8 + 90.6 = 350.6px) because the list's snap offset
- * (scroll-mt-[332.3px] in issue-row.php) and the script's band depend on them.
- * From 744px (tablet token mode: gap-xsmall 12, gap-3xsmall 6, text-small 14,
- * text-medium 20, hairline 0.4) the card grows to 106.8px
- * (14 + 3 x 6 + 2 x 0.4 + 74) and the stage to 252 + 12 + 106.8 = 370.8px, so the
- * snap offset there is tablet:scroll-mt-[352.5px]. Change all three together.
+ * Heights are fixed by formula, not by content, so the stage never jumps as the open
+ * card's text changes. The list's snap offset (issue-row.php scroll-mt), the gradient
+ * (magazines.php) and the script's band are measured from this stage by archive-list.js
+ * (--archive-stage-h, --archive-snap-offset), with the CSS-derived --marg-archive-stage-h
+ * / --marg-archive-open-top as fallbacks, so changing these heights needs no change there. The type is fluid (tailwind.css "Fluid type scale"), so the card and its
+ * title box follow the type tokens (tailwind.css "Type-derived component sizes"):
+ *  - title box --marg-archive-title-h: 66px at 390 (pt 4 + 62), 74px at 744 (pt 6 + 68);
+ *  - card --marg-archive-card-h = text-small + 3 x gap-3xsmall + 2 x hairline + title box:
+ *    90.6px at 390 (12 + 3 x 4 + 2 x 0.3 + 66), 106.8px at 744 (14 + 3 x 6 + 2 x 0.4 + 74);
+ *  - stage --marg-archive-stage-h = 252 + gap-xsmall + card: 350.6px at 390, 370.8px at
+ *    744, so the open-row offset --marg-archive-open-top (stage - row) is 332.3px /
+ *    352.5px there.
+ * Change the formulas in tailwind.css, not here.
  *
  * The whole stage is aria-hidden: it repeats the first/open row, which the list
  * already exposes. Its link is pointer-only (tabindex -1); keyboard focus on the row
@@ -92,7 +99,7 @@ $slot_text  = '' !== $annotation ? $annotation : $tagline;
 
 	<a
 		href="<?php echo esc_url( $row['url'] ?? '' ); ?>"
-		class="flex h-[90.6px] flex-col gap-3xsmall tablet:h-[106.8px] overflow-hidden px-gutter text-marg-red"
+		class="flex h-(--marg-archive-card-h) flex-col gap-3xsmall overflow-hidden px-gutter text-marg-red"
 		tabindex="-1"
 		data-archive-panel
 	>
@@ -101,10 +108,11 @@ $slot_text  = '' !== $annotation ? $annotation : $tagline;
 			<span class="text-trim absolute left-[47.95%] top-0 block w-[130px] -translate-x-1/2 text-center" data-archive-panel-vol<?php echo $has_title ? '' : ' hidden'; ?>><?php echo esc_html( $has_title ? ( $row['vol_issue'] ?? '' ) : '' ); ?></span>
 		</span>
 		<span class="block h-(--stroke-hairline) w-full shrink-0 bg-marg-red"></span>
-		<span class="block h-[66px] shrink-0 overflow-hidden pt-3xsmall tablet:h-[74px]">
+		<span class="block h-(--marg-archive-title-h) shrink-0 overflow-hidden pt-3xsmall">
 			<?php
 			// Trim the top only: line-clamp clips overflow, and a trimmed bottom edge would cut descenders.
-			// Box = pt + three trimmed lines minus most of the last line's bottom half-leading (66 mobile, 74 tablet).
+			// Box = pt + three trimmed lines minus most of the last line's bottom half-leading
+			// (66 at 390, 74 at 744; fluid in between and above: --marg-archive-title-h in tailwind.css).
 			?>
 			<span class="line-clamp-3 break-words [text-box:trim-start_cap_alphabetic] text-center font-sans text-medium font-regular" data-archive-panel-title><?php echo esc_html( $has_title ? $row['title'] : ( $row['vol_issue'] ?? '' ) ); ?></span>
 		</span>
