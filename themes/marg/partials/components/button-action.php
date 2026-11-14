@@ -3,8 +3,10 @@
  * Component: button/action circle, KEEP / VIEW / BUY (Figma 605:322, 605:323, I836:567;296:363;
  * states on the components page frame 234:6).
  *
- * 50px (mobile) / 70px (>= tablet-lg) circle via `size-circle`, 1px border,
- * serif caps label (text-medium). Colours: KEEP marg-red, VIEW marg-grey, BUY marg-black.
+ * 50px (mobile) / 60px (tablet) / 70px (>= tablet-lg) circle, 1px border, serif caps
+ * label (text-medium). The box is --marg-action-circle (tailwind.css "Type-derived
+ * component sizes"): the stepped size-circle token, grown with the fluid text-medium
+ * where the label would otherwise touch the border (VIEW is ~2.6em wide). Colours: KEEP marg-red, VIEW marg-grey, BUY marg-black.
  * Hover (234:2, 243:61, 243:59): solid fill in the stroke colour with a white label
  * (not on disabled buttons). Active (234:4 "IN SHELF", 243:67 "IN CART"): no border,
  * no fill, Sans bold caps text-xsmall label in marg-red, centred in the same circle box.
@@ -122,7 +124,7 @@ if ( $active ) {
 	$is_link = '' !== trim( $active_url );
 	$attrs   = [
 		'class'            => class_names(
-			'inline-flex size-circle shrink-0 items-center justify-center font-sans text-xsmall font-bold uppercase leading-[1.2] whitespace-nowrap text-marg-red no-underline',
+			'inline-flex size-(--marg-action-circle) shrink-0 items-center justify-center font-sans text-xsmall font-bold uppercase leading-[1.2] whitespace-nowrap text-marg-red no-underline',
 			'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current',
 			$is_link ? 'hover:underline' : '',
 			$args['class']
@@ -147,7 +149,7 @@ if ( $active ) {
 $is_link = '' !== trim( (string) $args['url'] ) && ! $disabled;
 
 $classes = class_names(
-	'inline-flex size-circle shrink-0 items-center justify-center rounded-full border font-serif text-medium font-regular uppercase leading-[1.2] whitespace-nowrap no-underline transition-colors',
+	'inline-flex size-(--marg-action-circle) shrink-0 items-center justify-center rounded-full border font-serif text-medium font-regular uppercase leading-[1.2] whitespace-nowrap no-underline transition-colors',
 	'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current',
 	$variant['class'],
 	$disabled ? 'cursor-not-allowed opacity-40' : $variant['hover'],

@@ -16,6 +16,16 @@
  * one centred muted line: the title (ellipsis) or "Vol. N No. M" for unnamed issues,
  * in Color/mard-red/muted-50 (text-marg-red-muted-50, Figma 866:145 / 866:157).
  * The list's own bottom hairline closes the last row.
+ *  - Row height: --archive-row-h from magazines.php, max(18.3px, one line of the fluid
+ *    text-small): exactly 18.3px at the 390 and 744 anchors, and it only grows near 1133px
+ *    where the fluid text-small line would otherwise overflow the row.
+ *  - Strict snapping (Figma 879:1388, tailwind.css "Archive page"): every row is a
+ *    snap-start position whose scroll-margin-top puts it in the open position, the last
+ *    row-height of the sticky stage. archive-list.js measures the stage and a row and sets
+ *    --archive-snap-offset (stage height - row height) on [data-archive]. Before the
+ *    script runs the fallback is --marg-archive-open-top (tailwind.css "Type-derived
+ *    component sizes"), the same offset derived from the fluid type tokens: 332.3px at
+ *    390 and 352.5px at 744 (350.6 - 18.3, 370.8 - 18.3), fluid in between.
  *
  * The <li> carries the data the mobile open card (partials/archive/stage.php: image,
  * annotation) and the desktop header hover image (data-img-*, data-img-hover-sizes) need;
@@ -44,7 +54,7 @@ $annotation = (string) ( $row['annotation'] ?? '' );
 $image      = ProductPresenter::archive_image( $row['image_id'] ?? 0 );
 
 $li_attrs = [
-	'class'                => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[332.3px] tablet:max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[352.5px] max-tablet-lg:px-gutter',
+	'class'                => 'relative max-tablet-lg:snap-start max-tablet-lg:[@media(height>=520px)]:in-[.js]:scroll-mt-[var(--archive-snap-offset,var(--marg-archive-open-top))] max-tablet-lg:px-gutter',
 	'data-archive-row'     => true,
 	'data-active'          => ! empty( $args['active'] ),
 	'data-date'            => (string) ( $row['date'] ?? '' ),
@@ -65,7 +75,7 @@ $sr_label = trim( implode( ', ', array_filter( [ (string) ( $row['vol_issue'] ??
 <li<?php echo html_attrs( $li_attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- html_attrs() escapes. ?>>
 	<a
 		href="<?php echo esc_url( $row['url'] ); ?>"
-		class="archive-row-link group/row relative flex h-[18.3px] items-center text-marg-red outline-marg-red focus-visible:outline-1 focus-visible:outline-offset-2 tablet-lg:grid tablet-lg:h-auto tablet-lg:grid-cols-18 tablet-lg:items-start tablet-lg:gap-y-3xsmall tablet-lg:py-3xsmall"
+		class="archive-row-link group/row relative flex h-[var(--archive-row-h,18.3px)] items-center text-marg-red outline-marg-red focus-visible:outline-1 focus-visible:outline-offset-2 tablet-lg:grid tablet-lg:h-auto tablet-lg:grid-cols-18 tablet-lg:items-start tablet-lg:gap-y-3xsmall tablet-lg:py-3xsmall"
 	>
 		<span class="pointer-events-none absolute left-0 right-0 top-0 block h-(--stroke-hairline) bg-marg-red tablet-lg:left-[22.222%] tablet-lg:h-px" aria-hidden="true"></span>
 

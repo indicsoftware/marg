@@ -3,10 +3,23 @@
  * (partials/archive/magazines.php, stage.php, issue-row.php).
  *
  * Below 1133px (and on screens at least 520px tall, where the stage is sticky) the
- * archive is a list of collapsed 18.3px rows scrolling under a sticky "stage": the image
- * strip plus the open card. The row in the last row-height of the stage (hidden behind
+ * archive is a list of collapsed rows (--archive-row-h, 18.3px at the Figma anchors)
+ * scrolling under a sticky "stage": the image strip plus the open card. The row in the last row-height of the stage (hidden behind
  * the open card) is the open one. An IntersectionObserver watches that band and copies
  * the row's data-* attributes (date, vol, title, url, img-*, annotation) into the stage.
+ *
+ * Strict snapping (Figma 879:1388, "like the iPhone time picker"): the page snaps with
+ * scroll-snap-type: y mandatory (tailwind.css "Archive page"), each row being a snap-start
+ * position whose scroll-margin-top puts it in the open position, and the footer group's
+ * bottom edge the one snap position past the list. The geometry is read from the DOM,
+ * never hard-coded, so it follows the fluid type tokens:
+ *  - --archive-stage-h (stage height) and --archive-snap-offset (stage height - row
+ *    height) are set on [data-archive] (issue-row.php scroll-margin-top, magazines.php
+ *    gradient), updated by a ResizeObserver on the stage and the first row;
+ *  - data-snap="loose" on [data-archive] when the footer group is taller than the
+ *    viewport (mandatory snapping would skip its middle): the CSS falls back to proximity.
+ * Scrolls made here (keyboard focus, back from Covers) are instant: the browser's snap
+ * settles the rest, and nothing animates under prefers-reduced-motion.
  *
  * Also:
  *  - keyboard focus on a row scrolls it to the open position (scroll-margin-top), so the
@@ -228,6 +241,7 @@ export function initArchiveList() {
 	}
 
 	const spacer = root.querySelector('[data-archive-spacer]');
+	const footerGroup = document.querySelector('[data-footer-group]');
 	const img = stage.querySelector('[data-archive-img]');
 	const placeholder = stage.querySelector('[data-archive-placeholder]');
 	const annotationEl = stage.querySelector('[data-archive-annotation]');
@@ -328,6 +342,38 @@ export function initArchiveList() {
 		activate(best);
 	};
 
+	/**
+	 * Publish the measured snap geometry (see the file header). Outside the sticky Titles
+	 * layout the properties are removed and the CSS fallbacks apply.
+	 */
+	const setGeometry = () => {
+		const { style } = root;
+		if (!media.matches || isCovers()) {
+			style.removeProperty('--archive-stage-h');
+			style.removeProperty('--archive-snap-offset');
+			delete root.dataset.snap;
+			return;
+		}
+		const stageHeight = stage.getBoundingClientRect().height;
+		const rowHeight = rows[0].getBoundingClientRect().height;
+		if (stageHeight > 0 && rowHeight > 0) {
+			const stageValue = `${stageHeight}px`;
+			const offsetValue = `${Math.max(0, stageHeight - rowHeight)}px`;
+			if (style.getPropertyValue('--archive-stage-h') !== stageValue) {
+				style.setProperty('--archive-stage-h', stageValue);
+			}
+			if (style.getPropertyValue('--archive-snap-offset') !== offsetValue) {
+				style.setProperty('--archive-snap-offset', offsetValue);
+			}
+		}
+		const loose =
+			footerGroup !== null && footerGroup.getBoundingClientRect().height > window.innerHeight;
+		const snap = loose ? 'loose' : 'strict';
+		if (root.dataset.snap !== snap) {
+			root.dataset.snap = snap;
+		}
+	};
+
 	const sizeSpacer = () => {
 		if (!spacer) {
 			return;
@@ -361,6 +407,7 @@ export function initArchiveList() {
 	const connect = () => {
 		disconnect();
 		coversShown = isCovers();
+		setGeometry();
 		if (!media.matches || coversShown) {
 			sizeSpacer();
 			return;
@@ -433,6 +480,22 @@ export function initArchiveList() {
 			row.scrollIntoView({ block: 'start' });
 		}
 	};
+
+	// The stage, a row or the footer can change size without a window resize (fluid type
+	// tokens, web fonts, the dynamic viewport): keep the snap offset in step at once, and
+	// re-measure the band and spacer once things settle. Writing the custom properties
+	// does not resize any observed element, so this does not loop.
+	if ('ResizeObserver' in window) {
+		const resizeObserver = new ResizeObserver(() => {
+			setGeometry();
+			onResize();
+		});
+		resizeObserver.observe(stage);
+		resizeObserver.observe(rows[0]);
+		if (footerGroup) {
+			resizeObserver.observe(footerGroup);
+		}
+	}
 
 	window.addEventListener('resize', onResize, { passive: true });
 	window.addEventListener('load', sizeSpacer, { once: true });

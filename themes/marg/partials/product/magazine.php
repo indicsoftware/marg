@@ -233,7 +233,9 @@ $has_details = $specs || '' !== $description || $editor_groups;
  * with the footer"). It sits after </main> as a labelled complementary landmark, in the same
  * max-w-page frame the article used. Mobile: no bottom padding and a fixed 414px carousel viewport,
  * so the footer (922:7051, pt-jumbo) starts flush with the viewport's bottom edge as drawn; desktop
- * keeps the section's 35px.
+ * keeps the section's 35px. The carousel's bottom padding (half a text-xsmall, 5px at 390, inside
+ * the 414px) holds the last text-trimmed line's descent, which grows with the fluid type, so the
+ * strip never becomes a few px vertically scrollable; overflow-y-hidden keeps it horizontal-only.
  */
 $related = array_values(
 	array_filter(
@@ -263,7 +265,7 @@ if ( $related ) {
 						]
 					);
 					?>
-					<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)]">
+					<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overflow-y-hidden overscroll-x-contain px-gutter pb-[calc(var(--text-xsmall)/2)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)] tablet-lg:pb-0">
 						<?php foreach ( $related as $card ) : ?>
 							<li class="w-[224px] shrink-0 snap-start tablet-lg:w-auto">
 								<?php

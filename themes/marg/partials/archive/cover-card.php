@@ -13,12 +13,16 @@
  * Cover: the featured image (ProductPresenter::cover_id via archive_row()['cover_id']),
  * 230 x 315 in the 280 card (82.14% wide), object-cover, centred in the space above the
  * panel. Without a cover the same box shows the marg-cover-bg placeholder. On short
- * screens the box shrinks so it stays clear of the 44px header (100svh - 158 - 2 x 44).
+ * screens the box shrinks so it stays clear of the 44px header (100svh - panel - 2 x 44).
  *
- * Info panel (white, 158px, p 6, 3-col grid, rows auto auto 1fr auto 54px, row-gap 6,
+ * Info panel (white, 158px at 390, p 6, 3-col grid, rows auto auto 1fr auto 54px, row-gap 6,
  * marg-grey 80%): date (col 1) and "Vol. N No. M" (col 2, centred); the title (named
  * issues only, 3 lines max); the serif annotation (when set, 2 lines max). The 54px last
- * row clears the fixed counter footer (partials/archive/covers.php).
+ * row clears the fixed counter footer (partials/archive/covers.php). The type is fluid
+ * (tailwind.css "Fluid type scale"), so the panel height is --marg-archive-cover-panel-h
+ * (tailwind.css "Type-derived component sizes"): 158px at text-small 12, plus 17/3 px per
+ * px of text-small above that, so the three title lines and two annotation lines still
+ * fit up to 743px. The cover box reserves the same height.
  *
  * Title and annotation are cap-trimmed at the top only, as the stage panel title
  * (stage.php): line-clamp clips overflow, so a bottom edge trimmed to the baseline would
@@ -64,12 +68,12 @@ $li_attrs = [
 <li<?php echo html_attrs( $li_attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- html_attrs() escapes. ?>>
 	<a href="<?php echo esc_url( $row['url'] ); ?>" class="relative flex h-full flex-col px-2xsmall outline-marg-red focus-visible:outline-1 focus-visible:-outline-offset-1">
 		<span class="flex min-h-0 flex-1 items-center justify-center" aria-hidden="true">
-			<span class="block aspect-[230/315] w-[min(82.14%,calc((100svh_-_246px)*230/315))] overflow-hidden bg-marg-cover-bg">
+			<span class="block aspect-[230/315] w-[min(82.14%,calc((100svh_-_var(--marg-archive-cover-panel-h)_-_2*var(--spacing-header))*230/315))] overflow-hidden bg-marg-cover-bg">
 				<?php echo $cover; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() output, escaped by core. ?>
 			</span>
 		</span>
 
-		<span class="grid h-[158px] shrink-0 grid-cols-3 grid-rows-[auto_auto_minmax(0,1fr)_auto_54px] gap-y-2xsmall bg-white p-2xsmall font-sans text-small leading-[1.2] font-regular break-words text-marg-grey/80">
+		<span class="grid h-(--marg-archive-cover-panel-h) shrink-0 grid-cols-3 grid-rows-[auto_auto_minmax(0,1fr)_auto_54px] gap-y-2xsmall bg-white p-2xsmall font-sans text-small leading-[1.2] font-regular break-words text-marg-grey/80">
 			<span class="sr-only"><?php echo esc_html( $sr_label . ( $has_title ? ':' : '' ) ); ?></span>
 			<span class="text-trim col-start-1 row-start-1 whitespace-nowrap" aria-hidden="true"><?php echo esc_html( $row['date'] ?? '' ); ?></span>
 			<span class="text-trim col-start-2 row-start-1 whitespace-nowrap text-center" aria-hidden="true"><?php echo esc_html( $row['vol_issue'] ?? '' ); ?></span>

@@ -13,6 +13,10 @@
  * DESKTOP values from 1133px (tablet-lg). Utilities read var(--token), so
  * text-regular, gap-medium, size-circle, size-link-icon etc. are responsive
  * without breakpoint prefixes. Comments read "tablet / desktop".
+ * Exception: the five text-size tokens are FLUID (Figma DS 12:54 revision, "the
+ * type scale ... is abrupt"): they interpolate linearly from the mobile value at
+ * 390px to the tablet value at 744px and the desktop value at 1280px (see "Fluid
+ * type scale" below). Spacing, stroke and component tokens stay stepped.
  * Do NOT change this to `@theme inline`, which would bake the mobile values in.
  */
 
@@ -95,7 +99,8 @@
 	--font-weight-semibold: 600;
 	--font-weight-bold: 700;
 
-	/* Font sizes: MOBILE values (tablet / desktop in comments, overridden below) */
+	/* Font sizes: MOBILE values, the static fallback below 390px (tablet / desktop
+	 * in comments). Fluid from 390px: see "Fluid type scale" in @layer theme. */
 	--text-xsmall: 10px; /* 12px / 14px */
 	--text-xsmall--line-height: 1.2;
 	--text-small: 12px; /* 14px / 16px */
@@ -143,7 +148,8 @@
 	--container-mobile: 366px;
 }
 
-/* TABLET variable mode from 744px, DESKTOP variable mode from 1133px (Figma frames 1133 / 1280 / 1920). */
+/* TABLET variable mode from 744px, DESKTOP variable mode from 1133px (Figma frames 1133 / 1280 / 1920).
+ * Type is fluid instead (390 -> 744 -> 1280, "Fluid type scale" below). */
 @layer theme {
 	/* Figma variable stroke/hairline: Mobile 0.3 / Tablet 0.4 / Desktop 0.5. */
 	:root {
@@ -151,16 +157,108 @@
 		--stroke-hairline: 0.3px;
 	}
 
-	/* Figma "Tablet (750–1199)" mode, applied across tablet portrait (744-1132).
-	 * Only tokens whose Tablet value differs from Mobile; header, link-icon and
-	 * gutter keep their mobile values (see the @theme comments). */
+	/* ---------------------------------------------------------------------
+	 * Fluid type scale (Figma DS 12:54 revision: "Make the type scale through the
+	 * variables for the different break points. Currently it is abrupt.").
+	 *
+	 * Each --text-* token runs on straight lines between the Figma variable modes,
+	 * anchored at the Figma frame widths:
+	 *   <= 390px          Mobile value (the static @theme value)
+	 *   390px -> 744px    Mobile -> Tablet
+	 *   744px -> 1280px   Tablet -> Desktop
+	 *   >= 1280px         Desktop value
+	 *
+	 *            xsmall  small  regular  medium  xlarge
+	 *   390px      10     12      14       18      24
+	 *   744px      12     14      16       20      28
+	 *   1280px     14     16      18       24      35
+	 *
+	 * Formula, between anchors (w1, s1) and (w2, s2):
+	 *   size = s1 + (100vw - w1) * (s2 - s1) / (w2 - w1)
+	 * i.e. A px + B vw with B = 100 * (s2 - s1) / (w2 - w1) and A = s1 - w1 * B / 100
+	 * (exact slopes: e.g. regular 390 -> 744 = 11.797px + 0.565vw, 744 -> 1280 =
+	 * 13.224px + 0.373vw). Each segment sits in its own media query and is clamped
+	 * to its two anchor values, so it never overshoots. Sizes stay in px like the
+	 * rest of the theme: browser zoom scales them (and narrows the CSS viewport,
+	 * which only moves along the same line), and they never drop below the Mobile
+	 * value. Line height stays 1.2 (--text-*--line-height in @theme).
+	 *
+	 * Boxes sized from the type (archive stage card, Covers info panel, action
+	 * circles) derive from these tokens: see "Type-derived component sizes" below.
+	 * ------------------------------------------------------------------- */
+	@media (width >= 390px) {
+		:root {
+			--text-xsmall: clamp(10px, calc(10px + (100vw - 390px) * 2 / 354), 12px);
+			--text-small: clamp(12px, calc(12px + (100vw - 390px) * 2 / 354), 14px);
+			--text-regular: clamp(14px, calc(14px + (100vw - 390px) * 2 / 354), 16px);
+			--text-medium: clamp(18px, calc(18px + (100vw - 390px) * 2 / 354), 20px);
+			--text-xlarge: clamp(24px, calc(24px + (100vw - 390px) * 4 / 354), 28px);
+		}
+	}
+
 	@media (width >= 744px) {
 		:root {
-			--text-xsmall: 12px;
-			--text-small: 14px;
-			--text-regular: 16px;
-			--text-medium: 20px;
-			--text-xlarge: 28px;
+			--text-xsmall: clamp(12px, calc(12px + (100vw - 744px) * 2 / 536), 14px);
+			--text-small: clamp(14px, calc(14px + (100vw - 744px) * 2 / 536), 16px);
+			--text-regular: clamp(16px, calc(16px + (100vw - 744px) * 2 / 536), 18px);
+			--text-medium: clamp(20px, calc(20px + (100vw - 744px) * 4 / 536), 24px);
+			--text-xlarge: clamp(28px, calc(28px + (100vw - 744px) * 7 / 536), 35px);
+		}
+	}
+
+	@media (width >= 1280px) {
+		:root {
+			--text-xsmall: 14px;
+			--text-small: 16px;
+			--text-regular: 18px;
+			--text-medium: 24px;
+			--text-xlarge: 35px;
+		}
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Type-derived component sizes. Each one equals its Figma value at the anchor
+	 * widths (390 / 744) and follows the fluid type in between, so nothing clips.
+	 *
+	 * Magazine archive mobile stage (partials/archive/stage.php, < 1133px):
+	 *  - title box: pt-3xsmall + three cap-top-trimmed text-medium lines. Figma 66 at
+	 *    18px (mobile), 74 at 20px (tablet): 3 x medium + 8px between those; above 20px
+	 *    the tablet ratio 3.4 x medium (68 / 20) plus up to 1px (reached at 20.5px) for
+	 *    the browsers' whole-pixel rounding of the font's ascent / descent at fractional
+	 *    sizes, so the third line's descenders never touch the clip edge.
+	 *  - open card (866:150 / 866:162): date row (min-h text-small) + 3 x gap-3xsmall +
+	 *    two hairlines + title box = 90.6 mobile, 106.8 tablet.
+	 *  - stage: 252px strip + gap-xsmall + card = 350.6 mobile, 370.8 tablet. The open
+	 *    (snap) position is its last row, max(18.3px, one text-small line) as
+	 *    --archive-row-h in magazines.php: --marg-archive-open-top = 332.3 / 352.5.
+	 *    archive-list.js measures the stage itself (--archive-stage-h,
+	 *    --archive-snap-offset); these are the CSS values before it runs.
+	 * Covers info panel (partials/archive/cover-card.php, < 744px): Figma 158px at
+	 * text-small 12 / xsmall 10. Of that, 68px is type (date row, three title lines,
+	 * two annotation lines; the rest is p 6, four 6px row gaps and the 54px counter
+	 * row), so the panel grows by 68 / 12 = 17 / 3 per px of text-small.
+	 * Action circles (partials/components/button-action.php, KEEP / VIEW / BUY and the
+	 * IN SHELF / IN CART states): the stepped circle token (50 / 60 / 70), but never
+	 * narrower than the mobile proportion 50 / 18 = 25 / 9 x text-medium, so the serif
+	 * caps label (VIEW ~2.6em, IN SHELF ~4.6 x text-xsmall) keeps its Figma clearance
+	 * from the border while the type grows (390-743 and 744-1132). Exactly 50 at 390,
+	 * 60 at 744 and 70 from 1133.
+	 * ------------------------------------------------------------------- */
+	:root {
+		--marg-archive-title-h: calc(var(--spacing-3xsmall) + max(3 * var(--text-medium) + 8px, 3.4 * var(--text-medium) + clamp(0px, 2 * (var(--text-medium) - 20px), 1px)));
+		--marg-archive-card-h: calc(var(--text-small) + 3 * var(--spacing-3xsmall) + 2 * var(--stroke-hairline) + var(--marg-archive-title-h));
+		--marg-archive-stage-h: calc(252px + var(--spacing-xsmall) + var(--marg-archive-card-h));
+		--marg-archive-open-top: calc(var(--marg-archive-stage-h) - max(18.3px, 1.2 * var(--text-small)));
+		--marg-archive-cover-panel-h: calc(158px + (var(--text-small) - 12px) * 17 / 3);
+		--marg-action-circle: max(var(--spacing-circle), calc(var(--text-medium) * 25 / 9));
+	}
+
+	/* Figma "Tablet (750–1199)" mode, applied across tablet portrait (744-1132).
+	 * Only tokens whose Tablet value differs from Mobile; header, link-icon and
+	 * gutter keep their mobile values (see the @theme comments). Text sizes: fluid,
+	 * above. */
+	@media (width >= 744px) {
+		:root {
 			--spacing-micro: 3px;
 			--spacing-3xsmall: 6px;
 			--spacing-2xsmall: 9px;
@@ -177,13 +275,10 @@
 		}
 	}
 
+	/* Figma "Desktop (1200+)" mode from tablet landscape (1133). Text sizes: fluid,
+	 * above (they reach the Desktop values at 1280). */
 	@media (width >= 1133px) {
 		:root {
-			--text-xsmall: 14px;
-			--text-small: 16px;
-			--text-regular: 18px;
-			--text-medium: 24px;
-			--text-xlarge: 35px;
 			--spacing-micro: 4px;
 			--spacing-3xsmall: 8px;
 			--spacing-2xsmall: 12px;
@@ -351,15 +446,35 @@
 	 * focus rule.
 	 *
 	 * Mobile list snapping (Figma 879:1388: "the focused card should snap into the top
-	 * position"). The rows carry snap-start + scroll-mt (issue-row.php). proximity, not
-	 * mandatory: rows are 18.3px apart, so every resting point inside the list is close to a
-	 * snap position, while the footer below the list stays freely scrollable. Same media
-	 * query and html.js gate as the sticky stage (stage.php); archive-list.js matches it.
+	 * position like the iPhone time picker"). Strict: mandatory snapping on the page, so
+	 * every scroll (drag, fling, wheel, keys) comes to rest with a row exactly in the open
+	 * position. Snap positions:
+	 *  - every row: snap-start + scroll-margin-top = stage height - row height
+	 *    (issue-row.php; --archive-snap-offset, measured by archive-list.js);
+	 *  - the footer group's bottom edge (snap-align end below): the one position past the
+	 *    list, so the footer stays reachable. archive-list.js sizes [data-archive-spacer] so
+	 *    the last row can reach the open position before it.
+	 * Snap-stop stays normal, so a fling runs across many rows and settles on one, as in
+	 * the time picker. Under prefers-reduced-motion the base layer sets
+	 * scroll-behavior: auto, and the script never animates a scroll.
+	 * If the footer group is taller than the viewport, mandatory snapping would skip its
+	 * middle: archive-list.js then sets data-snap="loose" on [data-archive] and the page
+	 * falls back to proximity. Same media query and html.js gate as the sticky stage
+	 * (stage.php); archive-list.js matches it. The Covers view turns snapping off below
+	 * 744px ("Archive Covers view", more specific than these rules).
 	 */
 	@media (width < 1133px) and (height >= 520px) {
 		html.js:has(> body.marg-archive--magazines) {
-			scroll-snap-type: y proximity;
+			scroll-snap-type: y mandatory;
 			scroll-padding-top: 0;
+		}
+
+		html.js:has(> body.marg-archive--magazines [data-archive][data-snap="loose"]) {
+			scroll-snap-type: y proximity;
+		}
+
+		html.js:has(> body.marg-archive--magazines) [data-footer-group] {
+			scroll-snap-align: end;
 		}
 	}
 
