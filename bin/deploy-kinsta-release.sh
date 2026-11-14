@@ -96,5 +96,14 @@ rm -rf -- "$content_path/themes/marg.bak" "$content_path/themes/marg-local-link"
 active_theme="$(wp --path="$wordpress_path" option get stylesheet --quiet)"
 printf 'Deployed %s; active stylesheet: %s\n' "$release_sha" "$active_theme"
 
+# Clear Kinsta's page (and edge) cache so visitors get the new templates right away
+# instead of cached HTML from the previous release. Non-fatal: the release is
+# already live, so a purge failure only warns.
+if wp --path="$wordpress_path" kinsta cache purge --site --quiet; then
+	printf 'Kinsta site cache purged\n'
+else
+	printf 'Warning: Kinsta cache purge failed; clear caches from MyKinsta or the WP admin bar\n' >&2
+fi
+
 trap - EXIT
 rm -rf -- "$backup_root"
