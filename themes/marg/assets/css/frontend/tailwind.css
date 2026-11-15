@@ -480,7 +480,7 @@
 
 	/* Desktop archive: the 420px header is sticky (header.php), so keep focused rows and
 	 * anchor targets below it (WCAG 2.2 SC 2.4.11). Same media query as the sticky header. */
-	@media (width >= 1133px) and (height >= 720px) {
+	@media (width >= 1133px) {
 		html:has(> body.marg-archive--magazines) {
 			scroll-padding-top: 420px;
 		}
