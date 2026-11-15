@@ -28,8 +28,8 @@
  *    so the default text alone sets the footprint and nothing shifts (below 1440,
  *    Cart hides while Shelf is hovered, so Shelf's "Upcoming" never runs into it). They take
  *    pointer events for the hover only: no link, no tabindex, cursor default.
- *  - cols 2-6 / rows 4-6: the canvas animation slot (Frame 22). Empty for now: no
- *    markup, the explicit grid placement keeps the cell free.
+ *  - cols 2-6 / rows 4-6: the canvas animation slot (Frame 22, "We are working on an
+ *    animation in <canvas>"): Marginalia 2 by Eemon Roy, bottom-aligned (see the markup).
  *  - cols 7-11 / row 6: tagline, Times 18 (.font-serif hairline stroke), bottom-
  *    aligned. One line as drawn (it may run past col 11 into the empty col 12)
  *    from 1524px, where cols 7-12 still hold the 381px line; narrower, it wraps
@@ -136,7 +136,23 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 			</span>
 		</div>
 
-		<?php // Canvas animation slot (Frame 22, cols 2-6 / rows 4-6): intentionally empty until the animation exists. ?>
+		<?php
+		// Canvas animation slot (Frame 22, cols 2-6 / rows 4-6, bottom-aligned): Marginalia 2 by
+		// Eemon Roy, a living 400x100 red-ink drawing, embedded unmodified from
+		// assets/marginalia/index.html in an iframe as its README prescribes. The iframe gets its
+		// src only on desktop (assets/js/frontend/components/marginalia.js), and is scaled down to
+		// the slot's width below 1920 (5 columns are narrower than 400px there).
+		?>
+		<div class="col-[2/7] row-[4/7] self-end overflow-hidden" data-marginalia>
+			<iframe
+				class="block h-[100px] w-[400px] origin-bottom-left border-0 bg-transparent [transform:scale(var(--marginalia-scale,1))]"
+				data-src="<?php echo esc_url( get_template_directory_uri() . '/assets/marginalia/index.html' ); ?>"
+				title="<?php esc_attr_e( 'Marginalia, a living drawing in red ink', 'tenup-theme' ); ?>"
+				width="400"
+				height="100"
+				tabindex="-1"
+			></iframe>
+		</div>
 
 		<p class="col-[7/12] row-start-6 flex items-end font-serif text-regular min-[1540px]:whitespace-nowrap">
 			<span class="text-trim"><?php esc_html_e( 'Seventy years of the Marg quarterly are open access.', 'tenup-theme' ); ?></span>
