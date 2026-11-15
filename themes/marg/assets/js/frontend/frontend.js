@@ -13,6 +13,7 @@ import { initArchiveList } from './components/archive-list';
 import { initArchiveViewToggle } from './components/archive-view-toggle';
 import { initArchiveCovers } from './components/archive-covers';
 import { initFooterReveal } from './components/footer-reveal';
+import { initMarginalia } from './components/marginalia';
 
 initProductActions();
 initSiteHeader();
@@ -20,3 +21,4 @@ initArchiveList();
 initArchiveViewToggle();
 initArchiveCovers();
 initFooterReveal();
+initMarginalia();
