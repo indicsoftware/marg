@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon/link">
+<mask id="marg-tri-left-outline-mask" fill="white">
+<path d="M20 4L4 12L20 20V4Z"/>
+</mask>
+<path id="glyph" d="M4 12L20 4V20L4 12Z" stroke-width="2" stroke="currentColor" mask="url(#marg-tri-left-outline-mask)"/>
+</g>
+</svg>

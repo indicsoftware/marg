@@ -21,12 +21,12 @@
  *    (30% red, blur(2px) = Figma layer blur 4, invisible icons keep their space).
  *    aria-hidden, not focusable, no fake counts: "Shelf" alone, "Cart(N)" with the
  *    real WooCommerce cart count (just "Cart" when there is no cart).
- *    Mouse hover (hover-capable devices only, CSS only): each one, and each half of
- *    Shelf / Cart on its own, swaps its text for "Upcoming" and loses the blur (still
- *    30% red, same 18/600 type; Figma has no hover state for them). "Upcoming" is
+ *    Mouse hover (hover-capable devices only, CSS only): hovering ANY of them swaps
+ *    every placeholder's text for "Upcoming" at once, keeping the same blur and 30% red
+ *    (review feedback; Figma has no hover state for them). "Upcoming" is
  *    stacked absolutely over the default text (centred, or left-aligned for Shelf),
  *    so the default text alone sets the footprint and nothing shifts (below 1440,
- *    Cart hides while Shelf is hovered, so Shelf's "Upcoming" never runs into it). They take
+ *    Cart hides meanwhile, so Shelf's "Upcoming" never runs into it). They take
  *    pointer events for the hover only: no link, no tabindex, cursor default.
  *  - cols 2-6 / rows 4-6: the canvas animation slot (Frame 22, "We are working on an
  *    animation in <canvas>"): Marginalia 2 by Eemon Roy, top-aligned in row 4 (see the markup).
@@ -49,9 +49,9 @@
  * in cols 8-17 / row 3, linking to the parent magazine. Without a parent, only
  * the back link. Long titles wrap upwards (bottom-aligned, overflow at the top).
  *
- * Link hover (link/navigation state=hover 274:321 / 274:325): blur(1px), and the
- * icon-top gap shrinks 8 -> 4. Keyboard focus draws the outline instead (a blur
- * would blur the focus outline too).
+ * Link hover (link/navigation state=hover 274:321 / 274:325, updated): the solid
+ * triangle swaps for an outline triangle; no blur and the gap stays. Keyboard focus
+ * draws the focus outline.
  *
  * @package TenUpTheme
  */
@@ -69,16 +69,18 @@ $marg_years  = SiteChrome::archive_years( true );
 // Decorative placeholders: 30% red, never interactive (hover only reveals "Upcoming").
 $marg_placeholder = 'cursor-default select-none self-start whitespace-nowrap text-regular font-semibold text-marg-red-muted';
 
-// One hover target: Figma layer blur 4 = CSS blur(2px), removed on hover with the label swap.
-$marg_soon = 'group/soon blur-[2px] hover:blur-none';
+// Hover targets ([data-soon]): Figma layer blur 4 = CSS blur(2px), kept on hover. Hovering any
+// placeholder swaps EVERY placeholder's label for "Upcoming" at once (the grid is group/soonzone).
+// Class names are written out in full (not concatenated) so Tailwind's source scan generates them.
+$marg_soon = 'blur-[2px]';
 
 // Default label (sets the footprint) and the stacked "Upcoming" label shown instead on hover.
-$marg_soon_default  = 'block text-trim group-hover/soon:invisible';
-$marg_soon_upcoming = 'invisible absolute top-0 text-trim group-hover/soon:visible';
+$marg_soon_default  = 'block text-trim group-has-[[data-soon]:hover]/soonzone:invisible';
+$marg_soon_upcoming = 'invisible absolute top-0 text-trim group-has-[[data-soon]:hover]/soonzone:visible';
 $marg_soon_centred  = $marg_soon_upcoming . ' left-1/2 -translate-x-1/2';
 $marg_upcoming      = __( 'Upcoming', 'tenup-theme' );
 
-$marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg-red tablet-lg:grid tablet-lg:grid-cols-24 '
+$marg_grid = 'group/soonzone mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg-red tablet-lg:grid tablet-lg:grid-cols-24 '
 	. ( $marg_main ? 'tablet-lg:grid-rows-[repeat(8,52.375px)]' : 'tablet-lg:grid-rows-[repeat(4,52.625px)]' );
 
 ?>
@@ -88,15 +90,19 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 		<nav class="col-start-2 row-start-2 self-start justify-self-start" aria-label="<?php esc_attr_e( 'Archive periods', 'tenup-theme' ); ?>">
 			<a
 				href="<?php echo esc_url( $marg_header['is_archive'] ? '#top' : $marg_header['archive_url'] ); ?>"
-				class="<?php echo esc_attr( 'flex flex-col items-center gap-3xsmall text-regular font-semibold hover:gap-micro hover:blur-[1px] ' . $marg_focus ); ?>"
+				class="<?php echo esc_attr( 'group/navlink flex flex-col items-center gap-3xsmall text-regular font-semibold ' . $marg_focus ); ?>"
 				<?php echo $marg_header['is_archive'] ? 'aria-current="page"' : ''; ?>
 			>
-				<?php echo inline_svg( 'icon-link-triangle-down', [ 'class' => $marg_icon ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs(). ?>
+				<?php
+				// Hover (link/navigation 274:325): the solid triangle becomes an outline; no blur, gap unchanged.
+				echo inline_svg( 'icon-link-triangle-down', [ 'class' => 'block size-link-icon shrink-0 group-hover/navlink:hidden' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
+				echo inline_svg( 'icon-link-triangle-down-outline', [ 'class' => 'hidden size-link-icon shrink-0 group-hover/navlink:block' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
+				?>
 				<span class="<?php echo esc_attr( $marg_label ); ?>"><span class="sr-only"><?php esc_html_e( 'Archive', 'tenup-theme' ); ?> </span><?php echo esc_html( $marg_years ); ?></span>
 			</a>
 		</nav>
 
-		<div class="<?php echo esc_attr( 'col-start-6 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true">
+		<div class="<?php echo esc_attr( 'col-start-6 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true" data-soon>
 			<span class="<?php echo esc_attr( $marg_icon ); ?>"></span>
 			<span class="relative">
 				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php echo esc_html_x( '2016 – 2026', 'future archive period (en dash with spaces)', 'tenup-theme' ); ?></span>
@@ -104,7 +110,7 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 			</span>
 		</div>
 
-		<div class="<?php echo esc_attr( 'col-start-19 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true">
+		<div class="<?php echo esc_attr( 'col-start-19 row-start-2 flex flex-col items-center gap-3xsmall justify-self-start ' . $marg_placeholder . ' ' . $marg_soon ); ?>" aria-hidden="true" data-soon>
 			<span class="<?php echo esc_attr( $marg_icon ); ?>"></span>
 			<span class="relative">
 				<span class="<?php echo esc_attr( $marg_soon_default . ' uppercase' ); ?>"><?php esc_html_e( 'Search', 'tenup-theme' ); ?></span>
@@ -121,16 +127,15 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 		?>
 		<div class="<?php echo esc_attr( 'col-[21/24] row-start-4 flex items-center justify-self-stretch ' . $marg_placeholder ); ?>" aria-hidden="true">
 			<?php
-			// Each half is its own hover target, so Shelf and Cart swap independently. Below 1440 a half is
-			// narrower than "Upcoming" (87px) plus the gap to the centred Cart label, so Shelf's left-aligned
-			// "Upcoming" would run into the blurred Cart label: while Shelf is hovered, Cart steps aside
-			// (invisible, footprint kept). Cart's own centred "Upcoming" clears "Shelf" at every desktop width.
+			// Each half is a hover target. Below 1440 the pair is narrower than two "Upcoming" labels (87px
+			// each), so while the placeholders show "Upcoming" Cart steps aside (invisible, footprint kept)
+			// and Shelf's left-aligned "Upcoming" stands for the pair; from 1440 both show.
 			?>
-			<span class="<?php echo esc_attr( 'peer/shelf relative flex-1 basis-0 text-left ' . $marg_soon ); ?>">
+			<span class="<?php echo esc_attr( 'relative flex-1 basis-0 text-left ' . $marg_soon ); ?>" data-soon>
 				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php esc_html_e( 'Shelf', 'tenup-theme' ); ?></span>
 				<span class="<?php echo esc_attr( $marg_soon_upcoming . ' left-0' ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
 			</span>
-			<span class="<?php echo esc_attr( 'relative flex-1 basis-0 text-center max-[1440px]:peer-hover/shelf:invisible ' . $marg_soon ); ?>">
+			<span class="<?php echo esc_attr( 'relative flex-1 basis-0 text-center max-[1440px]:group-has-[[data-soon]:hover]/soonzone:invisible ' . $marg_soon ); ?>" data-soon>
 				<span class="<?php echo esc_attr( $marg_soon_default ); ?>"><?php echo esc_html( $marg_cart ); ?></span>
 				<span class="<?php echo esc_attr( $marg_soon_centred ); ?>"><?php echo esc_html( $marg_upcoming ); ?></span>
 			</span>
@@ -169,9 +174,13 @@ $marg_grid = 'mx-auto hidden w-full max-w-page font-sans leading-[1.2] text-marg
 		<nav class="col-[1/-1] row-[1/-1] grid grid-cols-subgrid grid-rows-subgrid" aria-label="<?php esc_attr_e( 'Breadcrumb', 'tenup-theme' ); ?>">
 			<a
 				href="<?php echo esc_url( $marg_header['archive_url'] ); ?>"
-				class="<?php echo esc_attr( 'col-start-2 row-start-2 flex items-center gap-micro self-start justify-self-start text-regular font-semibold hover:blur-[1px] ' . ( $marg_is_article ? 'text-marg-red-muted ' : '' ) . $marg_focus ); ?>"
+				class="<?php echo esc_attr( 'group/navlink col-start-2 row-start-2 flex items-center gap-micro self-start justify-self-start text-regular font-semibold ' . ( $marg_is_article ? 'text-marg-red-muted ' : '' ) . $marg_focus ); ?>"
 			>
-				<?php echo inline_svg( 'icon-link-triangle-left', [ 'class' => $marg_icon ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs(). ?>
+				<?php
+				// Hover (link/navigation 274:321): the solid triangle becomes an outline; no blur, gap unchanged.
+				echo inline_svg( 'icon-link-triangle-left', [ 'class' => 'block size-link-icon shrink-0 group-hover/navlink:hidden' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
+				echo inline_svg( 'icon-link-triangle-left-outline', [ 'class' => 'hidden size-link-icon shrink-0 group-hover/navlink:block' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG file; root attributes escaped by html_attrs().
+				?>
 				<span class="<?php echo esc_attr( $marg_label ); ?>"><span class="sr-only"><?php esc_html_e( 'Archive', 'tenup-theme' ); ?> </span><?php echo esc_html( $marg_years ); ?></span>
 			</a>
 
