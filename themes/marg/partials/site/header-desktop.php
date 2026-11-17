@@ -72,7 +72,7 @@ $marg_placeholder = 'cursor-default select-none self-start whitespace-nowrap tex
 // Hover targets ([data-soon]): Figma layer blur 4 = CSS blur(2px), kept on hover. Hovering any
 // placeholder swaps EVERY placeholder's label for "Upcoming" at once (the grid is group/soonzone).
 // Class names are written out in full (not concatenated) so Tailwind's source scan generates them.
-$marg_soon = 'blur-[2px]';
+$marg_soon = '[filter:blur(2px)]';
 
 // Default label (sets the footprint) and the stacked "Upcoming" label shown instead on hover.
 $marg_soon_default  = 'block text-trim group-has-[[data-soon]:hover]/soonzone:invisible';
@@ -170,8 +170,12 @@ $marg_grid = 'group/soonzone mx-auto hidden w-full max-w-page font-sans leading-
 	<?php else : ?>
 
 		<?php $marg_is_article = 'article' === $marg_header['variant']; ?>
-		<?php // Full-grid subgrid, so the children below place on the header's own column / row lines. ?>
-		<nav class="col-[1/-1] row-[1/-1] grid grid-cols-subgrid grid-rows-subgrid" aria-label="<?php esc_attr_e( 'Breadcrumb', 'tenup-theme' ); ?>">
+		<?php
+		// Full-grid subgrid, so the children below place on the header's own column / row lines.
+		// Without subgrid (Chrome before 117, Safari before 16) the nav repeats the header's own
+		// tracks (24 equal columns, 4 x 52.625px rows, no gaps), which lands on the same lines.
+		?>
+		<nav class="col-[1/-1] row-[1/-1] grid grid-cols-subgrid grid-rows-subgrid not-supports-[grid-template-columns:subgrid]:grid-cols-24 not-supports-[grid-template-columns:subgrid]:grid-rows-[repeat(4,52.625px)]" aria-label="<?php esc_attr_e( 'Breadcrumb', 'tenup-theme' ); ?>">
 			<a
 				href="<?php echo esc_url( $marg_header['archive_url'] ); ?>"
 				class="<?php echo esc_attr( 'group/navlink col-start-2 row-start-2 flex items-center gap-micro self-start justify-self-start text-regular font-semibold ' . ( $marg_is_article ? 'text-marg-red-muted ' : '' ) . $marg_focus ); ?>"
@@ -188,7 +192,7 @@ $marg_grid = 'group/soonzone mx-auto hidden w-full max-w-page font-sans leading-
 				<?php if ( $marg_is_article ) : ?>
 					<p class="col-[8/18] row-start-3 flex items-end justify-center text-center text-regular font-semibold">
 						<?php if ( '' !== $marg_header['title_url'] ) : ?>
-							<a href="<?php echo esc_url( $marg_header['title_url'] ); ?>" class="<?php echo esc_attr( 'text-trim hover:blur-[1px] ' . $marg_focus ); ?>"><?php echo esc_html( $marg_header['title'] ); ?></a>
+							<a href="<?php echo esc_url( $marg_header['title_url'] ); ?>" class="<?php echo esc_attr( 'text-trim hover:[filter:blur(1px)] ' . $marg_focus ); ?>"><?php echo esc_html( $marg_header['title'] ); ?></a>
 						<?php else : ?>
 							<span class="text-trim"><?php echo esc_html( $marg_header['title'] ); ?></span>
 						<?php endif; ?>

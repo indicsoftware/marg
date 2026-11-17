@@ -314,9 +314,64 @@
 	}
 }
 
-/* Figma trims every text box to cap height; add to text elements so gaps match Figma. */
+/*
+ * Figma trims every text box to cap height; add to text elements so gaps match Figma.
+ * text-trim trims both ends (cap to baseline), text-trim-start only the top.
+ * The --marg-trim-* flags drive the fallback below for browsers without text-box.
+ */
 @utility text-trim {
 	text-box: trim-both cap alphabetic;
+	--marg-trim-start: 1;
+	--marg-trim-end: 1;
+}
+
+@utility text-trim-start {
+	text-box: trim-start cap alphabetic;
+	--marg-trim-start: 1;
+	--marg-trim-end: 0;
+}
+
+/*
+ * text-box fallback for browsers without it (Chrome before 133, Safari before 18.2;
+ * the archive rows were 35px instead of 28px there). Negative block margins take off
+ * what text-box would: half the line height minus a per-font constant, measured
+ * against Chrome's native trim (Authentic Sans: cap height 0.752em, ascent minus
+ * descent 0.55em; Times New Roman: 0.662em and 0.675em):
+ *   top    = 0.5lh - (cap - (ascent - descent) / 2) em
+ *   bottom = 0.5lh - ((ascent - descent) / 2) em
+ * Matches native layout to within about half a pixel (Chrome's own pixel rounding).
+ * In the components layer, so a margin utility on the same element still wins.
+ * Not a perfect stand-in where the box does not hug its text: text-box is a no-op on
+ * flex containers (use max-tablet-lg:text-trim there) and min-height boxes keep their
+ * bottom edge (put text-trim on an inner block instead).
+ */
+@layer components {
+	@supports not (text-box: trim-both cap alphabetic) {
+		:root,
+		.font-sans {
+			--marg-trim-top: 0.477;
+			--marg-trim-bottom: 0.275;
+		}
+
+		.font-serif {
+			--marg-trim-top: 0.3247;
+			--marg-trim-bottom: 0.3373;
+		}
+
+		[class*="text-trim"] {
+			--marg-trim-start: 0;
+			--marg-trim-end: 0;
+
+			margin-block-start: calc(var(--marg-trim-start) * (var(--marg-trim-top) * 1em - 0.5lh));
+			margin-block-end: calc(var(--marg-trim-end) * (var(--marg-trim-bottom) * 1em - 0.5lh));
+		}
+
+		/* Centred with translate-y-1/2: native centres the cap height, so shift by half the difference instead. */
+		[class*="text-trim"][class*="translate-y-1/2"] {
+			margin-block-start: calc(var(--marg-trim-start) * (var(--marg-trim-top) - var(--marg-trim-bottom)) * 0.5em);
+			margin-block-end: 0;
+		}
+	}
 }
 
 @layer base {

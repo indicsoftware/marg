@@ -51,8 +51,8 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto tablet-lg:decor
 		?>
 		<nav class="flex gap-xsmall border-t-[0.5px] border-current pt-[15px] tablet-lg:contents" aria-label="<?php esc_attr_e( 'Footer', 'tenup-theme' ); ?>">
 			<a href="<?php echo esc_url( $marg_back_href ); ?>" class="<?php echo esc_attr( 'flex min-w-0 flex-1 flex-col gap-2xsmall text-regular font-semibold tablet-lg:col-[2/9] tablet-lg:row-start-1 tablet-lg:self-start ' . $marg_focus ); ?>">
-				<span class="text-trim leading-[16px] tablet-lg:-mb-[3px]"><?php esc_html_e( 'Back to Archives', 'tenup-theme' ); ?></span>
-				<span class="flex items-center gap-micro">
+				<span class="text-trim leading-[16px]"><?php esc_html_e( 'Back to Archives', 'tenup-theme' ); ?></span>
+				<span class="flex items-center gap-micro tablet-lg:-mt-[3px]">
 					<?php
 					// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG files; root attributes escaped by html_attrs().
 					if ( $marg_is_archive ) {
@@ -71,8 +71,8 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto tablet-lg:decor
 			</a>
 
 			<a href="<?php echo esc_url( SiteChrome::MARG_ART_URL ); ?>" target="_blank" rel="noopener" class="<?php echo esc_attr( 'flex min-w-0 flex-1 flex-col items-end gap-2xsmall text-right text-regular font-semibold tablet-lg:col-[17/24] tablet-lg:row-start-1 tablet-lg:self-start ' . $marg_focus ); ?>">
-				<span class="text-trim leading-[16px] tablet-lg:-mb-[3px]"><?php esc_html_e( 'Currently at Marg', 'tenup-theme' ); ?></span>
-				<span class="flex items-center justify-end gap-micro">
+				<span class="text-trim leading-[16px]"><?php esc_html_e( 'Currently at Marg', 'tenup-theme' ); ?></span>
+				<span class="flex items-center justify-end gap-micro tablet-lg:-mt-[3px]">
 					<span class="whitespace-nowrap uppercase leading-[1.2]">marg-art.org</span>
 					<?php
 					// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- theme SVG files; root attributes escaped by html_attrs().
@@ -106,11 +106,11 @@ $marg_legal_link = 'underline decoration-1 underline-offset-auto tablet-lg:decor
 
 			<?php // Address and telephone (908:223 / 922:6697): mobile 4 centred lines; desktop address left, phones right, 8px (3xsmall) below the registration (group 980:2935), trimmed at the top only (54px block, so row 2 sits 72px below its box as in Figma). ?>
 			<address class="w-full pt-[22px] not-italic tablet-lg:pt-3xsmall">
-				<p class="text-trim text-center font-serif text-small leading-[1.2] tablet-lg:flex tablet-lg:items-start tablet-lg:justify-between tablet-lg:text-left">
-					<span class="tablet-lg:block tablet-lg:[text-box:trim-start_cap_alphabetic]">
+				<p class="max-tablet-lg:text-trim text-center font-serif text-small leading-[1.2] tablet-lg:flex tablet-lg:items-start tablet-lg:justify-between tablet-lg:text-left">
+					<span class="tablet-lg:block tablet-lg:text-trim-start">
 						<?php echo implode( '<br>', array_map( 'esc_html', SiteChrome::address_lines() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each line escaped. ?>
 					</span><br class="tablet-lg:hidden">
-					<span class="tablet-lg:block tablet-lg:[text-box:trim-start_cap_alphabetic] tablet-lg:text-right">
+					<span class="tablet-lg:block tablet-lg:text-trim-start tablet-lg:text-right">
 						<?php
 						$marg_phones = SiteChrome::phones();
 						foreach ( $marg_phones as $marg_i => $marg_phone ) :

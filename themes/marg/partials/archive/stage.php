@@ -93,7 +93,7 @@ $slot_text  = '' !== $annotation ? $annotation : $tagline;
 
 		<?php // Annotation row (951:2587): pinned at strip y 170 whatever the image height, full strip width. ?>
 		<div class="absolute inset-x-0 top-[170px] flex h-[82px] items-center justify-center overflow-hidden">
-			<p class="text-trim m-0 w-full break-words text-center font-serif text-xsmall font-regular leading-[1.2] text-marg-red" data-archive-annotation data-archive-tagline="<?php echo esc_attr( $tagline ); ?>"><?php echo esc_html( $slot_text ); ?></p>
+			<p class="text-trim w-full break-words text-center font-serif text-xsmall font-regular leading-[1.2] text-marg-red" data-archive-annotation data-archive-tagline="<?php echo esc_attr( $tagline ); ?>"><?php echo esc_html( $slot_text ); ?></p>
 		</div>
 	</div>
 
@@ -114,7 +114,7 @@ $slot_text  = '' !== $annotation ? $annotation : $tagline;
 			// Box = pt + three trimmed lines minus most of the last line's bottom half-leading
 			// (66 at 390, 74 at 744; fluid in between and above: --marg-archive-title-h in tailwind.css).
 			?>
-			<span class="line-clamp-3 break-words [text-box:trim-start_cap_alphabetic] text-center font-sans text-medium font-regular" data-archive-panel-title><?php echo esc_html( $has_title ? $row['title'] : ( $row['vol_issue'] ?? '' ) ); ?></span>
+			<span class="line-clamp-3 break-words text-trim-start text-center font-sans text-medium font-regular" data-archive-panel-title><?php echo esc_html( $has_title ? $row['title'] : ( $row['vol_issue'] ?? '' ) ); ?></span>
 		</span>
 		<span class="block h-(--stroke-hairline) w-full shrink-0 bg-marg-red"></span>
 	</a>

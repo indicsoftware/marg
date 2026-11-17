@@ -83,7 +83,7 @@ $windows       = [
 
 	<div class="fixed inset-x-0 bottom-0 z-20 hidden px-medium pb-[env(safe-area-inset-bottom)] in-[.js]:block" data-archive-cover-counter aria-hidden="true">
 		<div class="flex items-end justify-center gap-3xsmall border-t-(length:--stroke-hairline) border-marg-red pt-2xsmall pb-[calc(var(--spacing-xsmall)_+_7px)] font-sans font-regular text-marg-red">
-			<span class="text-trim whitespace-nowrap text-xlarge leading-[1.2]"><?php esc_html_e( 'Vol.', 'tenup-theme' ); ?> <?php foreach ( $windows as $place => $value ) : ?><span class="inline-block h-[1lh] w-[1ch] overflow-hidden text-center align-top tabular-nums"><span class="<?php echo esc_attr( 'block translate-y-[calc(var(--digit)*-1lh)] transition-transform duration-300 ease-out motion-reduce:transition-none ' . $digit_classes[ $value ] ); ?>" data-archive-cover-digit="<?php echo esc_attr( $place ); ?>">
+			<span class="text-trim whitespace-nowrap text-xlarge leading-[1.2]"><?php esc_html_e( 'Vol.', 'tenup-theme' ); ?> <?php foreach ( $windows as $place => $value ) : ?><span class="inline-block h-[1lh] w-[1ch] overflow-hidden text-center align-top [font-variant-numeric:tabular-nums]"><span class="<?php echo esc_attr( 'block translate-y-[calc(var(--digit)*-1lh)] transition-transform duration-300 ease-out motion-reduce:transition-none ' . $digit_classes[ $value ] ); ?>" data-archive-cover-digit="<?php echo esc_attr( $place ); ?>">
 				<?php
 				for ( $cell = 0; $cell < 20; $cell++ ) {
 					$digit = $cell % 10;
