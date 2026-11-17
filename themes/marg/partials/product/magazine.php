@@ -114,12 +114,15 @@ $has_details = $specs || '' !== $description || $editor_groups;
 						<?php endif; ?>
 					</h1>
 					<?php if ( '' !== $date['label'] ) : ?>
-						<p class="text-trim w-full text-center font-sans text-regular font-semibold tablet-lg:order-first tablet-lg:min-h-[50px]">
-							<?php if ( '' !== $date_attr ) : ?>
-								<time datetime="<?php echo esc_attr( $date_attr ); ?>"><?php echo esc_html( $date['label'] ); ?></time>
-							<?php else : ?>
-								<?php echo esc_html( $date['label'] ); ?>
-							<?php endif; ?>
+						<?php // Trimmed on an inner block, not the 50px min-height box, so browsers without text-box (the margin fallback in tailwind.css) keep the same gap. ?>
+						<p class="w-full text-center font-sans text-regular font-semibold tablet-lg:order-first tablet-lg:min-h-[50px]">
+							<span class="text-trim block">
+								<?php if ( '' !== $date_attr ) : ?>
+									<time datetime="<?php echo esc_attr( $date_attr ); ?>"><?php echo esc_html( $date['label'] ); ?></time>
+								<?php else : ?>
+									<?php echo esc_html( $date['label'] ); ?>
+								<?php endif; ?>
+							</span>
 						</p>
 					<?php endif; ?>
 				</div>

@@ -78,10 +78,10 @@ $li_attrs = [
 			<span class="text-trim col-start-1 row-start-1 whitespace-nowrap" aria-hidden="true"><?php echo esc_html( $row['date'] ?? '' ); ?></span>
 			<span class="text-trim col-start-2 row-start-1 whitespace-nowrap text-center" aria-hidden="true"><?php echo esc_html( $row['vol_issue'] ?? '' ); ?></span>
 			<?php if ( $has_title ) : ?>
-				<span class="col-span-3 row-start-2 line-clamp-3 self-start [text-box:trim-start_cap_alphabetic]"><?php echo esc_html( $row['title'] ); ?></span>
+				<span class="col-span-3 row-start-2 line-clamp-3 self-start text-trim-start"><?php echo esc_html( $row['title'] ); ?></span>
 			<?php endif; ?>
 			<?php if ( '' !== $annotation ) : ?>
-				<span class="col-span-3 row-start-4 -mb-[0.32em] line-clamp-2 self-start font-serif text-xsmall [text-box:trim-start_cap_alphabetic]"><?php echo esc_html( $annotation ); ?></span>
+				<span class="col-span-3 row-start-4 -mb-[0.32em] line-clamp-2 self-start font-serif text-xsmall text-trim-start"><?php echo esc_html( $annotation ); ?></span>
 			<?php endif; ?>
 		</span>
 	</a>
