@@ -73,6 +73,13 @@ $li_attrs = [
 $sr_label = trim( implode( ', ', array_filter( [ (string) ( $row['vol_issue'] ?? '' ), (string) ( $row['date'] ?? '' ) ] ) ) );
 ?>
 <li<?php echo html_attrs( $li_attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- html_attrs() escapes. ?>>
+	<?php
+	// First issue of a volume: an invisible heading, so screen-reader users can jump volume by volume
+	// through the 268-row list (sighted users get the "Vol. N" column). Absolutely positioned, so no layout.
+	if ( ! empty( $row['volume_label'] ) ) :
+		?>
+		<h2 class="sr-only"><?php echo esc_html( trim( implode( ', ', array_filter( [ (string) $row['volume_label'], (string) ( $row['year'] ?? '' ) ] ) ) ) ); ?></h2>
+	<?php endif; ?>
 	<a
 		href="<?php echo esc_url( $row['url'] ); ?>"
 		class="archive-row-link group/row relative flex h-[var(--archive-row-h,18.3px)] items-center text-marg-red outline-marg-red focus-visible:outline-1 focus-visible:outline-offset-2 tablet-lg:grid tablet-lg:h-auto tablet-lg:grid-cols-18 tablet-lg:items-start tablet-lg:gap-y-3xsmall tablet-lg:py-3xsmall"

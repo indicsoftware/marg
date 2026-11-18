@@ -21,6 +21,10 @@ get_header(); ?>
 					</div>
 				</article>
 			<?php endwhile; ?>
+		<?php else : ?>
+			<?php // Nothing to show (404 included): an invisible heading and message, so <main> is not an empty landmark for screen readers. ?>
+			<h1 class="sr-only"><?php echo esc_html( is_404() ? __( 'Page not found', 'tenup-theme' ) : __( 'Nothing found', 'tenup-theme' ) ); ?></h1>
+			<p class="sr-only"><?php echo esc_html( is_404() ? __( 'This page does not exist. Use the Archives link to browse the magazine archive.', 'tenup-theme' ) : __( 'There is nothing to show here yet. Use the Archives link to browse the magazine archive.', 'tenup-theme' ) ); ?></p>
 		<?php endif; ?>
 	</div>
 

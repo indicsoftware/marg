@@ -141,6 +141,9 @@ $marg_grid = 'group/soonzone mx-auto hidden w-full max-w-page font-sans leading-
 			</span>
 		</div>
 
+		<?php // The placeholders above are aria-hidden (not links yet); one invisible sentence says what sighted users see. ?>
+		<p class="sr-only"><?php esc_html_e( 'Coming soon: the 2016 – 2026 archive, search, shelf and cart.', 'tenup-theme' ); ?></p>
+
 		<?php
 		// Canvas animation slot (Frame 22, cols 2-6 / rows 4-6, top-aligned: one empty row under "1946 – 2015", per review): Marginalia 2 by
 		// Eemon Roy, a living 400x100 red-ink drawing, embedded unmodified from

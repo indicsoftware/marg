@@ -65,7 +65,7 @@ $windows       = [
 ];
 ?>
 <div class="hidden max-tablet:group-data-[view=covers]/archive:block" data-archive-covers>
-	<ol class="-mt-header flex h-svh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] after:w-1/4 after:shrink-0 [&::-webkit-scrollbar]:hidden" data-archive-cover-track aria-label="<?php esc_attr_e( 'Issue covers', 'tenup-theme' ); ?>">
+	<ol role="list" class="-mt-header flex h-svh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] after:w-1/4 after:shrink-0 [&::-webkit-scrollbar]:hidden" data-archive-cover-track aria-label="<?php esc_attr_e( 'Issue covers', 'tenup-theme' ); ?>">
 		<?php
 		foreach ( $rows as $index => $row ) {
 			get_template_part(

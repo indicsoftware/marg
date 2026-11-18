@@ -15,11 +15,25 @@ namespace TenUpTheme;
 class SecurePDFEndpoint {
 
 	/**
+	 * Whether the hooks are already registered. The class is constructed twice (functions.php and the
+	 * framework's ModuleInitialization, which instantiates every class in src/), which printed the
+	 * wp_footer output twice (duplicate ids) and doubled every hook.
+	 *
+	 * @var bool
+	 */
+	private static $booted = false;
+
+	/**
 	 * Initialize the class and set up hooks.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
+		if ( self::$booted ) {
+			return;
+		}
+		self::$booted = true;
+
 		error_log( 'Secure PDF Endpoint: Constructor called' );
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_action( 'template_redirect', [ $this, 'handle_secure_pdf_request' ] );

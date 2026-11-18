@@ -15,11 +15,25 @@ namespace TenUpTheme;
 class WooCommerceMembershipsScripts {
 
 	/**
+	 * Whether the hooks are already registered. The class is constructed twice (functions.php and the
+	 * framework's ModuleInitialization, which instantiates every class in src/), which printed the
+	 * wp_footer output twice (duplicate ids) and doubled every hook.
+	 *
+	 * @var bool
+	 */
+	private static $booted = false;
+
+	/**
 	 * Initialize the class and set up hooks.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
+		if ( self::$booted ) {
+			return;
+		}
+		self::$booted = true;
+
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
