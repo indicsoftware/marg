@@ -303,6 +303,7 @@ $print_people = static function ( array $people ) {
 											'action'     => 'buy',
 											// Switches to "IN CART" (Figma 243:67) once the article is in the cart.
 											'product_id' => $product_id,
+											'active_sr_label' => $title,
 											'sr_label'   => trim(
 												sprintf(
 													/* translators: 1: article title, 2: currency, 3: price. */
@@ -371,9 +372,12 @@ $print_people = static function ( array $people ) {
 
 		<?php /* ------------------------------------------------ media column (col-11-18 / mobile top) */ ?>
 		<?php if ( $has_image ) : ?>
-			<?php // m-0! beats WP global styles' unlayered `:where(figure){margin:0 0 1em}`, which outranks Preflight's layered reset. ?>
-			<figure class="order-first m-0! px-[6px] tablet-lg:order-none tablet-lg:col-span-8 tablet-lg:col-start-11 tablet-lg:row-start-1 tablet-lg:px-0">
-				<div class="flex flex-col gap-2xsmall border-b border-marg-grey pb-6 tablet-lg:border-0 tablet-lg:pb-0">
+			<?php
+			// The <figure> is the inner box so <figcaption> is its direct child (valid HTML, and it names the figure).
+			// m-0! beats WP global styles' unlayered `:where(figure){margin:0 0 1em}`, which outranks Preflight's layered reset.
+			?>
+			<div class="order-first px-[6px] tablet-lg:order-none tablet-lg:col-span-8 tablet-lg:col-start-11 tablet-lg:row-start-1 tablet-lg:px-0">
+				<figure class="m-0! flex flex-col gap-2xsmall border-b border-marg-grey pb-6 tablet-lg:border-0 tablet-lg:pb-0">
 					<?php
 					echo wp_get_attachment_image(
 						$image_id,
@@ -391,8 +395,8 @@ $print_people = static function ( array $people ) {
 					<?php if ( '' !== $caption ) : ?>
 						<figcaption class="text-trim break-words font-sans text-xsmall text-marg-grey"><?php echo esc_html( $caption ); ?></figcaption>
 					<?php endif; ?>
-				</div>
-			</figure>
+				</figure>
+			</div>
 		<?php endif; ?>
 
 		<?php /* ------------------------------------------------ metadata (Figma Frame 2) */ ?>
@@ -407,7 +411,8 @@ $print_people = static function ( array $people ) {
 					$bio_html = '';
 					foreach ( $bios as $person ) {
 						if ( count( $bios ) > 1 ) {
-							$bio_html .= '<p class="font-semibold">' . esc_html( $person['name'] ) . '</p>';
+							// Each author's name heads their bio (under the lockup's h2 label).
+							$bio_html .= '<h3 class="font-semibold">' . esc_html( $person['name'] ) . '</h3>';
 						}
 						$bio_html .= wpautop( esc_html( $person['bio'] ) );
 					}
@@ -442,6 +447,8 @@ $print_people = static function ( array $people ) {
 				?>
 
 				<?php if ( $meta_rows ) : ?>
+					<?php // No visible label in the design; an invisible heading puts the details in the outline (absolute, so outside the flex gap). ?>
+					<h2 class="sr-only"><?php esc_html_e( 'Article details', 'tenup-theme' ); ?></h2>
 					<dl class="flex flex-col gap-3xsmall">
 						<?php foreach ( $meta_rows as $meta_row ) : ?>
 							<?php if ( 'permalink' === $meta_row['key'] ) : ?>
@@ -530,7 +537,7 @@ if ( $related ) {
 						]
 					);
 					?>
-					<ul class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
+					<ul role="list" class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
 						<?php foreach ( $related as $card ) : ?>
 							<li class="flex w-[250px] shrink-0 snap-start tablet-lg:w-auto">
 								<?php

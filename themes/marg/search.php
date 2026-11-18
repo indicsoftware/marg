@@ -16,7 +16,7 @@ get_header(); ?>
 				?>
 			</h1>
 
-			<ul>
+			<ul role="list">
 			<?php
 			while ( have_posts() ) :
 				the_post();
@@ -29,7 +29,7 @@ get_header(); ?>
 					}
 
 					// @phpstan-ignore argument.type (s)
-					the_title( '<span itemprop="name"><a href="' . esc_url( get_permalink() ) . '" itemprop="url">', '</a></span>' );
+					the_title( '<h2 class="inline" itemprop="name"><a href="' . esc_url( get_permalink() ) . '" itemprop="url">', '</a></h2>' );
 					?>
 					<div itemprop="description">
 						<?php the_excerpt(); ?>
@@ -40,6 +40,15 @@ get_header(); ?>
 			</ul>
 
 			<?php the_posts_navigation(); ?>
+		<?php else : ?>
+			<?php // No results: an invisible heading and message for screen readers (the page is otherwise empty). ?>
+			<h1 class="sr-only">
+				<?php
+				/* translators: the search query */
+				printf( esc_html__( 'No results for: %s', 'tenup-theme' ), esc_html( get_search_query() ) );
+				?>
+			</h1>
+			<p class="sr-only"><?php esc_html_e( 'No issues or articles matched your search.', 'tenup-theme' ); ?></p>
 		<?php endif; ?>
 	</section>
 

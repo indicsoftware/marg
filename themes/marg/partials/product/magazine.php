@@ -215,7 +215,7 @@ $has_details = $specs || '' !== $description || $editor_groups;
 						<h2 id="<?php echo esc_attr( $uid . '-articles' ); ?>" class="border-t border-marg-red py-2xsmall font-sans text-xsmall font-bold uppercase tablet-lg:border-t-0 tablet-lg:p-0">
 							<span class="text-trim block"><?php esc_html_e( 'Articles in this issue', 'tenup-theme' ); ?></span>
 						</h2>
-						<ol class="flex flex-col gap-[24px] tablet-lg:gap-0">
+						<ol role="list" class="flex flex-col gap-[24px] tablet-lg:gap-0">
 							<?php
 							foreach ( $articles as $row ) {
 								get_template_part( 'partials/product/magazine/article-row', null, [ 'row' => $row ] );
@@ -268,7 +268,7 @@ if ( $related ) {
 						]
 					);
 					?>
-					<ul class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overflow-y-hidden overscroll-x-contain px-gutter pb-[calc(var(--text-xsmall)/2)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)] tablet-lg:pb-0">
+					<ul role="list" class="-mx-gutter flex min-h-[414px] snap-x snap-mandatory scroll-px-gutter items-start gap-medium overflow-x-auto overflow-y-hidden overscroll-x-contain px-gutter pb-[calc(var(--text-xsmall)/2)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mx-0 tablet-lg:grid tablet-lg:min-h-0 tablet-lg:grid-cols-3 tablet-lg:gap-x-[2.27%] tablet-lg:overflow-visible tablet-lg:px-[calc(100%/24)] tablet-lg:pb-0">
 						<?php foreach ( $related as $card ) : ?>
 							<li class="w-[224px] shrink-0 snap-start tablet-lg:w-auto">
 								<?php

@@ -79,6 +79,8 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 ?>
 <section class="group/archive relative text-marg-red [--archive-row-h:max(18.3px,var(--text-small)*1.2)] tablet-lg:pb-jumbo" data-archive data-view="<?php echo esc_attr( $view ); ?>" aria-labelledby="marg-archive-heading">
 	<h1 id="marg-archive-heading" class="sr-only"><?php echo esc_html( $heading ); ?></h1>
+	<?php // Below 1133px the tagline is only drawn in the aria-hidden stage; desktop exposes the header copy instead. ?>
+	<p class="sr-only tablet-lg:hidden"><?php esc_html_e( 'Seventy years of the Marg quarterly are open access.', 'tenup-theme' ); ?></p>
 
 	<?php if ( ! $rows ) : ?>
 		<div class="mx-auto w-full max-w-page">
@@ -103,7 +105,7 @@ $logo = function_exists( 'TenUpTheme\inline_svg' )
 		<div class="<?php echo esc_attr( 'pointer-events-none fixed inset-x-0 top-[var(--archive-stage-h,var(--marg-archive-stage-h))] bottom-0 -z-1 hidden bg-[linear-gradient(to_bottom,transparent_0%,var(--color-marg-grey)_90.385%)] opacity-20 max-tablet-lg:[@media(height>=520px)]:in-[.js]:block max-tablet:group-data-[view=covers]/archive:hidden!' ); ?>" data-archive-gradient aria-hidden="true"></div>
 
 		<div class="<?php echo esc_attr( 'relative mx-auto w-full max-w-page tablet-lg:-mt-px ' . $titles_only ); ?>">
-			<ol class="-mt-[var(--archive-row-h,18.3px)] tablet-lg:mt-0 tablet-lg:ml-[calc(100%/12)] tablet-lg:w-3/4" data-archive-list aria-label="<?php esc_attr_e( 'Issues', 'tenup-theme' ); ?>">
+			<ol role="list" class="-mt-[var(--archive-row-h,18.3px)] tablet-lg:mt-0 tablet-lg:ml-[calc(100%/12)] tablet-lg:w-3/4" data-archive-list aria-label="<?php esc_attr_e( 'Issues', 'tenup-theme' ); ?>">
 				<?php
 				foreach ( $rows as $index => $row ) {
 					get_template_part(

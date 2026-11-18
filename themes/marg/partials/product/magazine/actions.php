@@ -133,6 +133,8 @@ $price_text = static function ( $entry ) {
 							'action'     => 'buy',
 							/* translators: 1: "Buy print copy" / "Buy digital copy", 2: magazine title, 3: price e.g. INR 500. */
 							'sr_label'   => trim( sprintf( __( '%1$s of %2$s, %3$s', 'tenup-theme' ), $entry['label'], $title, $price_text( $entry ) ), ', ' ),
+							// Title only: the active state checks the parent product, so the copy in the cart may be either medium.
+							'active_sr_label' => $title,
 							'url'        => $entry['url'],
 							'product_id' => $product_id,
 							'attrs'      => [
@@ -150,6 +152,7 @@ $price_text = static function ( $entry ) {
 							'action'     => 'buy',
 							/* translators: %s: magazine title. */
 							'sr_label'   => sprintf( __( 'Buy %s: choose print or digital copy', 'tenup-theme' ), $title ),
+							'active_sr_label' => $title,
 							'product_id' => $product_id,
 							'attrs'      => [
 								'popovertarget' => $buy_id,
@@ -193,9 +196,10 @@ $price_text = static function ( $entry ) {
 						echo esc_html( sprintf( __( 'Buy %s', 'tenup-theme' ), $title ) );
 						?>
 					</p>
-					<button type="button" popovertarget="<?php echo esc_attr( $buy_id ); ?>" popovertargetaction="hide" class="text-trim font-sans text-xsmall font-bold underline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current"><?php esc_html_e( 'close', 'tenup-theme' ); ?></button>
+					<?php // autofocus: opening the chooser moves focus into it (popover focusing steps); closing returns it to BUY. ?>
+					<button type="button" autofocus popovertarget="<?php echo esc_attr( $buy_id ); ?>" popovertargetaction="hide" class="text-trim font-sans text-xsmall font-bold underline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current"><?php esc_html_e( 'close', 'tenup-theme' ); ?></button>
 				</div>
-				<ul class="flex flex-col gap-3xsmall">
+				<ul role="list" class="flex flex-col gap-3xsmall">
 					<?php foreach ( $buy as $entry ) : ?>
 						<li>
 							<form method="post" action="<?php echo esc_url( ProductPresenter::permalink( $product_id ) ); ?>" class="flex items-center justify-between gap-small border-t border-marg-red pt-3xsmall">
@@ -221,6 +225,7 @@ $price_text = static function ( $entry ) {
 									[
 										'action'     => 'buy',
 										'sr_label'   => $entry['label'] . ', ' . $price_text( $entry ),
+										'active_sr_label' => 'print' === $entry['medium'] ? __( 'print copy', 'tenup-theme' ) : __( 'digital copy', 'tenup-theme' ),
 										'product_id' => (int) $entry['variation_id'],
 										'attrs'      => [ 'type' => 'submit' ],
 									]

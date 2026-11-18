@@ -16,11 +16,25 @@ namespace TenUpTheme;
 class WooCommerceMemberships {
 
 	/**
+	 * Whether the hooks are already registered. The class is constructed twice (functions.php and the
+	 * framework's ModuleInitialization, which instantiates every class in src/), which printed the
+	 * wp_footer output twice (duplicate ids) and doubled every hook.
+	 *
+	 * @var bool
+	 */
+	private static $booted = false;
+
+	/**
 	 * Initialize the class and set up hooks.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
+		if ( self::$booted ) {
+			return;
+		}
+		self::$booted = true;
+
 		// Only initialize if WooCommerce and WooCommerce Memberships are active
 		if ( ! $this->is_woocommerce_memberships_active() ) {
 			return;

@@ -38,6 +38,9 @@
  *                                   automatic (BUY + product in cart). KEEP has no backend yet.
  *     @type string    $active_label Active label. Default "In cart" (BUY) / "In shelf" (KEEP).
  *     @type string    $active_url   Active BUY link. Default wc_get_cart_url().
+ *     @type string    $active_sr_label What is in the cart, for the active BUY link's accessible name
+ *                                   ("In cart: view cart, print copy of {title}"). The BUY wording of
+ *                                   sr_label is not reused there, as the link opens the cart.
  *     @type array     $attrs        Extra attributes (data-*, aria-*, rel…). Escaped by html_attrs().
  *                                   Ignored in the active state, which is a plain link / text.
  *     @type string    $class        Extra classes for the root element.
@@ -60,6 +63,7 @@ $args = wp_parse_args(
 		'active'       => null,
 		'active_label' => '',
 		'active_url'   => '',
+		'active_sr_label' => '',
 		'attrs'        => [],
 		'class'        => '',
 	]
@@ -139,6 +143,18 @@ if ( $active ) {
 			$args['sr_label']
 		) : false,
 	];
+	// The active BUY link opens the cart: name it for that, starting with the visible label (2.5.3).
+	if ( $is_link && 'buy' === $args['action'] ) {
+		$attrs['aria-label'] = '' !== (string) $args['active_sr_label']
+			? sprintf(
+				/* translators: 1: active label, e.g. "In cart", 2: what is in the cart, e.g. "print copy of Ars Botanica". */
+				__( '%1$s: view cart, %2$s', 'tenup-theme' ),
+				$active_label,
+				$args['active_sr_label']
+			)
+			/* translators: %s: active label, e.g. "In cart". */
+			: sprintf( __( '%s: view cart', 'tenup-theme' ), $active_label );
+	}
 	$tag     = $is_link ? 'a' : 'span';
 	?>
 	<<?php echo tag_escape( $tag ); ?><?php echo html_attrs( $attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in html_attrs(). ?>><span class="text-trim"><?php echo esc_html( $active_label ); ?></span></<?php echo tag_escape( $tag ); ?>>
