@@ -455,7 +455,7 @@ $print_people = static function ( array $people ) {
 								<div class="grid grid-cols-4 gap-x-[12px] border-t border-marg-red pt-3xsmall tablet-lg:grid-cols-8">
 									<dt class="text-trim col-span-2 self-start font-sans text-xsmall font-bold uppercase tablet-lg:col-span-3"><?php echo esc_html( $meta_row['label'] ); ?></dt>
 									<dd class="col-span-2 col-start-3 flex min-w-0 items-start justify-between gap-3xsmall font-sans text-small font-semibold tablet-lg:col-span-5 tablet-lg:col-start-4">
-										<a class="text-trim min-w-0 truncate hover:underline" href="<?php echo esc_url( $meta_row['url'] ); ?>"><?php echo esc_html( $meta_row['value'] ); ?></a>
+										<a class="text-trim min-w-0 overflow-x-clip whitespace-nowrap text-ellipsis hover:underline" href="<?php echo esc_url( $meta_row['url'] ); ?>"><?php echo esc_html( $meta_row['value'] ); ?></a>
 										<button type="button" class="flex shrink-0 opacity-30 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current" data-marg-action="copy" data-marg-copy="<?php echo esc_attr( $meta_row['value'] ); ?>" data-marg-copied-label="<?php esc_attr_e( 'copied!', 'tenup-theme' ); ?>">
 											<span class="text-trim" data-marg-label aria-live="polite"><?php esc_html_e( 'copy', 'tenup-theme' ); ?></span><span class="sr-only"> <?php echo esc_html( $meta_row['label'] ); ?></span>
 										</button>
@@ -537,7 +537,7 @@ if ( $related ) {
 						]
 					);
 					?>
-					<ul role="list" class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
+					<ul role="list" class="-mr-gutter flex snap-x snap-mandatory gap-2xsmall overflow-x-auto pr-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden tablet-lg:mr-0 tablet-lg:grid tablet-lg:grid-cols-3 tablet-lg:gap-x-[5.68%] tablet-lg:overflow-visible tablet-lg:pr-0">
 						<?php foreach ( $related as $card ) : ?>
 							<li class="flex w-[250px] shrink-0 snap-start tablet-lg:w-auto">
 								<?php
