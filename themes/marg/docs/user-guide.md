@@ -95,6 +95,9 @@ Synchronize data between WordPress installations.
 ### All Export/Import
 Export and import WordPress data.
 
+### Marginalia lab
+A private copy of the homepage at `/marginalia-lab/` for trying out the red-ink drawing in the header. You need to be logged in with an account that can edit posts, and you need a desktop-width window (at least 1133px). The panel in the corner changes pace, fullness, mark size, auto-draw, transform, ink colour and how often each element appears. Nothing there changes the live homepage. When you like the result, click **Copy settings** and send the text to a developer. **Copy link** shares the lab with your current settings.
+
 ## Getting Help
 
 If you need assistance with any feature, please contact your site administrator or refer to the WordPress documentation at [wordpress.org/support](https://wordpress.org/support/).

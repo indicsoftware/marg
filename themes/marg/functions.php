@@ -115,6 +115,11 @@ require_once __DIR__ . '/src/ProductPresenter.php';
 $product_templates = new \TenUpTheme\ProductTemplates();
 $product_templates->init();
 
+// Marginalia lab: a private copy of the homepage at /marginalia-lab/ for tuning the header drawing.
+require_once __DIR__ . '/src/MarginaliaLab.php';
+$marginalia_lab = new \TenUpTheme\MarginaliaLab();
+$marginalia_lab->init();
+
 // Initialize WooCommerce Customizations to remove grouped product type
 require_once __DIR__ . '/src/WooCommerceCustomizations.php';
 $woocommerce_customizations = new \TenUpTheme\WooCommerceCustomizations();
