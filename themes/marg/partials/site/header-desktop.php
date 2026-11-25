@@ -146,8 +146,9 @@ $marg_grid = 'group/soonzone mx-auto hidden w-full max-w-page font-sans leading-
 
 		<?php
 		// Canvas animation slot (Frame 22, cols 2-6 / rows 4-6, top-aligned: one empty row under "1946 – 2015", per review): Marginalia 2 by
-		// Eemon Roy, a living 400x100 red-ink drawing, embedded unmodified from
-		// assets/marginalia/index.html in an iframe as its README prescribes. The iframe gets its
+		// Eemon Roy, a living 400x100 red-ink drawing, embedded from assets/marginalia/index.html
+		// in an iframe as its README prescribes (its settings: window.MARGINALIA_CONFIG there; designers
+		// try them live at /marginalia-lab/, src/MarginaliaLab.php). The iframe gets its
 		// src only on desktop (assets/js/frontend/components/marginalia.js), and is scaled down to
 		// the slot's width below 1920 (5 columns are narrower than 400px there).
 		?>

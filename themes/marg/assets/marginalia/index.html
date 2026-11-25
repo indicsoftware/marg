@@ -9,6 +9,9 @@
   <link rel="icon" href="data:,">
   <script>
     // Edit these values, then reload the page. No visible controls are needed.
+    // Designers can try settings live at /marginalia-lab/ and copy them from there.
+    // Optional keys (defaults in brackets): autoDraw [true], transform [true],
+    // ink ['#da100d'], elements [{}]: how often each element appears, 1 = normal, 0 = never.
     window.MARGINALIA_CONFIG = {
       pace: 2.0,
       fullness: 1.0,
@@ -1565,6 +1568,7 @@
     flower: 0.3,
     tree: 0.2, birds: 0.3, drip: 0.6,
   };
+  M.FLOW_WEIGHTS = FLOW_WEIGHTS; // the embed's `elements` setting scales these in place
 
   class Figure {
     constructor(world, type, marks, o) {
@@ -2423,8 +2427,9 @@
     }
 
     render(ctx) {
-      ctx.fillStyle = 'rgba(218, 16, 13, 0.11)';
-      ctx.strokeStyle = 'rgba(218, 16, 13, 0.2)';
+      const rgb = M.INK_RGB.join(', ');
+      ctx.fillStyle = `rgba(${rgb}, 0.11)`;
+      ctx.strokeStyle = `rgba(${rgb}, 0.2)`;
       ctx.lineWidth = 0.8;
       for (const m of this.marks) if (m.style.wash) m.drawWash(ctx);
       ctx.fillStyle = M.INK;
@@ -2444,12 +2449,51 @@
   'use strict';
 
   const WIDTH = 400, HEIGHT = 100;
-  const { pace, fullness, markSize } = window.MARGINALIA_CONFIG;
-  for (const [name, value] of Object.entries({ pace, fullness, markSize })) {
-    if (!Number.isFinite(value) || value <= 0) {
-      throw new RangeError(`Marginalia: ${name} must be a positive, finite number`);
+  const OPTIONAL = { autoDraw: true, transform: true, ink: M.INK, elements: {} };
+
+  // Check one setting; returns an error message, or '' when the value is valid.
+  function invalid(name, value) {
+    if (name === 'pace' || name === 'fullness' || name === 'markSize') {
+      return Number.isFinite(value) && value > 0 ? '' : `${name} must be a positive, finite number`;
+    }
+    if (name === 'autoDraw' || name === 'transform') {
+      return typeof value === 'boolean' ? '' : `${name} must be true or false`;
+    }
+    if (name === 'ink') {
+      return /^#[0-9a-f]{6}$/i.test(value) ? '' : 'ink must be a colour like #da100d';
+    }
+    if (name === 'elements') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return 'elements must be an object';
+      for (const [id, n] of Object.entries(value)) {
+        if (!M.LIB[id]) return `elements: unknown element "${id}"`;
+        if (!Number.isFinite(n) || n < 0) return `elements.${id} must be a number of 0 or more`;
+      }
+      return '';
+    }
+    return `unknown setting "${name}"`;
+  }
+
+  const homepage = { ...OPTIONAL, ...window.MARGINALIA_CONFIG };
+  for (const [name, value] of Object.entries(homepage)) {
+    const error = invalid(name, value);
+    if (error) throw new RangeError(`Marginalia: ${error}`);
+  }
+  homepage.elements = { ...homepage.elements };
+  const settings = { ...homepage, elements: { ...homepage.elements } };
+
+  // The Marginalia lab (/marginalia-lab/) starts the drawing with its settings in the URL
+  // hash, as #lab=<JSON>; the homepage iframe has no hash. Invalid values are skipped.
+  function merge(partial, warn) {
+    for (const [name, value] of Object.entries(partial || {})) {
+      const error = invalid(name, value);
+      if (error) { if (warn) console.warn(`Marginalia: ${error}`); continue; }
+      settings[name] = name === 'elements' ? { ...value } : value;
     }
   }
+  if (location.hash.startsWith('#lab=')) {
+    try { merge(JSON.parse(decodeURIComponent(location.hash.slice(5))), true); } catch (e) { console.warn(e); }
+  }
+
   const unit = Math.sqrt((1200 * 800) / (WIDTH * HEIGHT));
   const canvas = document.getElementById('sheet');
   const ctx = canvas.getContext('2d');
@@ -2459,9 +2503,48 @@
   }
 
   const world = new M.World(WIDTH * unit, HEIGHT * unit);
-  world.density = fullness;
-  world.markScale = markSize;
+  const baseAutoWeights = { ...world.autoWeights };
+  const baseFlowWeights = { ...M.FLOW_WEIGHTS };
   window.marginalia = world;
+
+  // How often an element appears, relative to the artist's weights (1 = as drawn, 0 = never).
+  function frequency(id) {
+    const n = settings.elements[id];
+    return Number.isFinite(n) && n >= 0 ? n : 1;
+  }
+
+  function scaleWeights(target, base) {
+    let total = 0;
+    for (const id in base) total += (target[id] = base[id] * frequency(id));
+    // Every element switched off: fall back to the artist's weights rather than draw nothing.
+    if (total <= 0) Object.assign(target, base);
+  }
+
+  function setInk(hex) {
+    M.INK = hex;
+    M.INK_RGB = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  }
+
+  // Push the current settings into the running drawing (pace is read every frame in advance()).
+  function applySettings() {
+    world.density = settings.fullness;
+    world.markScale = settings.markSize;
+    if (world.auto !== settings.autoDraw) world.setAuto(settings.autoDraw);
+    world.transform = settings.transform;
+    scaleWeights(world.autoWeights, baseAutoWeights);
+    scaleWeights(M.FLOW_WEIGHTS, baseFlowWeights);
+    setInk(settings.ink);
+  }
+
+  // A weighted pick among the entries above zero, or from the auto-draw weights if none are.
+  function pickWeighted(table) {
+    const live = {};
+    let any = false;
+    for (const id in table) if (table[id] > 0) { live[id] = table[id]; any = true; }
+    return world.rng.weighted(any ? live : world.autoWeights);
+  }
+
+  applySettings();
 
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let inView = true;
@@ -2510,7 +2593,9 @@
   function keepInhabited() {
     const drawing = world.figs.filter((fig) => fig.state === 'draw').length;
     for (let count = visibleStrokes() + drawing; count < 3; count++) {
-      const type = world.rng.pick(['line', 'spiral', 'loops', 'wave', 'dots']);
+      const type = pickWeighted(Object.fromEntries(
+        ['line', 'spiral', 'loops', 'wave', 'dots'].map((id) => [id, frequency(id)])
+      ));
       const fig = world.addFigure(type, null, null, { life: world.rng.range(8, 24) });
       if (motion.matches) reveal(fig);
       else drawIn(fig);
@@ -2519,10 +2604,12 @@
 
   function seedSheet() {
     const weights = { ...world.autoWeights };
-    const scribbles = M.LIB_ORDER.filter((id) => M.LIB[id].group === 'scribbles');
+    const scribbles = Object.fromEntries(M.LIB_ORDER
+      .filter((id) => M.LIB[id].group === 'scribbles')
+      .map((id) => [id, frequency(id)]));
     const count = world.rng.int(5, 7);
     for (let i = 0; i < count; i++) {
-      const type = i === 0 ? world.rng.pick(scribbles) : world.rng.weighted(weights);
+      const type = i === 0 ? pickWeighted(scribbles) : pickWeighted(weights);
       delete weights[type];
       const fig = world.addFigure(type, null, null, {
         life: world.rng.range(8, 20),
@@ -2554,8 +2641,8 @@
     if (!steps) return;
     const dt = seconds / steps;
     for (let i = 0; i < steps; i++) {
-      world.update(dt * pace, dt);
-      keepInhabited();
+      world.update(paused ? 0 : dt * settings.pace, dt);
+      if (!paused) keepInhabited();
     }
   }
 
@@ -2588,6 +2675,31 @@
     last = now;
     frame = requestAnimationFrame(tick);
   }
+
+  // For the Marginalia lab page (/marginalia-lab/), which tunes the drawing live from its
+  // parent window. The homepage never calls it.
+  let paused = false;
+  const copy = (s) => ({ ...s, elements: { ...s.elements } });
+  window.marginaliaEmbed = {
+    homepage: () => copy(homepage),
+    settings: () => copy(settings),
+    elements: M.LIB_ORDER.map((id) => ({ id, name: M.LIB[id].name, group: M.LIB[id].group })),
+    set(partial) {
+      merge(partial, true);
+      applySettings();
+      paint();
+    },
+    clear() {
+      world.clear();
+      keepInhabited();
+      world.ink = world.measureInk();
+      paint();
+    },
+    pause(on) {
+      paused = Boolean(on);
+    },
+    reducedMotion: () => motion.matches,
+  };
 
   seedSheet();
   resize();
